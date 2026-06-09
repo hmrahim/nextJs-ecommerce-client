@@ -1,6 +1,7 @@
 // 📁 PATH: src/components/admin/attributes/AttributeFormModal.jsx
 'use client';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { ATTRIBUTE_TYPES } from './_dummyData';
 
 function slugify(t) {
@@ -48,20 +49,23 @@ function Toggle({ checked, onChange, label, description }) {
 export default function AttributeFormModal({ editing, onSave, onClose }) {
   const isEdit = !!editing;
 
-  const [form, setForm] = useState({
-    name:         editing?.name         || '',
-    slug:         editing?.slug         || '',
-    type:         editing?.type         || 'select',
-    isRequired:   editing?.isRequired   ?? false,
-    isFilterable: editing?.isFilterable ?? true,
-    isVariant:    editing?.isVariant    ?? false,
-    isActive:     editing?.isActive     !== false,
+  const { watch, setValue, handleSubmit: rhfHandleSubmit } = useForm({
+    defaultValues: {
+      name:         editing?.name         || '',
+      slug:         editing?.slug         || '',
+      type:         editing?.type         || 'select',
+      isRequired:   editing?.isRequired   ?? false,
+      isFilterable: editing?.isFilterable ?? true,
+      isVariant:    editing?.isVariant    ?? false,
+      isActive:     editing?.isActive     !== false,
+    },
   });
+  const form = watch();
+  const set = (k, v) => setValue(k, v, { shouldDirty: true });
+
   const [slugManual, setSlugManual] = useState(isEdit);
   const [errors, setErrors]         = useState({});
   const [saving, setSaving]         = useState(false);
-
-  const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
   const handleNameChange = (e) => {
     const val = e.target.value;
@@ -69,21 +73,20 @@ export default function AttributeFormModal({ editing, onSave, onClose }) {
     if (!slugManual) set('slug', slugify(val));
   };
 
-  const validate = () => {
+  const validate = (data) => {
     const e = {};
-    if (!form.name.trim()) e.name = 'Attribute name required';
-    if (!form.slug.trim()) e.slug = 'Slug required';
+    if (!data.name.trim()) e.name = 'Attribute name required';
+    if (!data.slug.trim()) e.slug = 'Slug required';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = async (ev) => {
-    ev.preventDefault();
-    if (!validate()) return;
+  const onSubmit = async (data) => {
+    if (!validate(data)) return;
     setSaving(true);
-    await onSave(form);
-    setSaving(false);
+    try { await onSave(data); } finally { setSaving(false); }
   };
+  const handleSubmit = rhfHandleSubmit(onSubmit);
 
   const selectedType = ATTRIBUTE_TYPES.find(t => t.value === form.type);
 

@@ -1,6 +1,7 @@
 // 📁 PATH: src/components/admin/profile/PersonalInfoPanel.jsx
 'use client';
 import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 
 function SectionCard({ title, children }) {
   return (
@@ -33,31 +34,25 @@ function InputField({ label, id, ...props }) {
 }
 
 export default function PersonalInfoPanel({ profile, onSave, saving }) {
-  const [form, setForm] = useState({
-    firstName: '',
-    lastName: '',
-    phone: '',
+  const { register, reset, handleSubmit: rhfHandleSubmit } = useForm({
+    defaultValues: { firstName: '', lastName: '', phone: '' },
   });
   const [deleteModal, setDeleteModal] = useState(false);
   const [deleteReason, setDeleteReason] = useState('');
 
   useEffect(() => {
     if (profile) {
-      setForm({
+      reset({
         firstName: profile.firstName || '',
         lastName: profile.lastName || '',
         phone: profile.phone || '',
       });
     }
-  }, [profile]);
+  }, [profile, reset]);
 
-  const handleChange = (e) => {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleSubmit = async () => {
-    await onSave(form);
-  };
+  const handleSubmit = rhfHandleSubmit(async (data) => {
+    await onSave(data);
+  });
 
   if (!profile) return null;
 
@@ -128,10 +123,10 @@ export default function PersonalInfoPanel({ profile, onSave, saving }) {
       {/* Editable fields */}
       <SectionCard title="Basic details">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <InputField label="First name"   id="firstName" name="firstName" value={form.firstName} onChange={handleChange} placeholder="First name" />
-          <InputField label="Last name"    id="lastName"  name="lastName"  value={form.lastName}  onChange={handleChange} placeholder="Last name" />
-          <InputField label="Email address" id="email"   name="email"     value={profile.email || ''} disabled type="email" />
-          <InputField label="Phone number" id="phone"    name="phone"     value={form.phone}     onChange={handleChange} placeholder="+880" type="tel" />
+          <InputField label="First name"   id="firstName" {...register('firstName')} placeholder="First name" />
+          <InputField label="Last name"    id="lastName"  {...register('lastName')}  placeholder="Last name" />
+          <InputField label="Email address" id="email"    name="email" value={profile.email || ''} disabled type="email" readOnly />
+          <InputField label="Phone number" id="phone"    {...register('phone')} placeholder="+880" type="tel" />
         </div>
         <button
           onClick={handleSubmit}

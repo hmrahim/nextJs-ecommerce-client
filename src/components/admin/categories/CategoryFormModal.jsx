@@ -1,6 +1,7 @@
 
 'use client';
 import { useState, useRef } from 'react';
+import { useForm } from 'react-hook-form';
 import { uploadService } from '@/services/uploadService';
 
 function slugify(text) {
@@ -178,19 +179,22 @@ function ImageUploader({ value, onChange }) {
 export default function CategoryFormModal({ editing, parentFor, allCategories, onSave, onClose }) {
   const isEdit = !!editing;
 
-  const [form, setForm] = useState({
-    name:      editing?.name      || '',
-    slug:      editing?.slug      || '',
-    parentId:  editing?.parentId  || parentFor?._id || '',
-    imageUrl:  editing?.imageUrl  || '',
-    sortOrder: editing?.sortOrder ?? '',
-    isActive:  editing?.isActive  !== false,
+  const { watch, setValue, handleSubmit: rhfHandleSubmit } = useForm({
+    defaultValues: {
+      name:      editing?.name      || '',
+      slug:      editing?.slug      || '',
+      parentId:  editing?.parentId  || parentFor?._id || '',
+      imageUrl:  editing?.imageUrl  || '',
+      sortOrder: editing?.sortOrder ?? '',
+      isActive:  editing?.isActive  !== false,
+    },
   });
+  const form = watch();
+  const set = (k, v) => setValue(k, v, { shouldDirty: true });
+
   const [slugManual, setSlugManual] = useState(isEdit);
   const [errors, setErrors]         = useState({});
   const [saving, setSaving]         = useState(false);
-
-  const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
   const handleNameChange = (e) => {
     const val = e.target.value;
@@ -198,26 +202,27 @@ export default function CategoryFormModal({ editing, parentFor, allCategories, o
     if (!slugManual) set('slug', slugify(val));
   };
 
-  const validate = () => {
+  const validate = (data) => {
     const e = {};
-    if (!form.name.trim()) e.name = 'Category name required';
-    if (!form.slug.trim()) e.slug = 'Slug required';
-    if (isEdit && form.parentId === editing._id) e.parentId = 'A category cannot be its own parent';
+    if (!data.name.trim()) e.name = 'Category name required';
+    if (!data.slug.trim()) e.slug = 'Slug required';
+    if (isEdit && data.parentId === editing._id) e.parentId = 'A category cannot be its own parent';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
+  const onSubmit = async (data) => {
+    if (!validate(data)) return;
     setSaving(true);
-    await onSave({
-      ...form,
-      parentId:  form.parentId || null,
-      sortOrder: form.sortOrder !== '' ? parseInt(form.sortOrder) : undefined,
-    });
-    setSaving(false);
+    try {
+      await onSave({
+        ...data,
+        parentId:  data.parentId || null,
+        sortOrder: data.sortOrder !== '' ? parseInt(data.sortOrder) : undefined,
+      });
+    } finally { setSaving(false); }
   };
+  const handleSubmit = rhfHandleSubmit(onSubmit);
 
   const parentOptions = allCategories.filter(c => !isEdit || c._id !== editing._id);
 

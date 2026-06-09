@@ -1,6 +1,7 @@
 // 📁 PATH: src/components/admin/profile/AddressesPanel.jsx
 'use client';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 const ADDRESS_TYPES = ['home', 'office', 'other'];
 const COUNTRIES = ['Bangladesh', 'Saudi Arabia', 'India', 'UAE', 'USA', 'UK'];
@@ -77,14 +78,15 @@ function AddressCard({ address, onEdit, onDelete, onSetDefault }) {
 }
 
 function AddressFormModal({ editData, onClose, onSubmit }) {
-  const [form, setForm] = useState(editData || EMPTY_FORM);
+  const { register, watch, setValue, handleSubmit: rhfHandleSubmit } = useForm({
+    defaultValues: editData || EMPTY_FORM,
+  });
+  const form = watch();
 
-  const handleChange = (e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
-
-  const handleSave = () => {
-    if (!form.street || !form.city || !form.country) return;
-    onSubmit(form);
-  };
+  const handleSave = rhfHandleSubmit((data) => {
+    if (!data.street || !data.city || !data.country) return;
+    onSubmit(data);
+  });
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -108,7 +110,8 @@ function AddressFormModal({ editData, onClose, onSubmit }) {
               {ADDRESS_TYPES.map(t => (
                 <button
                   key={t}
-                  onClick={() => setForm(prev => ({ ...prev, type: t }))}
+                  type="button"
+                  onClick={() => setValue('type', t, { shouldDirty: true })}
                   className={`flex-1 py-2 rounded-xl text-sm font-medium border capitalize transition-colors ${
                     form.type === t
                       ? 'bg-violet-500/20 border-violet-500/40 text-violet-300'
@@ -130,9 +133,7 @@ function AddressFormModal({ editData, onClose, onSubmit }) {
             <div key={f.name}>
               <label className="text-xs font-medium text-slate-400 uppercase tracking-wider block mb-1.5">{f.label}</label>
               <input
-                name={f.name}
-                value={form[f.name]}
-                onChange={handleChange}
+                {...register(f.name)}
                 placeholder={f.placeholder}
                 className="w-full bg-[#0d0d16] border border-[#1e1e2e] rounded-lg px-3.5 py-2.5 text-sm text-slate-200
                   placeholder-slate-600 outline-none focus:border-violet-500/60 transition-colors"
@@ -142,9 +143,7 @@ function AddressFormModal({ editData, onClose, onSubmit }) {
           <div>
             <label className="text-xs font-medium text-slate-400 uppercase tracking-wider block mb-1.5">Country</label>
             <select
-              name="country"
-              value={form.country}
-              onChange={handleChange}
+              {...register('country')}
               className="w-full bg-[#0d0d16] border border-[#1e1e2e] rounded-lg px-3.5 py-2.5 text-sm text-slate-200
                 outline-none focus:border-violet-500/60 transition-colors"
             >
@@ -152,11 +151,11 @@ function AddressFormModal({ editData, onClose, onSubmit }) {
             </select>
           </div>
           <div className="flex gap-3 pt-2">
-            <button onClick={onClose}
+            <button type="button" onClick={onClose}
               className="flex-1 px-4 py-2.5 border border-[#1e1e2e] text-slate-400 text-sm rounded-xl hover:bg-white/5 transition-colors">
               Cancel
             </button>
-            <button onClick={handleSave}
+            <button type="button" onClick={handleSave}
               className="flex-1 px-4 py-2.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-xl transition-colors">
               {editData?._id ? 'Update address' : 'Add address'}
             </button>

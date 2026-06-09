@@ -2,6 +2,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
 import Link from 'next/link';
 import { productService } from '@/services/productService';
 
@@ -46,7 +47,11 @@ const textareaCls = "w-full px-3 py-2 rounded-lg border border-[#1e1e2e] bg-[#0a
 
 export default function ProductFormPage({ mode = 'create', productId }) {
   const router = useRouter();
-  const [form, setForm] = useState(INITIAL_FORM);
+  const { watch, setValue, reset, handleSubmit: rhfHandleSubmit } = useForm({ defaultValues: INITIAL_FORM });
+  const form = watch();
+  const set = (key, val) => setValue(key, val, { shouldDirty: true });
+  const setDim = (key, val) => setValue('dimensions', { ...form.dimensions, [key]: val }, { shouldDirty: true });
+
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
   const [loadingProduct, setLoadingProduct] = useState(mode === 'edit');
@@ -61,7 +66,7 @@ export default function ProductFormPage({ mode = 'create', productId }) {
         const res = await productService.adminGetAll({ id: productId });
         const p = res.data?.product || res.data;
         if (p) {
-          setForm({
+          reset({
             name: p.name || '', slug: p.slug || '', sku: p.sku || '',
             price: p.price || '', comparePrice: p.comparePrice || '', cost: p.cost || '',
             stock: p.stock ?? '', description: p.description || '',
@@ -75,18 +80,14 @@ export default function ProductFormPage({ mode = 'create', productId }) {
           setSlugManual(true);
         }
       } catch {
-        // If backend fails, load dummy for demo
-        setForm(prev => ({ ...prev, name: 'Sample Product', slug: 'sample-product', price: '99.99', stock: '50', status: 'active' }));
+        reset({ ...INITIAL_FORM, name: 'Sample Product', slug: 'sample-product', price: '99.99', stock: '50', status: 'active' });
         setSlugManual(true);
       } finally {
         setLoadingProduct(false);
       }
     };
     load();
-  }, [mode, productId]);
-
-  const set = (key, val) => setForm(prev => ({ ...prev, [key]: val }));
-  const setDim = (key, val) => setForm(prev => ({ ...prev, dimensions: { ...prev.dimensions, [key]: val } }));
+  }, [mode, productId, reset]);
 
   const handleNameChange = (e) => {
     const val = e.target.value;
@@ -94,30 +95,29 @@ export default function ProductFormPage({ mode = 'create', productId }) {
     if (!slugManual) set('slug', slugify(val));
   };
 
-  const validate = () => {
+  const validate = (data) => {
     const e = {};
-    if (!form.name.trim()) e.name = 'Product name is required';
-    if (!form.slug.trim()) e.slug = 'Slug is required';
-    if (!form.price || isNaN(form.price) || Number(form.price) < 0) e.price = 'Valid price required';
-    if (form.stock !== '' && (isNaN(form.stock) || Number(form.stock) < 0)) e.stock = 'Stock must be a non-negative number';
+    if (!data.name.trim()) e.name = 'Product name is required';
+    if (!data.slug.trim()) e.slug = 'Slug is required';
+    if (!data.price || isNaN(data.price) || Number(data.price) < 0) e.price = 'Valid price required';
+    if (data.stock !== '' && (isNaN(data.stock) || Number(data.stock) < 0)) e.stock = 'Stock must be a non-negative number';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
+  const handleSubmit = rhfHandleSubmit(async (data) => {
+    if (!validate(data)) return;
     setSaving(true);
     setApiError('');
 
     const payload = {
-      ...form,
-      price: parseFloat(form.price),
-      comparePrice: form.comparePrice ? parseFloat(form.comparePrice) : null,
-      cost: form.cost ? parseFloat(form.cost) : null,
-      stock: form.stock !== '' ? parseInt(form.stock) : 0,
-      weight: form.weight ? parseFloat(form.weight) : null,
-      tags: form.tags ? form.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+      ...data,
+      price: parseFloat(data.price),
+      comparePrice: data.comparePrice ? parseFloat(data.comparePrice) : null,
+      cost: data.cost ? parseFloat(data.cost) : null,
+      stock: data.stock !== '' ? parseInt(data.stock) : 0,
+      weight: data.weight ? parseFloat(data.weight) : null,
+      tags: data.tags ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
     };
 
     try {
@@ -128,13 +128,12 @@ export default function ProductFormPage({ mode = 'create', productId }) {
       }
       router.push('/dashboard/products');
     } catch {
-      // Demo mode — just navigate back
       setApiError('Backend not connected — product saved locally for demo.');
       setTimeout(() => router.push('/dashboard/products'), 1500);
     } finally {
       setSaving(false);
     }
-  };
+  });
 
   if (loadingProduct) {
     return (

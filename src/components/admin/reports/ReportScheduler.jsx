@@ -1,28 +1,35 @@
 'use client';
 
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 const FREQUENCIES = ['Daily', 'Weekly', 'Monthly', 'Quarterly'];
 const REPORT_OPTS  = ['Revenue Report', 'Orders Report', 'Customer Report', 'Product Performance', 'Full Dashboard'];
 const FORMAT_OPTS  = ['PDF', 'XLSX', 'CSV'];
 
 export default function ReportScheduler({ onClose }) {
-  const [form, setForm] = useState({
-    name: '',
-    frequency: 'Weekly',
-    report: 'Revenue Report',
-    format: 'PDF',
-    email: '',
-    day: 'Monday',
-    time: '08:00',
+  const { register, watch, setValue, handleSubmit: rhfHandleSubmit } = useForm({
+    defaultValues: {
+      name: '',
+      frequency: 'Weekly',
+      report: 'Revenue Report',
+      format: 'PDF',
+      email: '',
+      day: 'Monday',
+      time: '08:00',
+    },
   });
+  const form = watch();
+  const setForm = (updater) => {
+    const next = typeof updater === 'function' ? updater(form) : updater;
+    Object.entries(next).forEach(([k, v]) => setValue(k, v, { shouldDirty: true }));
+  };
   const [saved, setSaved] = useState(false);
 
-  function handleSave(e) {
-    e.preventDefault();
+  const handleSave = rhfHandleSubmit(() => {
     setSaved(true);
     setTimeout(onClose, 1400);
-  }
+  });
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">

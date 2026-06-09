@@ -3,6 +3,7 @@
 
 'use client';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { couponService } from '@/services/couponService';
 
 const INITIAL = {
@@ -49,27 +50,27 @@ function genCode(len = 8) {
 export default function CouponFormModal({ editing, onSave, onClose }) {
   const isEdit = !!editing;
 
-  const [form, setForm] = useState(
-    isEdit ? {
-      code:           editing.code        || '',
-      type:           editing.type        || 'percent',
-      value:          editing.value       ?? '',
-      minOrderAmount: editing.minOrderAmount ?? '',
-      maxUses:        editing.maxUses     ?? '',
-      maxUsesPerUser: editing.maxUsesPerUser ?? 1,
-      isActive:       editing.isActive    !== false,
-      expiresAt:      editing.expiresAt ? editing.expiresAt.split('T')[0] : '',
-      startDate:      editing.startDate  ? editing.startDate.split('T')[0] : '',
-      description:    editing.description || '',
-      applicableTo:   editing.applicableTo || 'all',
-    } : { ...INITIAL }
-  );
+  const defaultValues = isEdit ? {
+    code:           editing.code        || '',
+    type:           editing.type        || 'percent',
+    value:          editing.value       ?? '',
+    minOrderAmount: editing.minOrderAmount ?? '',
+    maxUses:        editing.maxUses     ?? '',
+    maxUsesPerUser: editing.maxUsesPerUser ?? 1,
+    isActive:       editing.isActive    !== false,
+    expiresAt:      editing.expiresAt ? editing.expiresAt.split('T')[0] : '',
+    startDate:      editing.startDate  ? editing.startDate.split('T')[0] : '',
+    description:    editing.description || '',
+    applicableTo:   editing.applicableTo || 'all',
+  } : { ...INITIAL };
+
+  const { watch, setValue, handleSubmit: rhfHandleSubmit } = useForm({ defaultValues });
+  const form = watch();
+  const set = (k, v) => setValue(k, v, { shouldDirty: true });
 
   const [errors, setErrors]     = useState({});
   const [saving, setSaving]     = useState(false);
   const [generating, setGen]    = useState(false);
-
-  const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
   const handleGenCode = async () => {
     setGen(true);
@@ -83,34 +84,34 @@ export default function CouponFormModal({ editing, onSave, onClose }) {
     }
   };
 
-  const validate = () => {
+  const validate = (data) => {
     const e = {};
-    if (!form.code.trim())                           e.code  = 'Coupon code required';
-    if (form.code && !/^[A-Z0-9_-]+$/i.test(form.code)) e.code = 'Only letters, numbers, - and _ allowed';
-    if (!form.value || isNaN(form.value) || Number(form.value) <= 0) e.value = 'Valid discount value required';
-    if (form.type === 'percent' && Number(form.value) > 100) e.value = 'Percentage cannot exceed 100%';
-    if (form.maxUses && (isNaN(form.maxUses) || Number(form.maxUses) < 1)) e.maxUses = 'Must be at least 1';
-    if (form.startDate && form.expiresAt && form.startDate > form.expiresAt) e.expiresAt = 'Expiry must be after start date';
+    if (!data.code.trim())                           e.code  = 'Coupon code required';
+    if (data.code && !/^[A-Z0-9_-]+$/i.test(data.code)) e.code = 'Only letters, numbers, - and _ allowed';
+    if (!data.value || isNaN(data.value) || Number(data.value) <= 0) e.value = 'Valid discount value required';
+    if (data.type === 'percent' && Number(data.value) > 100) e.value = 'Percentage cannot exceed 100%';
+    if (data.maxUses && (isNaN(data.maxUses) || Number(data.maxUses) < 1)) e.maxUses = 'Must be at least 1';
+    if (data.startDate && data.expiresAt && data.startDate > data.expiresAt) e.expiresAt = 'Expiry must be after start date';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
+  const handleSubmit = rhfHandleSubmit(async (data) => {
+    if (!validate(data)) return;
     setSaving(true);
-    await onSave({
-      ...form,
-      code:           form.code.toUpperCase().trim(),
-      value:          parseFloat(form.value),
-      minOrderAmount: form.minOrderAmount !== '' ? parseFloat(form.minOrderAmount) : 0,
-      maxUses:        form.maxUses !== '' ? parseInt(form.maxUses) : null,
-      maxUsesPerUser: form.maxUsesPerUser ? parseInt(form.maxUsesPerUser) : null,
-      expiresAt:      form.expiresAt || null,
-      startDate:      form.startDate || null,
-    });
-    setSaving(false);
-  };
+    try {
+      await onSave({
+        ...data,
+        code:           data.code.toUpperCase().trim(),
+        value:          parseFloat(data.value),
+        minOrderAmount: data.minOrderAmount !== '' ? parseFloat(data.minOrderAmount) : 0,
+        maxUses:        data.maxUses !== '' ? parseInt(data.maxUses) : null,
+        maxUsesPerUser: data.maxUsesPerUser ? parseInt(data.maxUsesPerUser) : null,
+        expiresAt:      data.expiresAt || null,
+        startDate:      data.startDate || null,
+      });
+    } finally { setSaving(false); }
+  });
 
   // Live preview
   const previewLabel = () => {
