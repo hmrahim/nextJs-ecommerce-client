@@ -12,15 +12,27 @@ export const attributeService = {
   adminReorder:   (items)        => api.patch('/admin/attributes/reorder', { items }),
 
   // Value-level operations
-  adminAddValue:    (attrId, data)        => api.post(`/admin/attributes/${attrId}/values`, data),
-  adminUpdateValue: (attrId, valId, data) => api.put(`/admin/attributes/${attrId}/values/${valId}`, data),
-  adminDeleteValue: (attrId, valId)       => api.delete(`/admin/attributes/${attrId}/values/${valId}`),
-  adminReorderValues: (attrId, items)     => api.patch(`/admin/attributes/${attrId}/values/reorder`, { items }),
+  adminAddValue: (attrId, data) =>
+    api.post(`/admin/attributes/${attrId}/values`, {
+      label:     data.label,
+      valueData: data.value,        // ← frontend "value" → backend "valueData"
+      isActive:  data.isActive,
+      sortOrder: data.sortOrder,
+    }),
+  adminUpdateValue: (attrId, valId, data) =>
+    api.put(`/admin/attributes/${attrId}/values/${valId}`, {
+      ...(data.label     !== undefined && { label:     data.label }),
+      ...(data.value     !== undefined && { valueData: data.value }),  // ← same fix
+      ...(data.isActive  !== undefined && { isActive:  data.isActive }),
+      ...(data.sortOrder !== undefined && { sortOrder: data.sortOrder }),
+    }),
+  adminDeleteValue:   (attrId, valId)  => api.delete(`/admin/attributes/${attrId}/values/${valId}`),
+  adminReorderValues: (attrId, items)  => api.patch(`/admin/attributes/${attrId}/values/reorder`, { items }),
 
   // Stats
   adminGetStats:  ()             => api.get('/admin/attributes/stats'),
 
-  // Public (used in product forms/filters)
+  // Public
   getAll:         ()             => api.get('/attributes'),
   getByCategory:  (categoryId)   => api.get(`/categories/${categoryId}/attributes`),
 };

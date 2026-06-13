@@ -13,7 +13,7 @@ export default function CartDrawer() {
     <>
       {cartOpen && <div className="fixed inset-0 bg-black/40 z-40" onClick={closeCart} />}
       <div className={`fixed right-0 top-0 h-full w-96 bg-white z-50 shadow-2xl flex flex-col transition-transform duration-300 ${cartOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        <div className="flex items-center justify-between p-4 border-b">
+        <div className="flex items-center justify-between p-4 border-b border-border">
           <h2 className="font-bold text-lg">Cart ({items.length})</h2>
           <button onClick={closeCart} className="text-2xl">×</button>
         </div>
@@ -24,7 +24,7 @@ export default function CartDrawer() {
           }
         </div>
         {items.length > 0 && (
-          <div className="p-4 border-t">
+          <div className="p-4 border-t border-border">
             <div className="flex justify-between font-bold mb-4">
               <span>Subtotal</span>
               <span>{formatPrice(subtotal)}</span>

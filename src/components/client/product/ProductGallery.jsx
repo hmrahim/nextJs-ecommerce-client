@@ -18,7 +18,7 @@ export default function ProductGallery({ product }) {
           <div className="flex gap-2 mt-3">
             {product.images.map((img, i) => (
               <button key={i} onClick={() => setSelected(i)}
-                className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 ${i === selected ? 'border-gray-900' : 'border-transparent'}`}>
+                className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 ${i === selected ? 'border-emerald-600' : 'border-transparent'}`}>
                 <Image src={img} alt="" fill className="object-cover" />
               </button>
             ))}

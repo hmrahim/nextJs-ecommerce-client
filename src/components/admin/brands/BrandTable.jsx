@@ -47,11 +47,11 @@ function BrandLogo({ brand }) {
   const [imgErr, setImgErr] = useState(false);
   const initials = brand.name.slice(0, 2).toUpperCase();
 
-  if (brand.logoUrl && !imgErr) {
+  if (brand.logo && !imgErr) {
     return (
       <div className="w-11 h-11 rounded-xl border border-[#1e1e2e] bg-white flex items-center justify-center overflow-hidden flex-shrink-0 p-1.5">
         <img
-          src={brand.logoUrl}
+          src={brand.logo.url}
           alt={brand.name}
           className="w-full h-full object-contain"
           onError={() => setImgErr(true)}

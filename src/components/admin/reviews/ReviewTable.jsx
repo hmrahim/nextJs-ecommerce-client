@@ -198,7 +198,10 @@ export default function ReviewTable({
 
                 {/* Status */}
                 <td className="px-4 py-3">
-                  <ReviewStatusBadge status={review.isApproved ? 'approved' : (review.isApproved === false ? 'rejected' : 'pending')} />
+                  <ReviewStatusBadge status={
+                    review.isApproved === true  ? 'approved' :
+                    review.isApproved === null  ? 'pending'  : 'rejected'
+                  } />
                 </td>
 
                 {/* Verified buyer */}
@@ -243,8 +246,8 @@ export default function ReviewTable({
                       </svg>
                     </button>
 
-                    {/* Approve */}
-                    {!review.isApproved && (
+                    {/* Approve — pending or rejected */}
+                    {review.isApproved !== true && (
                       <button
                         onClick={() => onApprove(review._id)}
                         className="p-1.5 rounded-lg hover:bg-emerald-500/10 text-slate-400 hover:text-emerald-400 transition-colors"
@@ -256,8 +259,21 @@ export default function ReviewTable({
                       </button>
                     )}
 
-                    {/* Reject */}
-                    {review.isApproved !== false && (
+                    {/* Cancel Approval — approved only */}
+                    {review.isApproved === true && (
+                      <button
+                        onClick={() => onReject(review._id)}
+                        className="p-1.5 rounded-lg hover:bg-amber-500/10 text-slate-400 hover:text-amber-400 transition-colors"
+                        title="Cancel Approval"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </button>
+                    )}
+
+                    {/* Reject — pending only */}
+                    {review.isApproved === null && (
                       <button
                         onClick={() => onReject(review._id)}
                         className="p-1.5 rounded-lg hover:bg-red-500/10 text-slate-400 hover:text-red-400 transition-colors"

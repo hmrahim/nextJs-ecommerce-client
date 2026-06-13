@@ -1,0 +1,144 @@
+"use client";
+import Link from "next/link";
+import { Search, ShoppingCart, Heart, User, MapPin, Menu, Bell, Globe, ChevronDown, Phone, Mail, Truck } from "lucide-react";
+import { categories } from "@/lib/shop-data";
+import { useState } from "react";
+function SiteHeader() {
+  const [megaOpen, setMegaOpen] = useState(false);
+  return <header className="sticky top-0 z-50">
+      {
+    /* Top utility bar */
+  }
+      <div className="hidden sm:block bg-[var(--color-primary-deep)] text-white/90 text-xs">
+        <div className="container-x flex h-8 items-center justify-between overflow-hidden">
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-1.5"><Phone className="h-3 w-3" /> +880 1700-000000</span>
+            <span className="hidden md:flex items-center gap-1.5"><Mail className="h-3 w-3" /> support@greenmart.com</span>
+            <span className="hidden lg:flex items-center gap-1.5"><Truck className="h-3 w-3" /> Free delivery on orders over ৳999</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <Link href="/become-seller" className="hover:text-white">Sell on GreenMart</Link>
+            <Link href="/account" className="hidden md:inline hover:text-white">Track Order</Link>
+            <Link href="/help" className="hidden md:inline hover:text-white">Help Center</Link>
+            <button className="flex items-center gap-1 hover:text-white"><Globe className="h-3 w-3" /> EN <ChevronDown className="h-3 w-3" /></button>
+          </div>
+        </div>
+      </div>
+
+      {
+    /* Main header */
+  }
+      <div className="bg-[var(--color-header)] text-[var(--color-header-foreground)]">
+        <div className="container-x flex h-14 md:h-16 items-center gap-2 md:gap-4">
+          <Link href="/" className="flex items-center gap-2 shrink-0">
+            <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 font-display font-bold">
+              G
+            </div>
+            <div className="hidden xs:block sm:block">
+              <div className="font-display text-xl font-bold leading-none">GreenMart</div>
+              <div className="text-[10px] text-emerald-200/70">Multivendor Marketplace</div>
+            </div>
+          </Link>
+
+          <div className="hidden lg:flex items-center gap-1 text-xs text-emerald-100 cursor-pointer hover:text-white">
+            <MapPin className="h-4 w-4" />
+            <div className="leading-tight">
+              <div className="text-[10px] text-emerald-200/70">Deliver to</div>
+              <div className="font-semibold">Dhaka 1207</div>
+            </div>
+          </div>
+
+          {
+    /* Search */
+  }
+          <div className="flex-1 min-w-0">
+            <div className="flex h-11 overflow-hidden rounded-lg bg-white shadow-sm">
+              <select className="hidden md:block border-r border-border bg-emerald-50 px-3 text-xs text-emerald-900 outline-none">
+                <option>All Categories</option>
+                {categories.map((c) => <option key={c.slug}>{c.name}</option>)}
+              </select>
+              <input
+    placeholder="Search for products, brands, vendors..."
+    className="flex-1 px-4 text-sm text-foreground outline-none"
+  />
+              <button className="bg-gradient-to-r from-emerald-500 to-emerald-600 px-5 text-white hover:from-emerald-600 hover:to-emerald-700">
+                <Search className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1 md:gap-2 shrink-0">
+            <button className="hidden md:grid h-10 w-10 place-items-center rounded-lg hover:bg-white/10 relative">
+              <Bell className="h-5 w-5" />
+              <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-amber-400" />
+            </button>
+            <Link href="/wishlist" className="hidden md:flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-white/10 relative">
+              <Heart className="h-5 w-5" />
+              <div className="hidden xl:block text-xs leading-tight">
+                <div className="text-emerald-200/70">Saved</div>
+                <div className="font-semibold">Wishlist</div>
+              </div>
+              <span className="absolute -top-1 -right-1 grid h-5 min-w-5 place-items-center rounded-full bg-amber-400 px-1 text-[10px] font-bold text-emerald-950">12</span>
+            </Link>
+            <Link href="/account" className="hidden md:flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-white/10">
+              <User className="h-5 w-5" />
+              <div className="hidden xl:block text-xs leading-tight">
+                <div className="text-emerald-200/70">Hello, Sign in</div>
+                <div className="font-semibold">Account & Lists</div>
+              </div>
+            </Link>
+            <Link href="/cart" className="flex items-center gap-2 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 px-3 py-2 relative">
+              <ShoppingCart className="h-5 w-5" />
+              <div className="hidden lg:block text-xs leading-tight">
+                <div className="text-emerald-200/70">My Cart</div>
+                <div className="font-semibold">৳ 4,280</div>
+              </div>
+              <span className="absolute -top-1 -right-1 grid h-5 min-w-5 place-items-center rounded-full bg-amber-400 px-1 text-[10px] font-bold text-emerald-950">3</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {
+    /* Category bar */
+  }
+      <div className="hidden sm:block bg-[var(--color-header-sub)] text-white/95 border-t border-border border-white/5">
+        <div className="container-x flex h-11 items-center gap-1 overflow-x-auto scrollbar-hide text-sm">
+          <button
+    onMouseEnter={() => setMegaOpen(true)}
+    onMouseLeave={() => setMegaOpen(false)}
+    className="flex items-center gap-2 rounded-md bg-emerald-700/60 px-3 py-1.5 font-semibold hover:bg-emerald-700 relative"
+  >
+            <Menu className="h-4 w-4" /> All Categories
+            {megaOpen && <div className="absolute left-0 top-full z-50 mt-1 grid w-[min(720px,calc(100vw-2rem))] grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1 rounded-xl border border-border bg-white p-3 text-foreground shadow-2xl">
+                {categories.map((c) => <Link
+    key={c.slug}
+    href={`/category/${c.slug}`}
+    className="flex items-start gap-3 rounded-lg p-3 hover:bg-emerald-50"
+  >
+                    <span className="text-2xl">{c.icon}</span>
+                    <div className="text-left">
+                      <div className="text-sm font-semibold text-emerald-900">{c.name}</div>
+                      <div className="text-[11px] text-muted-foreground line-clamp-1">{c.subcategories.slice(0, 3).join(", ")}</div>
+                    </div>
+                  </Link>)}
+              </div>}
+          </button>
+          {categories.slice(0, 8).map((c) => <Link
+    key={c.slug}
+    href={`/category/${c.slug}`}
+    className="whitespace-nowrap rounded-md px-3 py-1.5 hover:bg-white/10"
+  >
+              {c.name}
+            </Link>)}
+          <Link href="/vendors" className="whitespace-nowrap rounded-md px-3 py-1.5 hover:bg-white/10">Vendors</Link>
+          <Link href="/shop" className="whitespace-nowrap rounded-md px-3 py-1.5 hover:bg-white/10">All Products</Link>
+          <Link href="/blog" className="whitespace-nowrap rounded-md px-3 py-1.5 hover:bg-white/10">Blog</Link>
+          <span className="ml-auto whitespace-nowrap rounded-md bg-amber-400 px-3 py-1 text-xs font-bold text-emerald-950">🔥 Flash Sale Live</span>
+        </div>
+      </div>
+    </header>;
+}
+export {
+  SiteHeader
+};

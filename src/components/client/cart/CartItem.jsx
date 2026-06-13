@@ -17,9 +17,9 @@ export default function CartItem({ item }) {
         {item.variant && <p className="text-xs text-gray-400">{item.variant.name}</p>}
         <p className="text-sm font-bold mt-1">{formatPrice(price * item.quantity)}</p>
         <div className="flex items-center gap-2 mt-2">
-          <button onClick={() => updateQuantity(item.key, item.quantity - 1)} className="w-6 h-6 border rounded flex items-center justify-center text-sm">-</button>
+          <button onClick={() => updateQuantity(item.key, item.quantity - 1)} className="w-6 h-6 border border-border rounded flex items-center justify-center text-sm">-</button>
           <span className="text-sm w-4 text-center">{item.quantity}</span>
-          <button onClick={() => updateQuantity(item.key, item.quantity + 1)} className="w-6 h-6 border rounded flex items-center justify-center text-sm">+</button>
+          <button onClick={() => updateQuantity(item.key, item.quantity + 1)} className="w-6 h-6 border border-border rounded flex items-center justify-center text-sm">+</button>
           <button onClick={() => removeItem(item.key)} className="ml-2 text-gray-400 hover:text-red-500 text-xs">Remove</button>
         </div>
       </div>

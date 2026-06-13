@@ -19,25 +19,31 @@ export const authOptions = {
               email: credentials.email,
               password: credentials.password,
             },
-            {
-              headers: { 'Content-Type': 'application/json' },
-            }
+            { headers: { 'Content-Type': 'application/json' } }
           );
 
-          const user = res.data;
+      console.log(res);
+
+          const { token, user } = res.data; // ← user আর token আলাদা করো
+          
+
           if (!user) throw new Error('No user returned');
 
           return {
             id: user.id || user._id,
-            name: user.name,
+            firstName: user.firstName,
+            lastName: user.lastName,
             email: user.email,
-            role: user.role,
+            role: user.role,    // ✅ এখন সঠিকভাবে আসবে
+            token: token,        // ✅ API call এর জন্য
           };
         } catch (err) {
-          console.log('AUTH ERROR:', err?.response?.data);
           throw new Error(err?.response?.data?.message || 'Invalid credentials');
         }
       },
+
+
+
     }),
   ],
 
@@ -45,15 +51,21 @@ export const authOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.name = user.name;
+        token.firstName = user.firstName;
+        token.lastName = user.lastName;
         token.email = user.email;
         token.role = user.role;
+        token.token = user.token;
       }
       return token;
     },
+
     async session({ session, token }) {
       session.user.id = token.id;
+      session.user.firstName = token.firstName;
+      session.user.lastName = token.lastName;
       session.user.role = token.role;
+      session.user.token = token.token;
       return session;
     },
   },

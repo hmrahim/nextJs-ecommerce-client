@@ -1,15 +1,14 @@
-
+// src/components/admin/products/ProductTable.jsx
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import { ADMIN_ITEMS_PER_PAGE } from '@/lib/constants';
 
 const STATUS_CONFIG = {
-  active:      { label: 'Active',      cls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
-  draft:       { label: 'Draft',       cls: 'bg-slate-500/10 text-slate-400 border-slate-500/20' },
-  out_of_stock:{ label: 'Out of Stock',cls: 'bg-red-500/10 text-red-400 border-red-500/20' },
-  low_stock:   { label: 'Low Stock',   cls: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
-  archived:    { label: 'Archived',    cls: 'bg-gray-500/10 text-gray-500 border-gray-500/20' },
+  active:       { label: 'Active',       cls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+  draft:        { label: 'Draft',        cls: 'bg-slate-500/10  text-slate-400  border-slate-500/20'  },
+  out_of_stock: { label: 'Out of Stock', cls: 'bg-red-500/10    text-red-400    border-red-500/20'    },
+  low_stock:    { label: 'Low Stock',    cls: 'bg-amber-500/10  text-amber-400  border-amber-500/20'  },
+  archived:     { label: 'Archived',     cls: 'bg-gray-500/10   text-gray-500   border-gray-500/20'   },
 };
 
 function StatusBadge({ status }) {
@@ -22,9 +21,8 @@ function StatusBadge({ status }) {
 }
 
 function ProductImage({ images, name }) {
-  if (images?.length > 0) {
-    return <img src={images[0]} alt={name} className="w-9 h-9 rounded-lg object-cover" />;
-  }
+  const src = images?.[0]?.url || (typeof images?.[0] === 'string' ? images[0] : null);
+  if (src) return <img src={src} alt={name} className="w-9 h-9 rounded-lg object-cover" />;
   const initials = name?.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
   return (
     <div className="w-9 h-9 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-xs font-bold text-violet-400">
@@ -33,57 +31,120 @@ function ProductImage({ images, name }) {
   );
 }
 
-function ConfirmDeleteModal({ product, onConfirm, onCancel }) {
+// ── Archive Confirm Modal ─────────────────────────────────────────────────────
+function ConfirmArchiveModal({ product, onConfirm, onCancel, isPending }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onCancel}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={!isPending ? onCancel : undefined}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-      <div
-        className="relative bg-[#16161f] border border-[#1e1e2e] rounded-2xl p-6 w-full max-w-sm shadow-2xl"
-        onClick={e => e.stopPropagation()}
-      >
-        <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-4">
-          <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+      <div className="relative bg-[#16161f] border border-[#1e1e2e] rounded-2xl p-6 w-full max-w-sm shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-4">
+          {/* Archive icon */}
+          <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
           </svg>
         </div>
-        <h3 className="text-white font-semibold text-center mb-1">Delete Product?</h3>
-        <p className="text-slate-400 text-sm text-center mb-5">
-          "{product?.name}" will be permanently removed.
+        <h3 className="text-white font-semibold text-center mb-1">Archive Product?</h3>
+        <p className="text-slate-400 text-sm text-center mb-1">
+          &ldquo;{product?.name}&rdquo; archived হবে।
         </p>
+        <p className="text-slate-500 text-xs text-center mb-5">Product টি list থেকে সরে যাবে কিন্তু DB তে থাকবে।</p>
         <div className="flex gap-3">
-          <button onClick={onCancel} className="flex-1 px-4 py-2 rounded-lg border border-[#1e1e2e] text-slate-400 text-sm hover:bg-white/5 transition-colors">Cancel</button>
-          <button onClick={onConfirm} className="flex-1 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-sm font-medium transition-colors">Delete</button>
+          <button
+            onClick={onCancel}
+            disabled={isPending}
+            className="flex-1 px-4 py-2 rounded-lg border border-[#1e1e2e] text-slate-400 text-sm hover:bg-white/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={isPending}
+            className="flex-1 px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {isPending ? (
+              <><svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>Archiving…</>
+            ) : 'Archive'}
+          </button>
         </div>
       </div>
     </div>
   );
 }
 
+// ── Hard Delete Confirm Modal ─────────────────────────────────────────────────
+function ConfirmDeleteModal({ product, onConfirm, onCancel, isPending }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={!isPending ? onCancel : undefined}>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div className="relative bg-[#16161f] border border-[#1e1e2e] rounded-2xl p-6 w-full max-w-sm shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-4">
+          <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </div>
+        <h3 className="text-white font-semibold text-center mb-1">Permanently Delete?</h3>
+        <p className="text-slate-400 text-sm text-center mb-1">
+          &ldquo;{product?.name}&rdquo; চিরতরে মুছে যাবে।
+        </p>
+        <p className="text-red-400/70 text-xs text-center mb-5">⚠️ এটি undo করা যাবে না।</p>
+        <div className="flex gap-3">
+          <button
+            onClick={onCancel}
+            disabled={isPending}
+            className="flex-1 px-4 py-2 rounded-lg border border-[#1e1e2e] text-slate-400 text-sm hover:bg-white/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={isPending}
+            className="flex-1 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {isPending ? (
+              <><svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>Deleting…</>
+            ) : 'Delete Forever'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Table ─────────────────────────────────────────────────────────────────────
 export default function ProductTable({
   products = [],
   loading,
   selected = [],
   onSelectChange,
-  onDelete,
-  onToggleStatus,
+  onArchive,        // (id) => void — soft-delete
+  onDelete,         // (id) => void — hard-delete
+  onToggleStatus,   // (id) => void
+  onView,           // (product) => void
+  archivingId,      // id | null
+  deletingId,       // id | null
   pagination,
   onPageChange,
 }) {
-  const [deleteTarget, setDeleteTarget] = useState(null);
-  const [actionMenu, setActionMenu] = useState(null);
+  const [archiveTarget, setArchiveTarget] = useState(null);
+  const [deleteTarget,  setDeleteTarget]  = useState(null);
 
   const allSelected = products.length > 0 && selected.length === products.length;
-  const toggleAll = () => onSelectChange(allSelected ? [] : products.map(p => p._id));
-  const toggleOne = (id) => onSelectChange(
+  const toggleAll   = () => onSelectChange(allSelected ? [] : products.map(p => p._id));
+  const toggleOne   = (id) => onSelectChange(
     selected.includes(id) ? selected.filter(x => x !== id) : [...selected, id]
   );
 
-  const confirmDelete = (product) => {
-    setDeleteTarget(product);
-    setActionMenu(null);
+  const doArchive = () => {
+    if (!archiveTarget) return;
+    onArchive(archiveTarget._id);
+    setArchiveTarget(null);
   };
+
   const doDelete = () => {
-    if (deleteTarget) { onDelete(deleteTarget._id); setDeleteTarget(null); }
+    if (!deleteTarget) return;
+    console.log('🗑️ Hard deleting product id:', deleteTarget._id);
+    onDelete(deleteTarget._id);
+    setDeleteTarget(null);
   };
 
   const COLS = ['', 'Product', 'SKU', 'Price', 'Stock', 'Status', 'Sales', ''];
@@ -110,12 +171,8 @@ export default function ProductTable({
             <thead>
               <tr className="border-b border-[#1e1e2e]">
                 <th className="px-4 py-3 w-10">
-                  <input
-                    type="checkbox"
-                    checked={allSelected}
-                    onChange={toggleAll}
-                    className="w-4 h-4 rounded border-[#1e1e2e] bg-[#16161f] accent-violet-500"
-                  />
+                  <input type="checkbox" checked={allSelected} onChange={toggleAll}
+                    className="w-4 h-4 rounded border-[#1e1e2e] bg-[#16161f] accent-violet-500" />
                 </th>
                 {COLS.slice(1).map(h => (
                   <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">
@@ -124,6 +181,7 @@ export default function ProductTable({
                 ))}
               </tr>
             </thead>
+
             <tbody className="divide-y divide-[#1e1e2e]">
               {products.length === 0 ? (
                 <tr>
@@ -136,91 +194,109 @@ export default function ProductTable({
                     </div>
                   </td>
                 </tr>
-              ) : products.map((product) => (
-                <tr
-                  key={product._id}
-                  className={`group hover:bg-white/[0.02] transition-colors ${selected.includes(product._id) ? 'bg-violet-500/5' : ''}`}
-                >
-                  {/* Checkbox */}
-                  <td className="px-4 py-3">
-                    <input
-                      type="checkbox"
-                      checked={selected.includes(product._id)}
-                      onChange={() => toggleOne(product._id)}
-                      className="w-4 h-4 rounded border-[#1e1e2e] bg-[#16161f] accent-violet-500"
-                    />
-                  </td>
+              ) : products.map((product) => {
+                const isArchiving = archivingId === product._id;
+                const isDeleting  = deletingId  === product._id;
+                const isBusy      = isArchiving || isDeleting;
 
-                  {/* Product */}
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <ProductImage images={product.images} name={product.name} />
-                      <div className="min-w-0">
-                        <p className="text-white font-medium truncate max-w-[180px]">{product.name}</p>
-                        <p className="text-xs text-slate-500 truncate max-w-[180px]">{product.category?.name}</p>
+                return (
+                  <tr
+                    key={product._id}
+                    className={`group transition-all ${
+                      selected.includes(product._id) ? 'bg-violet-500/5' : 'hover:bg-white/[0.02]'
+                    } ${isBusy ? 'opacity-40 pointer-events-none' : ''}`}
+                  >
+                    {/* Checkbox */}
+                    <td className="px-4 py-3">
+                      <input type="checkbox" checked={selected.includes(product._id)} onChange={() => toggleOne(product._id)}
+                        className="w-4 h-4 rounded border-[#1e1e2e] bg-[#16161f] accent-violet-500" />
+                    </td>
+
+                    {/* Product */}
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <ProductImage images={product.images} name={product.name} />
+                        <div className="min-w-0">
+                          <p className="text-white font-medium truncate max-w-[180px]">{product.name}</p>
+                          <p className="text-xs text-slate-500 truncate max-w-[180px]">{product.category?.name}</p>
+                        </div>
                       </div>
-                    </div>
-                  </td>
+                    </td>
 
-                  {/* SKU */}
-                  <td className="px-4 py-3">
-                    <span className="text-slate-400 font-mono text-xs">{product.sku || '—'}</span>
-                  </td>
+                    {/* SKU */}
+                    <td className="px-4 py-3">
+                      <span className="text-slate-400 font-mono text-xs">{product.sku || '—'}</span>
+                    </td>
 
-                  {/* Price */}
-                  <td className="px-4 py-3">
-                    <div>
-                      <span className="text-white font-semibold">${product.price?.toFixed(2)}</span>
-                      {product.comparePrice && (
-                        <span className="ml-1.5 text-xs text-slate-500 line-through">${product.comparePrice?.toFixed(2)}</span>
+                    {/* Price */}
+                    <td className="px-4 py-3">
+                      <span className="text-white font-semibold">৳{product.price?.toLocaleString()}</span>
+                      {product.comparePrice && product.comparePrice > product.price && (
+                        <span className="ml-1.5 text-xs text-slate-500 line-through">৳{product.comparePrice?.toLocaleString()}</span>
                       )}
-                    </div>
-                  </td>
+                    </td>
 
-                  {/* Stock */}
-                  <td className="px-4 py-3">
-                    <span className={`font-medium ${product.stock === 0 ? 'text-red-400' : product.stock <= 5 ? 'text-amber-400' : 'text-slate-300'}`}>
-                      {product.stock}
-                    </span>
-                  </td>
+                    {/* Stock */}
+                    <td className="px-4 py-3">
+                      <span className={`font-medium ${product.stock === 0 ? 'text-red-400' : product.stock <= 5 ? 'text-amber-400' : 'text-slate-300'}`}>
+                        {product.stock}
+                      </span>
+                    </td>
 
-                  {/* Status */}
-                  <td className="px-4 py-3">
-                    <button onClick={() => onToggleStatus(product._id)} title="Click to toggle active/draft">
-                      <StatusBadge status={product.status} />
-                    </button>
-                  </td>
-
-                  {/* Sales */}
-                  <td className="px-4 py-3">
-                    <span className="text-slate-400">{product.sold ?? 0}</span>
-                  </td>
-
-                  {/* Actions */}
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Link
-                        href={`/dashboard/products/${product._id}`}
-                        className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-violet-400 transition-colors"
-                        title="Edit"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                      </Link>
-                      <button
-                        onClick={() => confirmDelete(product)}
-                        className="p-1.5 rounded-lg hover:bg-red-500/10 text-slate-400 hover:text-red-400 transition-colors"
-                        title="Delete"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
+                    {/* Status */}
+                    <td className="px-4 py-3">
+                      <button onClick={() => onToggleStatus?.(product._id)} title="Click to toggle active/draft" className="hover:opacity-80 transition-opacity">
+                        <StatusBadge status={product.status} />
                       </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+
+                    {/* Sales */}
+                    <td className="px-4 py-3">
+                      <span className="text-slate-400">{product.sold ?? 0}</span>
+                    </td>
+
+                    {/* Actions */}
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+
+                        {/* View */}
+                        <button onClick={() => onView?.(product)}
+                          className="p-1.5 rounded-lg hover:bg-sky-500/10 text-slate-400 hover:text-sky-400 transition-colors" title="View">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                        </button>
+
+                        {/* Edit */}
+                        <Link href={`/dashboard/products/${product._id}`}
+                          className="p-1.5 rounded-lg hover:bg-violet-500/10 text-slate-400 hover:text-violet-400 transition-colors" title="Edit">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </Link>
+
+                        {/* Archive — amber */}
+                        <button onClick={() => setArchiveTarget(product)}
+                          className="p-1.5 rounded-lg hover:bg-amber-500/10 text-slate-400 hover:text-amber-400 transition-colors" title="Archive">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                          </svg>
+                        </button>
+
+                        {/* Delete — red */}
+                        <button onClick={() => setDeleteTarget(product)}
+                          className="p-1.5 rounded-lg hover:bg-red-500/10 text-slate-400 hover:text-red-400 transition-colors" title="Delete Forever">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -232,31 +308,22 @@ export default function ProductTable({
               Page {pagination.page} of {pagination.pages} · {pagination.total} products
             </span>
             <div className="flex items-center gap-1">
-              <button
-                disabled={pagination.page <= 1}
-                onClick={() => onPageChange(pagination.page - 1)}
-                className="px-3 py-1 rounded-lg border border-[#1e1e2e] text-slate-400 hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-              >
+              <button disabled={pagination.page <= 1} onClick={() => onPageChange(pagination.page - 1)}
+                className="px-3 py-1 rounded-lg border border-[#1e1e2e] text-slate-400 hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
                 ← Prev
               </button>
               {Array.from({ length: Math.min(pagination.pages, 5) }, (_, i) => {
                 const p = Math.max(1, pagination.page - 2) + i;
                 if (p > pagination.pages) return null;
                 return (
-                  <button
-                    key={p}
-                    onClick={() => onPageChange(p)}
-                    className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${p === pagination.page ? 'bg-violet-600 text-white' : 'text-slate-400 hover:bg-white/5'}`}
-                  >
+                  <button key={p} onClick={() => onPageChange(p)}
+                    className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${p === pagination.page ? 'bg-violet-600 text-white' : 'text-slate-400 hover:bg-white/5'}`}>
                     {p}
                   </button>
                 );
               })}
-              <button
-                disabled={pagination.page >= pagination.pages}
-                onClick={() => onPageChange(pagination.page + 1)}
-                className="px-3 py-1 rounded-lg border border-[#1e1e2e] text-slate-400 hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-              >
+              <button disabled={pagination.page >= pagination.pages} onClick={() => onPageChange(pagination.page + 1)}
+                className="px-3 py-1 rounded-lg border border-[#1e1e2e] text-slate-400 hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
                 Next →
               </button>
             </div>
@@ -264,11 +331,23 @@ export default function ProductTable({
         )}
       </div>
 
+      {/* Archive Confirm */}
+      {archiveTarget && (
+        <ConfirmArchiveModal
+          product={archiveTarget}
+          onConfirm={doArchive}
+          onCancel={() => setArchiveTarget(null)}
+          isPending={archivingId === archiveTarget._id}
+        />
+      )}
+
+      {/* Delete Confirm */}
       {deleteTarget && (
         <ConfirmDeleteModal
           product={deleteTarget}
           onConfirm={doDelete}
           onCancel={() => setDeleteTarget(null)}
+          isPending={deletingId === deleteTarget._id}
         />
       )}
     </>

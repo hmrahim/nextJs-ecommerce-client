@@ -3,6 +3,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
+import { uploadService, UPLOAD_FOLDERS } from '@/services/uploadService';
 
 function slugify(text) {
   return text.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
@@ -42,17 +43,16 @@ function LogoUploader({ value, brandName, onChange }) {
     setUploadErr('');
     setUploading(true);
     const localUrl = URL.createObjectURL(file);
-    onChange(localUrl);
+    onChange({ url: localUrl, publicId: null });
 
     try {
-      const fd = new FormData();
-      fd.append('file', file);
-      const res  = await fetch('/api/upload', { method: 'POST', body: fd });
-      const data = await res.json();
-      const url  = data?.url || data?.imageUrl || data?.path;
-      if (url) { URL.revokeObjectURL(localUrl); onChange(url); }
-    } catch {
-      setUploadErr('Backend connected হলে image save হবে। Local preview দেখাচ্ছে।');
+      const res = await uploadService.uploadImage(file, {
+        folder: UPLOAD_FOLDERS.BRAND_LOGOS,
+      });
+      URL.revokeObjectURL(localUrl);
+      onChange({ url: res.url, publicId: res.publicId });
+    } catch (err) {
+      setUploadErr(err?.message || 'Upload failed. আবার চেষ্টা করো।');
     } finally {
       setUploading(false);
     }
@@ -78,7 +78,7 @@ function LogoUploader({ value, brandName, onChange }) {
         )}
         <div className="flex items-center justify-between px-3 py-2 border-t border-[#1e1e2e] bg-[#0a0a0f]">
           <span className="text-xs text-slate-500 truncate max-w-[60%]">Logo uploaded</span>
-          <button onClick={() => { onChange(''); if (inputRef.current) inputRef.current.value = ''; }}
+          <button onClick={() => { onChange({ url: '', publicId: null }); if (inputRef.current) inputRef.current.value = ''; }}
             className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1">
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -139,6 +139,7 @@ export default function BrandFormModal({ editing, onSave, onClose }) {
       name:            '',
       slug:            '',
       logoUrl:         '',
+      logoPublicId:    '',
       website:         '',
       description:     '',
       country:         '',
@@ -165,11 +166,11 @@ export default function BrandFormModal({ editing, onSave, onClose }) {
     return e;
   };
 
-  const handleSubmit = rhfHandleSubmit(async (data) => {
-    const e = validate(data);
+  const handleSubmit = rhfHandleSubmit(async () => {
+    const e = validate(form);
     if (Object.keys(e).length) { setErrors(e); return; }
     setSaving(true);
-    try { await onSave(data); } finally { setSaving(false); }
+    try { await onSave(form); } finally { setSaving(false); }
   });
 
   const TABS = [
@@ -236,7 +237,10 @@ export default function BrandFormModal({ editing, onSave, onClose }) {
                 <LogoUploader
                   value={form.logoUrl}
                   brandName={form.name}
-                  onChange={v => set('logoUrl', v)}
+                  onChange={({ url, publicId }) => {
+                    set('logoUrl', url);
+                    setValue('logoPublicId', publicId ?? '', { shouldDirty: true });
+                  }}
                 />
               </Field>
 

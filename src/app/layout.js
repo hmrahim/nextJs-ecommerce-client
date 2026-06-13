@@ -7,6 +7,8 @@ export const metadata = {
   description: 'Your eCommerce store',
 };
 
+
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">

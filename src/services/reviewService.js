@@ -1,8 +1,9 @@
+// 📁 PATH: src/services/reviewService.js
 import api from '@/lib/api';
 
 export const reviewService = {
   // ── Admin ────────────────────────────────────────────────────────────────
-  // সব review list করো (filter, sort, pagination সহ)
+  // সব review list করো (filter, sort, pagination, search সহ)
   adminGetAll: (params) => api.get('/admin/reviews', { params }),
 
   // একটি review-এর detail

@@ -1,6 +1,6 @@
 // 📁 PATH: src/components/admin/attributes/AttributeTable.jsx
 'use client';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ATTRIBUTE_TYPES } from './_dummyData';
 
 // ── Type badge ───────────────────────────────────────────────────────────────
@@ -79,6 +79,14 @@ export default function AttributeTable({
   onEdit, onDelete, onToggle, onManageValues,
 }) {
   const [menu, setMenu] = useState(null);
+  const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
+
+  const openMenu = (e, id) => {
+    if (menu === id) { setMenu(null); return; }
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMenuPos({ top: rect.bottom + 6, right: window.innerWidth - rect.right });
+    setMenu(id);
+  };
 
   const allSel = attributes.length > 0 && selected.length === attributes.length;
   const toggle = (id) => onSelectChange(selected.includes(id) ? selected.filter(x => x !== id) : [...selected, id]);
@@ -200,7 +208,7 @@ export default function AttributeTable({
 
                 {/* Actions */}
                 <td className="px-4 py-3.5">
-                  <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className={`flex items-center gap-0.5 transition-opacity ${menu === attr._id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
                     {/* Manage values */}
                     <button onClick={() => onManageValues(attr)} title="Manage values"
                       className="p-1.5 rounded-lg hover:bg-amber-500/10 text-slate-500 hover:text-amber-400 transition-colors">
@@ -217,7 +225,7 @@ export default function AttributeTable({
                     </button>
                     {/* More */}
                     <div className="relative">
-                      <button onClick={() => setMenu(menu === attr._id ? null : attr._id)} title="More"
+                      <button onClick={(e) => openMenu(e, attr._id)} title="More"
                         className="p-1.5 rounded-lg hover:bg-white/10 text-slate-500 hover:text-slate-300 transition-colors">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                           <circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>
@@ -225,8 +233,11 @@ export default function AttributeTable({
                       </button>
                       {menu === attr._id && (
                         <>
-                          <div className="fixed inset-0 z-10" onClick={() => setMenu(null)}/>
-                          <div className="absolute right-0 top-full mt-1 z-20 bg-[#16161f] border border-[#1e1e2e] rounded-xl shadow-2xl overflow-hidden min-w-[170px]">
+                          <div className="fixed inset-0 z-40" onClick={() => setMenu(null)}/>
+                          <div
+                            className="fixed z-50 bg-[#16161f] border border-[#1e1e2e] rounded-xl shadow-2xl overflow-hidden min-w-[170px]"
+                            style={{ top: menuPos.top, right: menuPos.right }}
+                          >
                             <button onClick={() => { onManageValues(attr); setMenu(null); }}
                               className="flex items-center gap-2.5 w-full px-3.5 py-2.5 text-sm text-slate-300 hover:bg-white/5">
                               📋 Manage Values

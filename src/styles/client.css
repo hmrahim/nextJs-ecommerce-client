@@ -1,0 +1,111 @@
+/* GreenMart client design system (ported from green-client-ui) */
+
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-deep: var(--primary-deep);
+  --color-primary-soft: var(--primary-soft);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-sale: var(--sale);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-header: var(--header);
+  --color-header-foreground: var(--header-foreground);
+  --color-header-sub: var(--header-sub);
+  --color-rating: var(--rating);
+  --font-display: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+:root {
+  --radius: 0.5rem;
+  --background: oklch(0.985 0.005 120);
+  --foreground: oklch(0.18 0.02 160);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.02 160);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.02 160);
+
+  /* Brand: deep emerald green */
+  --primary: oklch(0.58 0.16 152);
+  --primary-foreground: oklch(0.99 0.01 150);
+  --primary-deep: oklch(0.36 0.12 155);
+  --primary-soft: oklch(0.95 0.04 152);
+
+  --secondary: oklch(0.96 0.01 150);
+  --secondary-foreground: oklch(0.22 0.04 155);
+  --muted: oklch(0.96 0.005 150);
+  --muted-foreground: oklch(0.48 0.02 155);
+  --accent: oklch(0.93 0.06 150);
+  --accent-foreground: oklch(0.25 0.08 155);
+
+  --destructive: oklch(0.6 0.22 25);
+  --destructive-foreground: oklch(0.99 0.01 25);
+  --success: oklch(0.68 0.17 148);
+  --warning: oklch(0.78 0.16 80);
+  --sale: oklch(0.65 0.22 28);
+  --rating: oklch(0.78 0.16 80);
+
+  --border: oklch(0.91 0.01 150);
+  --input: oklch(0.94 0.01 150);
+  --ring: oklch(0.58 0.16 152);
+
+  /* Header bands like Amazon/Daraz */
+  --header: oklch(0.28 0.07 155);
+  --header-foreground: oklch(0.98 0.01 150);
+  --header-sub: oklch(0.36 0.09 155);
+}
+
+@utility container-x {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 1rem;
+  max-width: 1400px;
+}
+
+@utility chip {
+  display: inline-flex; align-items: center; gap: 0.25rem;
+  padding: 0.125rem 0.5rem; border-radius: 9999px;
+  font-size: 0.7rem; font-weight: 600;
+  background: var(--color-primary-soft); color: var(--color-primary-deep);
+}
+
+@utility sale-badge {
+  display: inline-flex; align-items: center;
+  padding: 0.125rem 0.4rem; border-radius: 0.25rem;
+  background: var(--color-sale); color: white;
+  font-size: 0.7rem; font-weight: 700;
+}
+
+@utility card-hover {
+  transition: all 0.25s ease;
+  &:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -10px color-mix(in oklab, var(--color-primary) 25%, transparent); }
+}
+
+@utility scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}

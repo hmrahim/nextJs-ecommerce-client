@@ -1,16 +1,27 @@
 // 📁 PATH: src/app/(admin)/dashboard/attributes/page.jsx
 'use client';
-import { useState, useCallback, useMemo } from 'react';
-import toast from 'react-hot-toast';
+import { useState, useMemo } from 'react';
 
-import { DUMMY_ATTRIBUTES, DUMMY_STATS } from '@/components/admin/attributes/_dummyData';
+import {
+  useAdminAttributes,
+  useCreateAttribute,
+  useUpdateAttribute,
+  useDeleteAttribute,
+  useToggleAttribute,
+  useBulkActivateAttributes,
+  useBulkDeactivateAttributes,
+  useBulkDeleteAttributes,
+  useAddAttributeValue,
+  useUpdateAttributeValue,
+  useDeleteAttributeValue,
+  useToggleAttributeValue,
+} from '@/hooks/Useattributes';
+
 import AttributeStatsBar      from '@/components/admin/attributes/AttributeStatsBar';
 import AttributeTable         from '@/components/admin/attributes/AttributeTable';
 import AttributeFormModal     from '@/components/admin/attributes/AttributeFormModal';
 import AttributeValuesDrawer  from '@/components/admin/attributes/AttributeValuesDrawer';
-
-// ── Slug helper ───────────────────────────────────────────────────────────────
-const slugify = (t) => t.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
+import VariantGeneratorModal  from '@/components/admin/variants/VariantGeneratorModal';
 
 // ── Filter bar ────────────────────────────────────────────────────────────────
 function Filters({ search, setSearch, typeFilter, setTypeFilter, statusFilter, setStatusFilter }) {
@@ -28,7 +39,6 @@ function Filters({ search, setSearch, typeFilter, setTypeFilter, statusFilter, s
 
   return (
     <div className="flex flex-wrap items-center gap-2.5">
-      {/* Search */}
       <div className="relative flex-1 min-w-[200px] max-w-xs">
         <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -82,35 +92,28 @@ function BulkBar({ count, onDelete, onActivate, onDeactivate, onClear }) {
   );
 }
 
-// ── Page ─────────────────────────────────────────────────────────────────────
+// ── Page ──────────────────────────────────────────────────────────────────────
 export default function AttributesPage() {
-  // ── State ─────────────────────────────────────────────────────────────────
-  const [attributes, setAttributes] = useState(DUMMY_ATTRIBUTES);
-  const [stats, setStats]           = useState(DUMMY_STATS);
-  const [selected, setSelected]     = useState([]);
-  const [modalOpen, setModalOpen]   = useState(false);
-  const [editing, setEditing]       = useState(null);
-  const [drawer, setDrawer]         = useState(null);   // attribute being managed
-
-  // Filters
-  const [search, setSearch]           = useState('');
-  const [typeFilter, setTypeFilter]   = useState('');
+  // ── Filters (client-side state) ───────────────────────────────────────────
+  const [search, setSearch]             = useState('');
+  const [typeFilter, setTypeFilter]     = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
-  // ── Recalc stats ──────────────────────────────────────────────────────────
-  const recalc = useCallback((list) => {
-    setStats({
-      total:       list.length,
-      active:      list.filter(a => a.isActive).length,
-      inactive:    list.filter(a => !a.isActive).length,
-      filterable:  list.filter(a => a.isFilterable).length,
-      variant:     list.filter(a => a.isVariant).length,
-      totalValues: list.reduce((s, a) => s + (a.values?.length || 0), 0),
-    });
-  }, []);
+  // ── UI state ──────────────────────────────────────────────────────────────
+  const [selected, setSelected]         = useState([]);
+  const [modalOpen, setModalOpen]       = useState(false);
+  const [editing, setEditing]           = useState(null);
+  const [drawer, setDrawer]             = useState(null);
+  const [variantModalOpen, setVariantModalOpen] = useState(false);
 
-  // ── Filtered list ─────────────────────────────────────────────────────────
+  // ── Data fetching ─────────────────────────────────────────────────────────
+  const { data, isLoading } = useAdminAttributes({ search, typeFilter, statusFilter });
+  const attributes = data?.attributes ?? [];
+  const stats      = data?.stats      ?? {};
+
+  // ── Client-side filtering (যদি backend filter না করে) ────────────────────
   const filtered = useMemo(() => {
+    // যদি backend filtering করে তাহলে এই block টা সরিয়ে শুধু `attributes` return করো
     let list = [...attributes];
     if (search)       list = list.filter(a => a.name.toLowerCase().includes(search.toLowerCase()) || a.slug.includes(search.toLowerCase()));
     if (typeFilter)   list = list.filter(a => a.type === typeFilter);
@@ -118,120 +121,61 @@ export default function AttributesPage() {
     return list;
   }, [attributes, search, typeFilter, statusFilter]);
 
-  // ── Attribute CRUD ────────────────────────────────────────────────────────
-  const handleSave = useCallback(async (formData) => {
-    setAttributes(prev => {
-      let updated;
-      if (editing) {
-        updated = prev.map(a => a._id === editing._id ? { ...a, ...formData } : a);
-        toast.success('Attribute updated');
-      } else {
-        const newAttr = {
-          ...formData,
-          _id: 'attr_' + Date.now(),
-          slug: formData.slug || slugify(formData.name),
-          usedInProducts: 0,
-          values: [],
-        };
-        updated = [...prev, newAttr];
-        toast.success('Attribute created');
-      }
-      recalc(updated);
-      return updated;
-    });
+  // ── Mutations ─────────────────────────────────────────────────────────────
+  const createAttr      = useCreateAttribute();
+  const updateAttr      = useUpdateAttribute();
+  const deleteAttr      = useDeleteAttribute();
+  const toggleAttr      = useToggleAttribute();
+  const bulkActivate    = useBulkActivateAttributes();
+  const bulkDeactivate  = useBulkDeactivateAttributes();
+  const bulkDelete      = useBulkDeleteAttributes();
+  const addValue        = useAddAttributeValue();
+  const updateValue     = useUpdateAttributeValue();
+  const deleteValue     = useDeleteAttributeValue();
+  const toggleValue     = useToggleAttributeValue();
+
+  // ── Handlers ──────────────────────────────────────────────────────────────
+  const handleSave = async (formData) => {
+    if (editing) {
+      await updateAttr.mutateAsync({ id: editing._id, data: formData });
+    } else {
+      await createAttr.mutateAsync(formData);
+    }
     setModalOpen(false);
     setEditing(null);
-    // 🔌 REAL API: editing ? await attributeService.adminUpdate(editing._id, formData) : await attributeService.adminCreate(formData);
-  }, [editing, recalc]);
+  };
 
-  const handleDelete = useCallback((id) => {
+  const handleDelete = (id) => {
     if (!confirm('Delete this attribute? Products using it may lose data.')) return;
-    setAttributes(prev => { const u = prev.filter(a => a._id !== id); recalc(u); return u; });
+    deleteAttr.mutate(id);
     setSelected(prev => prev.filter(x => x !== id));
-    toast.success('Attribute deleted');
-    // 🔌 REAL API: await attributeService.adminDelete(id);
-  }, [recalc]);
-
-  const handleToggle = useCallback((id) => {
-    setAttributes(prev => { const u = prev.map(a => a._id === id ? { ...a, isActive: !a.isActive } : a); recalc(u); return u; });
-    // 🔌 REAL API: await attributeService.adminToggle(id);
-  }, [recalc]);
-
-  // ── Bulk actions ──────────────────────────────────────────────────────────
-  const bulkActivate = () => {
-    setAttributes(prev => { const u = prev.map(a => selected.includes(a._id) ? { ...a, isActive: true } : a); recalc(u); return u; });
-    toast.success(`${selected.length} activated`);
-    setSelected([]);
   };
-  const bulkDeactivate = () => {
-    setAttributes(prev => { const u = prev.map(a => selected.includes(a._id) ? { ...a, isActive: false } : a); recalc(u); return u; });
-    toast.success(`${selected.length} deactivated`);
-    setSelected([]);
+
+  const handleToggle = (id) => toggleAttr.mutate(id);
+
+  const handleBulkActivate = () => {
+    bulkActivate.mutate(selected, { onSuccess: () => setSelected([]) });
   };
-  const bulkDelete = () => {
+  const handleBulkDeactivate = () => {
+    bulkDeactivate.mutate(selected, { onSuccess: () => setSelected([]) });
+  };
+  const handleBulkDelete = () => {
     if (!confirm(`Delete ${selected.length} attribute(s)? This cannot be undone.`)) return;
-    setAttributes(prev => { const u = prev.filter(a => !selected.includes(a._id)); recalc(u); return u; });
-    toast.success(`${selected.length} deleted`);
-    setSelected([]);
+    bulkDelete.mutate(selected, { onSuccess: () => setSelected([]) });
   };
 
-  // ── Value CRUD (inside drawer) ────────────────────────────────────────────
-  const handleAddValue = useCallback((attrId, data) => {
-    const newVal = { _id: 'v_' + Date.now(), ...data, sortOrder: 99, isActive: true };
-    setAttributes(prev => {
-      const u = prev.map(a => a._id === attrId ? { ...a, values: [...(a.values || []), newVal] } : a);
-      recalc(u);
-      return u;
-    });
-    setDrawer(prev => prev?._id === attrId
-      ? { ...prev, values: [...(prev.values || []), newVal] }
-      : prev
-    );
-    toast.success('Value added');
-    // 🔌 REAL API: await attributeService.adminAddValue(attrId, data);
-  }, [recalc]);
+  // ── Value handlers (drawer) ───────────────────────────────────────────────
+  const handleAddValue = (attrId, valueData) =>
+    addValue.mutate({ attrId, data: valueData });
 
-  const handleUpdateValue = useCallback((valId, data) => {
-    setAttributes(prev => {
-      const u = prev.map(a => ({
-        ...a,
-        values: (a.values || []).map(v => v._id === valId ? { ...v, ...data } : v),
-      }));
-      recalc(u);
-      return u;
-    });
-    setDrawer(prev => prev ? {
-      ...prev,
-      values: (prev.values || []).map(v => v._id === valId ? { ...v, ...data } : v),
-    } : prev);
-    // 🔌 REAL API: await attributeService.adminUpdateValue(attrId, valId, data);
-  }, [recalc]);
+  const handleUpdateValue = (attrId, valId, valueData) =>
+    updateValue.mutate({ attrId, valId, data: valueData });
 
-  const handleDeleteValue = useCallback((valId) => {
-    setAttributes(prev => {
-      const u = prev.map(a => ({ ...a, values: (a.values || []).filter(v => v._id !== valId) }));
-      recalc(u);
-      return u;
-    });
-    setDrawer(prev => prev ? { ...prev, values: (prev.values || []).filter(v => v._id !== valId) } : prev);
-    toast.success('Value removed');
-    // 🔌 REAL API: await attributeService.adminDeleteValue(attrId, valId);
-  }, [recalc]);
+  const handleDeleteValue = (attrId, valId) =>
+    deleteValue.mutate({ attrId, valId });
 
-  const handleToggleValue = useCallback((valId) => {
-    setAttributes(prev => {
-      const u = prev.map(a => ({
-        ...a,
-        values: (a.values || []).map(v => v._id === valId ? { ...v, isActive: !v.isActive } : v),
-      }));
-      recalc(u);
-      return u;
-    });
-    setDrawer(prev => prev ? {
-      ...prev,
-      values: (prev.values || []).map(v => v._id === valId ? { ...v, isActive: !v.isActive } : v),
-    } : prev);
-  }, [recalc]);
+  const handleToggleValue = (attrId, valId, currentActive) =>
+    toggleValue.mutate({ attrId, valId, currentActive });
 
   // ── Open helpers ──────────────────────────────────────────────────────────
   const openCreate = () => { setEditing(null); setModalOpen(true); };
@@ -249,9 +193,16 @@ export default function AttributesPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs px-2.5 py-1 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-400 font-medium">
-            ⚡ Demo Mode
-          </span>
+          <button
+            onClick={() => setVariantModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-violet-500/30 bg-violet-500/5 hover:bg-violet-500/10 text-violet-400 text-sm font-semibold transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h8"/>
+            </svg>
+            Generate Variants
+          </button>
+
           <button onClick={openCreate}
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-black text-sm font-semibold transition-colors shadow-lg shadow-amber-900/30">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -263,11 +214,11 @@ export default function AttributesPage() {
       </div>
 
       {/* Stats */}
-      <AttributeStatsBar stats={stats} loading={false}/>
+      <AttributeStatsBar stats={stats} loading={isLoading} />
 
       {/* Filters */}
       <Filters
-        search={search}      setSearch={setSearch}
+        search={search}           setSearch={setSearch}
         typeFilter={typeFilter}   setTypeFilter={setTypeFilter}
         statusFilter={statusFilter} setStatusFilter={setStatusFilter}
       />
@@ -275,16 +226,16 @@ export default function AttributesPage() {
       {/* Bulk bar */}
       <BulkBar
         count={selected.length}
-        onActivate={bulkActivate}
-        onDeactivate={bulkDeactivate}
-        onDelete={bulkDelete}
+        onActivate={handleBulkActivate}
+        onDeactivate={handleBulkDeactivate}
+        onDelete={handleBulkDelete}
         onClear={() => setSelected([])}
       />
 
       {/* Table */}
       <AttributeTable
         attributes={filtered}
-        loading={false}
+        loading={isLoading}
         selected={selected}
         onSelectChange={setSelected}
         onEdit={openEdit}
@@ -307,10 +258,18 @@ export default function AttributesPage() {
         <AttributeValuesDrawer
           attribute={drawer}
           onClose={() => setDrawer(null)}
-          onAddValue={handleAddValue}
-          onUpdateValue={handleUpdateValue}
-          onDeleteValue={handleDeleteValue}
-          onToggleValue={handleToggleValue}
+         onAddValue={(_attrId, data) => handleAddValue(drawer._id, data)}
+          onUpdateValue={(valId, data) => handleUpdateValue(drawer._id, valId, data)}
+          onDeleteValue={(valId) => handleDeleteValue(drawer._id, valId)}
+          onToggleValue={(valId, currentActive) => handleToggleValue(drawer._id, valId, currentActive)}
+        />
+      )}
+
+      {/* Variant Generator Modal */}
+      {variantModalOpen && (
+        <VariantGeneratorModal
+          attributes={attributes}
+          onClose={() => setVariantModalOpen(false)}
         />
       )}
     </div>

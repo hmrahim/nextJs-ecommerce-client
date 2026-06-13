@@ -1,13 +1,14 @@
-import Navbar from '@/components/client/layout/Navbar';
-import Footer from '@/components/client/layout/Footer';
-import CartDrawer from '@/components/client/cart/CartDrawer';
+import { SiteHeader } from '@/components/client/layout/SiteHeader';
+import { SiteFooter } from '@/components/client/layout/SiteFooter';
+import { MobileBottomNav } from '@/components/client/layout/MobileBottomNav';
 
 export default function ClientLayout({ children }) {
   return (
-    <>
-   
-      <main className="min-h-screen">{children}</main>
-    
-    </>
+    <div className="flex min-h-screen flex-col bg-background text-foreground font-sans antialiased">
+      <SiteHeader />
+      <main className="flex-1 pb-16 md:pb-0">{children}</main>
+      <SiteFooter />
+      <MobileBottomNav />
+    </div>
   );
 }

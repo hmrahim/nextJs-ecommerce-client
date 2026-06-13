@@ -1,5 +1,5 @@
 
-'use client';
+
 import { useState } from 'react';
 
 function ConfirmModal({ category, onConfirm, onCancel }) {
@@ -14,11 +14,11 @@ function ConfirmModal({ category, onConfirm, onCancel }) {
         </div>
         <h3 className="text-white font-semibold text-center mb-1">Delete Category?</h3>
         <p className="text-slate-400 text-sm text-center mb-2">
-          "<span className="text-white">{category?.name}</span>" এবং এর সব subcategory মুছে যাবে।
+          "<span className="text-white">{category?.name}</span>" and all subcategory will be deleted. Are you sure?
         </p>
         {category?.children?.length > 0 && (
           <p className="text-xs text-red-400 text-center mb-4 bg-red-500/5 border border-red-500/10 rounded-lg px-3 py-2">
-            ⚠️ এই category তে {category.children.length}টা subcategory আছে — সেগুলোও delete হবে।
+            ⚠️ This category has {category.children.length} subcategories — they will also be deleted.
           </p>
         )}
         <div className="flex gap-3 mt-4">

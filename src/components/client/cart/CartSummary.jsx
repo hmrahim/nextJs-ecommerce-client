@@ -25,7 +25,7 @@ export default function CartSummary() {
         <h2 className="font-bold text-lg mb-4">Order Summary</h2>
         <div className="flex justify-between mb-2 text-sm"><span>Subtotal</span><span>{formatPrice(subtotal)}</span></div>
         <div className="flex justify-between mb-4 text-sm"><span>Shipping</span><span className="text-green-500">Free</span></div>
-        <div className="flex justify-between font-bold border-t pt-4"><span>Total</span><span>{formatPrice(subtotal)}</span></div>
+        <div className="flex justify-between font-bold border-t border-border pt-4"><span>Total</span><span>{formatPrice(subtotal)}</span></div>
         <Link href="/checkout" className="block w-full bg-gray-900 text-white text-center py-3 rounded-lg mt-4 font-medium hover:bg-gray-700 transition-colors">
           Proceed to Checkout
         </Link>

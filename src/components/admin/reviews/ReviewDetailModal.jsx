@@ -47,11 +47,10 @@ export default function ReviewDetailModal({
       ? `${review.userId.firstName || ''} ${review.userId.lastName || ''}`.trim() || 'Unknown'
       : 'Unknown';
 
-  const statusKey = review.isApproved
-    ? 'approved'
-    : review.isApproved === false
-    ? 'rejected'
-    : 'pending';
+  // isApproved: true → approved | null → pending | false → rejected
+  const statusKey =
+    review.isApproved === true  ? 'approved' :
+    review.isApproved === null  ? 'pending'  : 'rejected';
 
   const handleApprove = async () => {
     setActionLoading('approve');
@@ -240,6 +239,7 @@ export default function ReviewDetailModal({
           {/* Moderation Actions */}
           <Section title="Moderation">
             <div className="flex flex-wrap gap-3">
+              {/* Approve — show for pending and rejected */}
               {statusKey !== 'approved' && (
                 <button
                   onClick={handleApprove}
@@ -259,7 +259,30 @@ export default function ReviewDetailModal({
                   Approve
                 </button>
               )}
-              {statusKey !== 'rejected' && (
+
+              {/* Cancel Approval — show only for approved reviews */}
+              {statusKey === 'approved' && (
+                <button
+                  onClick={handleReject}
+                  disabled={!!actionLoading}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 disabled:opacity-50 text-amber-400 text-sm font-semibold transition-colors"
+                >
+                  {actionLoading === 'reject' ? (
+                    <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  )}
+                  Cancel Approval
+                </button>
+              )}
+
+              {/* Reject — show for pending only */}
+              {statusKey === 'pending' && (
                 <button
                   onClick={handleReject}
                   disabled={!!actionLoading}

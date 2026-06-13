@@ -17,14 +17,14 @@ export default function ProductFilter() {
         <h3 className="font-semibold mb-3 text-sm">Price Range</h3>
         <div className="flex gap-2">
           <input type="number" placeholder="Min" onChange={(e) => update('minPrice', e.target.value)}
-            className="w-full border rounded px-2 py-1 text-sm" />
+            className="w-full border border-border rounded px-2 py-1 text-sm" />
           <input type="number" placeholder="Max" onChange={(e) => update('maxPrice', e.target.value)}
-            className="w-full border rounded px-2 py-1 text-sm" />
+            className="w-full border border-border rounded px-2 py-1 text-sm" />
         </div>
       </div>
       <div>
         <h3 className="font-semibold mb-3 text-sm">Sort By</h3>
-        <select onChange={(e) => update('sort', e.target.value)} className="w-full border rounded px-2 py-1 text-sm">
+        <select onChange={(e) => update('sort', e.target.value)} className="w-full border border-border rounded px-2 py-1 text-sm">
           <option value="">Default</option>
           <option value="price:asc">Price: Low–High</option>
           <option value="price:desc">Price: High–Low</option>
