@@ -1,14 +1,20 @@
 "use client";
 import Link from "next/link";
-import { Search, ShoppingCart, Heart, User, MapPin, Menu, Bell, Globe, ChevronDown, Phone, Mail, Truck } from "lucide-react";
-import { categories } from "@/lib/shop-data";
+import {
+  Search, ShoppingCart, Heart, User, MapPin, Menu,
+  Bell, Globe, ChevronDown, Phone, Mail, Truck,
+} from "lucide-react";
 import { useState } from "react";
-function SiteHeader() {
+import { useCategories } from "@/hooks/client/useCategories";
+
+export function SiteHeader() {
   const [megaOpen, setMegaOpen] = useState(false);
-  return <header className="sticky top-0 z-50">
-      {
-    /* Top utility bar */
-  }
+  const { data: categories = [] } = useCategories();
+
+  return (
+    <header className="sticky top-0 z-50">
+
+      {/* ── Top utility bar ── */}
       <div className="hidden sm:block bg-[var(--color-primary-deep)] text-white/90 text-xs">
         <div className="container-x flex h-8 items-center justify-between overflow-hidden">
           <div className="flex items-center gap-4">
@@ -20,27 +26,30 @@ function SiteHeader() {
             <Link href="/become-seller" className="hover:text-white">Sell on GreenMart</Link>
             <Link href="/account" className="hidden md:inline hover:text-white">Track Order</Link>
             <Link href="/help" className="hidden md:inline hover:text-white">Help Center</Link>
-            <button className="flex items-center gap-1 hover:text-white"><Globe className="h-3 w-3" /> EN <ChevronDown className="h-3 w-3" /></button>
+            <button className="flex items-center gap-1 hover:text-white">
+              <Globe className="h-3 w-3" /> EN <ChevronDown className="h-3 w-3" />
+            </button>
           </div>
         </div>
       </div>
 
-      {
-    /* Main header */
-  }
+      {/* ── Main header ── */}
       <div className="bg-[var(--color-header)] text-[var(--color-header-foreground)]">
         <div className="container-x flex h-14 md:h-16 items-center gap-2 md:gap-4">
+
+          {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 font-display font-bold">
               G
             </div>
-            <div className="hidden xs:block sm:block">
+            <div className="hidden sm:block">
               <div className="font-display text-xl font-bold leading-none">GreenMart</div>
               <div className="text-[10px] text-emerald-200/70">Multivendor Marketplace</div>
             </div>
           </Link>
 
-          <div className="hidden lg:flex items-center gap-1 text-xs text-emerald-100 cursor-pointer hover:text-white">
+          {/* Location */}
+          <div className="hidden lg:flex items-center gap-1 text-xs text-emerald-100 cursor-pointer hover:text-white shrink-0">
             <MapPin className="h-4 w-4" />
             <div className="leading-tight">
               <div className="text-[10px] text-emerald-200/70">Deliver to</div>
@@ -48,25 +57,26 @@ function SiteHeader() {
             </div>
           </div>
 
-          {
-    /* Search */
-  }
+          {/* Search */}
           <div className="flex-1 min-w-0">
             <div className="flex h-11 overflow-hidden rounded-lg bg-white shadow-sm">
-              <select className="hidden md:block border-r border-border bg-emerald-50 px-3 text-xs text-emerald-900 outline-none">
-                <option>All Categories</option>
-                {categories.map((c) => <option key={c.slug}>{c.name}</option>)}
+              <select className="hidden md:block border-r border-border bg-emerald-50 px-3 text-xs text-emerald-900 outline-none shrink-0">
+                <option value="">All Categories</option>
+                {categories.map((c) => (
+                  <option key={c._id} value={c.slug}>{c.name}</option>
+                ))}
               </select>
               <input
-    placeholder="Search for products, brands, vendors..."
-    className="flex-1 px-4 text-sm text-foreground outline-none"
-  />
-              <button className="bg-gradient-to-r from-emerald-500 to-emerald-600 px-5 text-white hover:from-emerald-600 hover:to-emerald-700">
+                placeholder="Search for products, brands, vendors..."
+                className="flex-1 min-w-0 px-4 text-sm text-foreground outline-none"
+              />
+              <button className="shrink-0 bg-gradient-to-r from-emerald-500 to-emerald-600 px-5 text-white hover:from-emerald-600 hover:to-emerald-700">
                 <Search className="h-5 w-5" />
               </button>
             </div>
           </div>
 
+          {/* Actions */}
           <div className="flex items-center gap-1 md:gap-2 shrink-0">
             <button className="hidden md:grid h-10 w-10 place-items-center rounded-lg hover:bg-white/10 relative">
               <Bell className="h-5 w-5" />
@@ -99,46 +109,69 @@ function SiteHeader() {
         </div>
       </div>
 
-      {
-    /* Category bar */
-  }
-      <div className="hidden sm:block bg-[var(--color-header-sub)] text-white/95 border-t border-border border-white/5">
-        <div className="container-x flex h-11 items-center gap-1 overflow-x-auto scrollbar-hide text-sm">
-          <button
-    onMouseEnter={() => setMegaOpen(true)}
-    onMouseLeave={() => setMegaOpen(false)}
-    className="flex items-center gap-2 rounded-md bg-emerald-700/60 px-3 py-1.5 font-semibold hover:bg-emerald-700 relative"
-  >
-            <Menu className="h-4 w-4" /> All Categories
-            {megaOpen && <div className="absolute left-0 top-full z-50 mt-1 grid w-[min(720px,calc(100vw-2rem))] grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1 rounded-xl border border-border bg-white p-3 text-foreground shadow-2xl">
-                {categories.map((c) => <Link
-    key={c.slug}
-    href={`/category/${c.slug}`}
-    className="flex items-start gap-3 rounded-lg p-3 hover:bg-emerald-50"
-  >
-                    <span className="text-2xl">{c.icon}</span>
-                    <div className="text-left">
-                      <div className="text-sm font-semibold text-emerald-900">{c.name}</div>
-                      <div className="text-[11px] text-muted-foreground line-clamp-1">{c.subcategories.slice(0, 3).join(", ")}</div>
+      {/* ── Category nav bar ── */}
+      <div className="hidden sm:block bg-[var(--color-header-sub)] text-white/95 border-t border-white/5">
+        <div className="container-x flex h-11 items-center gap-1 text-sm">
+
+          {/* All Categories mega menu */}
+          <div
+            className="relative shrink-0"
+            onMouseEnter={() => setMegaOpen(true)}
+            onMouseLeave={() => setMegaOpen(false)}
+          >
+            <button className="flex items-center gap-2 rounded-md bg-emerald-700/60 px-3 py-1.5 font-semibold hover:bg-emerald-700 whitespace-nowrap">
+              <Menu className="h-4 w-4" /> All Categories
+            </button>
+
+            {megaOpen && (
+              <div className="absolute left-0 top-full z-50 mt-1 grid w-[min(720px,calc(100vw-2rem))] grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1 rounded-xl border border-border bg-white p-3 text-foreground shadow-2xl">
+                {categories.map((c) => (
+                  <Link
+                    key={c._id}
+                    href={`/category/${c.slug}`}
+                    className="flex items-start gap-3 rounded-lg p-3 hover:bg-emerald-50"
+                  >
+                    <div className="h-8 w-8 shrink-0 rounded-full bg-emerald-50 overflow-hidden grid place-items-center">
+                      {c.image
+                        ? <img src={c.image} alt={c.name} className="h-full w-full object-cover" />
+                        : <span className="text-lg">{c.icon ?? "🛍️"}</span>
+                      }
                     </div>
-                  </Link>)}
-              </div>}
-          </button>
-          {categories.slice(0, 8).map((c) => <Link
-    key={c.slug}
-    href={`/category/${c.slug}`}
-    className="whitespace-nowrap rounded-md px-3 py-1.5 hover:bg-white/10"
-  >
-              {c.name}
-            </Link>)}
-          <Link href="/vendors" className="whitespace-nowrap rounded-md px-3 py-1.5 hover:bg-white/10">Vendors</Link>
-          <Link href="/shop" className="whitespace-nowrap rounded-md px-3 py-1.5 hover:bg-white/10">All Products</Link>
-          <Link href="/blog" className="whitespace-nowrap rounded-md px-3 py-1.5 hover:bg-white/10">Blog</Link>
-          <span className="ml-auto whitespace-nowrap rounded-md bg-amber-400 px-3 py-1 text-xs font-bold text-emerald-950">🔥 Flash Sale Live</span>
+                    <div className="text-left min-w-0">
+                      <div className="text-sm font-semibold text-emerald-900 truncate">{c.name}</div>
+                      {c.description && (
+                        <div className="text-[11px] text-muted-foreground line-clamp-1">{c.description}</div>
+                      )}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* ── Scrollable nav links ── */}
+          <div className="flex flex-1 items-center gap-1 overflow-x-auto scrollbar-hide">
+            {categories.slice(0, 6).map((c) => (
+              <Link
+                key={c._id}
+                href={`/category/${c.slug}`}
+                className="whitespace-nowrap rounded-md px-3 py-1.5 hover:bg-white/10 shrink-0"
+              >
+                {c.name}
+              </Link>
+            ))}
+            <Link href="/vendors"      className="whitespace-nowrap rounded-md px-3 py-1.5 hover:bg-white/10 shrink-0">Vendors</Link>
+            <Link href="/shop"         className="whitespace-nowrap rounded-md px-3 py-1.5 hover:bg-white/10 shrink-0">All Products</Link>
+            <Link href="/blog"         className="whitespace-nowrap rounded-md px-3 py-1.5 hover:bg-white/10 shrink-0">Blog</Link>
+          </div>
+
+          {/* Flash sale badge — fixed on right, never pushes items */}
+          <span className="shrink-0 ml-2 whitespace-nowrap rounded-md bg-amber-400 px-3 py-1 text-xs font-bold text-emerald-950">
+            🔥 Flash Sale Live
+          </span>
         </div>
       </div>
-    </header>;
+
+    </header>
+  );
 }
-export {
-  SiteHeader
-};

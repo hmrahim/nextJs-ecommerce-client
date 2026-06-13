@@ -1,10 +1,9 @@
 "use client";
 import { useState } from "react";
 import { SlidersHorizontal, ChevronDown, ChevronUp } from "lucide-react";
+import { useCategories } from "@/hooks/client/useCategories";
+import { useBrands } from "@/hooks/client/useBrands";
 
-/* ─────────────────────────────────────────────
-   FilterGroup — collapsible section
-───────────────────────────────────────────── */
 function FilterGroup({ title, defaultOpen = true, children }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
@@ -26,37 +25,30 @@ function FilterGroup({ title, defaultOpen = true, children }) {
   );
 }
 
-/* ─────────────────────────────────────────────
-   Static option lists.
-   In production these would come from API hooks
-   (useShopBrands, useShopCategories, etc.).
-───────────────────────────────────────────── */
-const BRANDS = [
-  "Samsung", "Apple", "Xiaomi", "Sony",
-  "LG", "Asus", "HP", "Dell",
-];
-
 const PRICE_PRESETS = [
-  { label: "Under ৳500",          min: "",    max: "500" },
-  { label: "৳500 – ৳2,000",       min: "500", max: "2000" },
-  { label: "৳2,000 – ৳5,000",     min: "2000", max: "5000" },
-  { label: "৳5,000 – ৳20,000",    min: "5000", max: "20000" },
-  { label: "Above ৳20,000",       min: "20000", max: "" },
+  { label: "Under ৳500",       min: "",     max: "500" },
+  { label: "৳500 – ৳2,000",    min: "500",  max: "2000" },
+  { label: "৳2,000 – ৳5,000",  min: "2000", max: "5000" },
+  { label: "৳5,000 – ৳20,000", min: "5000", max: "20000" },
+  { label: "Above ৳20,000",    min: "20000", max: "" },
 ];
 
-/* ─────────────────────────────────────────────
-   FILTER PANEL
+function SkeletonList({ count = 6 }) {
+  return (
+    <div className="space-y-1">
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="h-7 animate-pulse rounded bg-muted" />
+      ))}
+    </div>
+  );
+}
 
-   Props:
-     filters        — current filter values (from URL)
-     onFilterChange — (key: string, value: any) => void
-                      called by the shop page, which
-                      updates the URL query string.
-───────────────────────────────────────────── */
 export function FilterPanel({ filters = {}, onFilterChange }) {
   const set = (key, value) => onFilterChange?.(key, value);
 
-  /* clear all → pass empty string for every key */
+  const { data: categories = [], isLoading: catsLoading } = useCategories();
+  const { data: brands = [],     isLoading: brandsLoading } = useBrands();
+
   const clearAll = () => {
     [
       "categoryId", "subCategoryId", "subSubCategoryId",
@@ -65,7 +57,6 @@ export function FilterPanel({ filters = {}, onFilterChange }) {
     ].forEach((k) => set(k, ""));
   };
 
-  /* ── price preset helper ── */
   const activePricePreset = PRICE_PRESETS.find(
     (p) =>
       String(p.min) === String(filters.minPrice ?? "") &&
@@ -74,11 +65,9 @@ export function FilterPanel({ filters = {}, onFilterChange }) {
 
   const applyPreset = (p) => {
     if (activePricePreset?.label === p.label) {
-      set("minPrice", "");
-      set("maxPrice", "");
+      set("minPrice", ""); set("maxPrice", "");
     } else {
-      set("minPrice", p.min);
-      set("maxPrice", p.max);
+      set("minPrice", p.min); set("maxPrice", p.max);
     }
   };
 
@@ -97,9 +86,69 @@ export function FilterPanel({ filters = {}, onFilterChange }) {
         </button>
       </div>
 
+      {/* ── Category ── */}
+      <FilterGroup title="Category">
+        {catsLoading ? (
+          <SkeletonList count={6} />
+        ) : (
+          categories.map((c) => (
+            <label
+              key={c._id}
+              className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-emerald-50 cursor-pointer"
+            >
+              <input
+                type="radio"
+                name="category"
+                checked={filters.categoryId === c._id}
+                onChange={() =>
+                  set("categoryId", filters.categoryId === c._id ? "" : c._id)
+                }
+                className="accent-emerald-600"
+              />
+              <span className="flex items-center gap-1.5">
+                {c.image ? (
+                  <img src={c.image} alt="" className="h-4 w-4 rounded-full object-cover" />
+                ) : (
+                  <span className="text-sm">{c.icon ?? "🛍️"}</span>
+                )}
+                {c.name}
+              </span>
+            </label>
+          ))
+        )}
+      </FilterGroup>
+
+      {/* ── Brand ── */}
+      <FilterGroup title="Brand">
+        {brandsLoading ? (
+          <SkeletonList count={6} />
+        ) : (
+          brands.map((b) => (
+            <label
+              key={b._id}
+              className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-emerald-50 cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                checked={filters.brandId === b._id}
+                onChange={(e) =>
+                  set("brandId", e.target.checked ? b._id : "")
+                }
+                className="accent-emerald-600"
+              />
+              <span className="flex items-center gap-1.5">
+                {b.logo && (
+                  <img src={b.logo} alt="" className="h-4 w-4 rounded object-contain" />
+                )}
+                {b.name}
+              </span>
+            </label>
+          ))
+        )}
+      </FilterGroup>
+
       {/* ── Price Range ── */}
       <FilterGroup title="Price Range">
-        {/* Manual inputs */}
         <div className="flex gap-2 mb-2">
           <input
             type="number"
@@ -116,7 +165,6 @@ export function FilterPanel({ filters = {}, onFilterChange }) {
             className="w-full rounded-md border border-border px-2 py-1 text-sm"
           />
         </div>
-        {/* Presets */}
         {PRICE_PRESETS.map((p) => (
           <label
             key={p.label}
@@ -130,26 +178,6 @@ export function FilterPanel({ filters = {}, onFilterChange }) {
               className="accent-emerald-600"
             />
             {p.label}
-          </label>
-        ))}
-      </FilterGroup>
-
-      {/* ── Brand ── */}
-      <FilterGroup title="Brand">
-        {BRANDS.map((b) => (
-          <label
-            key={b}
-            className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-emerald-50 cursor-pointer"
-          >
-            <input
-              type="checkbox"
-              checked={filters.brandId === b}
-              onChange={(e) =>
-                set("brandId", e.target.checked ? b : "")
-              }
-              className="accent-emerald-600"
-            />
-            {b}
           </label>
         ))}
       </FilterGroup>
