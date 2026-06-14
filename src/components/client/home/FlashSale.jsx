@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Countdown } from "./Countdown";
 import { ProductCard } from "../product/ProductCard";
 import { useShopFeaturedProducts } from "@/hooks/client/useShopProducts";
+import ProductSlider from "./ProductSlider";
 
 function SkeletonCard() {
   return (
@@ -19,10 +20,15 @@ function SkeletonCard() {
 }
 
 const FlashSale = () => {
-  const { data: products = [], isLoading } = useShopFeaturedProducts(6);
+  const { data: products = [], isLoading } = useShopFeaturedProducts(12);
+
+  const cards = isLoading
+    ? Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
+    : products.map((p) => <ProductCard key={p._id} p={p} />);
 
   return (
     <section className="overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-emerald-50 to-amber-50">
+      {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-white/60 p-4">
         <div className="flex items-center gap-3">
           <div className="grid h-10 w-10 place-items-center rounded-full bg-amber-400">
@@ -44,11 +50,11 @@ const FlashSale = () => {
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 p-3 sm:grid-cols-3 lg:grid-cols-6">
-        {isLoading
-          ? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
-          : products.map((p) => <ProductCard key={p._id} p={p} />)
-        }
+      {/* Slider */}
+      <div className="p-4">
+        <ProductSlider autoPlay={3500}>
+          {cards}
+        </ProductSlider>
       </div>
     </section>
   );

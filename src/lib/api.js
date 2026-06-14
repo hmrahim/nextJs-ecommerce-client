@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { getSession } from 'next-auth/react';
+import { getSessionId } from './session';
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: { 'Content-Type': 'application/json' },
@@ -16,6 +17,13 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // Guest cart identification (used by /cart endpoints)
+    const sessionId = getSessionId();
+    if (sessionId) {
+      config.headers['x-session-id'] = sessionId;
+    }
+
     return config;
   },
   (error) => Promise.reject(error)
@@ -39,10 +47,6 @@ export const postUser = async (user) => {
   const res = await api.post(`/register`, user);
   return res.status === 200 ? res : null;
 };
-
-
-
-
 
 
 export default api;

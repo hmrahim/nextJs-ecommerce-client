@@ -10,6 +10,7 @@ import { productKeys } from '@/hooks/useProducts';
 import { categoryService } from '@/services/categoryService';
 import { brandService } from '@/services/brandService';
 import toast from 'react-hot-toast';
+import ProductVariantsPanel from '@/components/admin/variants/ProductVariantsPanel';
 
 const INITIAL_FORM = {
   name: '', slug: '', sku: '', price: '', comparePrice: '', cost: '',
@@ -698,6 +699,12 @@ export default function ProductFormPage({ mode = 'create', productId }) {
             </FormSection>
           </div>
         </div>
+
+        {mode === 'edit' && productId && (
+          <div className="mt-6">
+            <ProductVariantsPanel productId={productId} />
+          </div>
+        )}
 
         <div className="flex items-center justify-between mt-6 pt-5 border-t border-[#1e1e2e]">
           <Link href="/dashboard/products"

@@ -1,7 +1,6 @@
-
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -10,7 +9,7 @@ import {
   RotateCcw, Minus, Plus, Share2, Check, Package,
   Tag, AlertCircle,
 } from 'lucide-react';
-import { useCartStore }     from '@/store/cartStore';
+import { useCart }          from '@/hooks/useCart';
 import { useWishlistStore } from '@/store/wishlistStore';
 import ProductReviews       from '@/components/client/product/ProductReviews';
 import { ProductCard }      from '@/components/client/product/ProductCard';
@@ -18,12 +17,53 @@ import {
   useShopProductBySlug,
   useShopRelatedProducts,
 } from '@/hooks/client/useShopProducts';
+import { variantService } from '@/services/Variantservice';
 
-/* ── Skeleton ─────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────
+   Helpers — build attribute groups from variants and locate the
+   matching active variant. Backend (ProductVariantModel) shape:
+     variant.attributes = [{ attributeName, attributeSlug,
+                             valueId, valueLabel, valueData }]
+───────────────────────────────────────────────────────────── */
+function buildAttrGroups(variants = []) {
+  const map = {};
+  for (const v of variants) {
+    for (const a of v.attributes || []) {
+      const key = a.attributeName;
+      if (!map[key]) map[key] = { slug: a.attributeSlug, values: [] };
+      if (!map[key].values.some((x) => x.valueId === a.valueId)) {
+        map[key].values.push({
+          valueId:    a.valueId,
+          valueLabel: a.valueLabel,
+          valueData:  a.valueData || '',
+        });
+      }
+    }
+  }
+  return Object.entries(map).map(([name, v]) => ({
+    name, slug: v.slug, values: v.values,
+  }));
+}
+
+function findMatchingVariant(variants, selection) {
+  if (!variants?.length) return null;
+  const keys = Object.keys(selection);
+  if (!keys.length) return null;
+  return (
+    variants.find((v) =>
+      keys.every((k) =>
+        (v.attributes || []).some(
+          (a) => a.attributeName === k && a.valueId === selection[k],
+        ),
+      ),
+    ) || null
+  );
+}
+
+/* Skeleton */
 function Skeleton({ className }) {
   return <div className={`animate-pulse rounded bg-slate-200 ${className}`} />;
 }
-
 function PageSkeleton() {
   return (
     <div className="container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-2 gap-10">
@@ -45,44 +85,74 @@ function PageSkeleton() {
   );
 }
 
-/* ── Variant Picker ───────────────────────────────────── */
-function VariantPicker({ variants = [], selected, onSelect }) {
-  if (!variants.length) return null;
+/* ─────────────────────────────────────────────────────────────
+   Variant Picker — renders one group per attribute. Colour-type
+   attributes render as colour swatches (uses valueData as hex),
+   everything else renders as labelled chips. Disables values
+   that have no in-stock matching variant given current selection.
+───────────────────────────────────────────────────────────── */
+function VariantPicker({ groups, variants, selection, onChange }) {
+  if (!groups.length) return null;
 
-  const attrKeys = [...new Set(
-    variants.flatMap((v) => Object.keys(v.attrs ?? {}))
-  )];
+  // for "disable out-of-stock" hint, compute reachable variants when
+  // the user hovers/clicks a value for a given group key.
+  const isReachable = (groupName, valueId) => {
+    const trial = { ...selection, [groupName]: valueId };
+    return variants.some((v) =>
+      Object.entries(trial).every(([k, vid]) =>
+        (v.attributes || []).some(
+          (a) => a.attributeName === k && a.valueId === vid,
+        ),
+      ) && (v.stock ?? 0) > 0,
+    );
+  };
 
   return (
     <div className="space-y-4">
-      {attrKeys.map((key) => {
-        const values = [...new Set(
-          variants.map((v) => v.attrs?.[key]).filter(Boolean)
-        )];
-        const selectedVal = selected?.attrs?.[key];
+      {groups.map((g) => {
+        const selectedValueId = selection[g.name];
+        const selectedLabel   = g.values.find((v) => v.valueId === selectedValueId)?.valueLabel;
+        const isColor         = g.slug === 'color' || g.name?.toLowerCase() === 'color';
 
         return (
-          <div key={key}>
+          <div key={g.name}>
             <p className="text-sm font-semibold text-slate-900 mb-2 capitalize">
-              {key}:{' '}
-              <span className="font-normal text-slate-500">{selectedVal ?? '—'}</span>
+              {g.name}:{' '}
+              <span className="font-normal text-slate-500">{selectedLabel || '—'}</span>
             </p>
-            <div className="flex flex-wrap gap-2">
-              {values.map((val) => {
-                const match = variants.find((v) => v.attrs?.[key] === val);
-                const active = selectedVal === val;
-                const outOfStock = match?.stock === 0;
+
+            <div className={isColor ? 'flex flex-wrap gap-2' : 'flex flex-wrap gap-2'}>
+              {g.values.map((val) => {
+                const active     = val.valueId === selectedValueId;
+                const reachable  = isReachable(g.name, val.valueId);
+
+                if (isColor) {
+                  return (
+                    <button
+                      key={val.valueId}
+                      type="button"
+                      title={val.valueLabel}
+                      disabled={!reachable && !active}
+                      onClick={() => onChange(g.name, val.valueId)}
+                      style={{ backgroundColor: val.valueData || '#e5e7eb' }}
+                      className={`h-9 w-9 rounded-full border-2 transition
+                        ${active ? 'border-emerald-600 ring-2 ring-emerald-300' : 'border-white shadow'}
+                        ${!reachable && !active ? 'opacity-40 cursor-not-allowed' : ''}`}
+                    />
+                  );
+                }
+
                 return (
                   <button
-                    key={val}
-                    disabled={outOfStock}
-                    onClick={() => match && onSelect(match)}
+                    key={val.valueId}
+                    type="button"
+                    disabled={!reachable && !active}
+                    onClick={() => onChange(g.name, val.valueId)}
                     className={`px-4 py-2 rounded-lg border text-sm transition
                       ${active ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-border hover:border-emerald-400'}
-                      ${outOfStock ? 'opacity-40 cursor-not-allowed line-through' : ''}
-                    `}
+                      ${!reachable && !active ? 'opacity-40 cursor-not-allowed line-through' : ''}`}
                   >
-                    {val}
+                    {val.valueLabel}
                   </button>
                 );
               })}
@@ -99,23 +169,68 @@ function VariantPicker({ variants = [], selected, onSelect }) {
 ══════════════════════════════════════════════════════════ */
 export default function ProductDetailPage() {
   const { slug } = useParams();
-  console.log(slug);
 
   /* data */
   const { data: product, isLoading, isError } = useShopProductBySlug(slug);
   const { data: related = [] } = useShopRelatedProducts(product?._id);
 
   /* stores */
-  const addItem      = useCartStore((s) => s.addItem);
-  const toggleWish   = useWishlistStore((s) => s.toggle);
-  const isWishlisted = useWishlistStore((s) => s.isWishlisted);
+  const { addToCart } = useCart();
+  const toggleWish    = useWishlistStore((s) => s.toggle);
+  const isWishlisted  = useWishlistStore((s) => s.isWishlisted);
 
   /* local state */
-  const [imgIdx,      setImgIdx]      = useState(0);
-  const [selectedVar, setSelectedVar] = useState(null);
-  const [qty,         setQty]         = useState(1);
-  const [tab,         setTab]         = useState('description');
-  const [copied,      setCopied]      = useState(false);
+  const [imgIdx,    setImgIdx]    = useState(0);
+  const [selection, setSelection] = useState({}); // { [attributeName]: valueId }
+  const [variants,  setVariants]  = useState([]); // populated from product or fallback fetch
+  const [qty,       setQty]       = useState(1);
+  const [tab,       setTab]       = useState('description');
+  const [copied,    setCopied]    = useState(false);
+
+  /*
+   * Always fetch full variant docs from the public endpoint — the embedded
+   * `product.variants` array stores a compact { sku, attrs, price, stock }
+   * shape for order/cart use, but the picker needs the rich attribute
+   * metadata (valueId, valueData/hex, valueLabel) that only the
+   * ProductVariantModel collection carries.
+   */
+  useEffect(() => {
+    if (!product?._id) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res  = await variantService.getPublic(product._id);
+        const list = res.data?.data || res.data?.results || res.data || [];
+        if (!cancelled) setVariants(Array.isArray(list) ? list : []);
+      } catch {
+        if (!cancelled) setVariants([]);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [product?._id]);
+
+  /* Derived attribute groups + auto-select first option per group */
+  const attrGroups = useMemo(() => buildAttrGroups(variants), [variants]);
+
+  useEffect(() => {
+    if (!attrGroups.length) { setSelection({}); return; }
+    setSelection((prev) => {
+      const next = { ...prev };
+      let changed = false;
+      attrGroups.forEach((g) => {
+        if (!next[g.name] && g.values[0]) {
+          next[g.name] = g.values[0].valueId;
+          changed = true;
+        }
+      });
+      return changed ? next : prev;
+    });
+  }, [attrGroups]);
+
+  const activeVariant = useMemo(
+    () => findMatchingVariant(variants, selection),
+    [variants, selection],
+  );
 
   /* loading / error */
   if (isLoading) return <PageSkeleton />;
@@ -131,27 +246,42 @@ export default function ProductDetailPage() {
     );
   }
 
-  /* derived values — schema field names */
+  /* derived values */
   const images       = product.images ?? [];
-  const activeImage  = images[imgIdx]?.url ?? '/placeholder.png';
-  const price        = selectedVar?.price ?? product.price ?? 0;
-  const comparePrice = product.comparePrice ?? null;
+  const variantImage = activeVariant?.image?.url || activeVariant?.image;
+  const activeImage  = variantImage || images[imgIdx]?.url || '/placeholder.png';
+  const price        = activeVariant?.price ?? product.price ?? 0;
+  const comparePrice = activeVariant?.comparePrice ?? product.comparePrice ?? null;
   const discount     = comparePrice && comparePrice > price
     ? Math.round((comparePrice - price) / comparePrice * 100)
     : 0;
-  const stock        = selectedVar?.stock ?? product.stock ?? 0;
+  const stock        = activeVariant?.stock ?? product.stock ?? 0;
   const inStock      = !product.trackInventory || stock > 0;
-  const brandName    = product.brand?.name   ?? '';
+  const brandName    = product.brand?.name    ?? '';
   const categoryName = product.category?.name ?? '';
   const categorySlug = product.category?.slug ?? '';
   const wishlisted   = isWishlisted(product._id);
+  const displaySku   = activeVariant?.sku || product.sku;
 
   /* handlers */
-  const handleAddToCart = () => {
-    addItem(
+  const handleAddToCart = async () => {
+    // Require the user to pick every attribute before adding a variant product
+    if (attrGroups.length && !activeVariant) return;
+
+    await addToCart(
       { ...product, id: product._id },
       qty,
-      selectedVar ? { id: selectedVar._id, sku: selectedVar.sku, price: selectedVar.price } : null
+      activeVariant
+        ? {
+            id:    activeVariant._id,
+            _id:   activeVariant._id,
+            sku:   activeVariant.sku,
+            price: activeVariant.price,
+            title: activeVariant.variantTitle,
+            attributes: activeVariant.attributes,
+            image: variantImage || null,
+          }
+        : null,
     );
   };
 
@@ -167,6 +297,9 @@ export default function ProductDetailPage() {
     setTab('reviews');
     document.getElementById('product-tabs')?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  const onSelectAttr = (attrName, valueId) =>
+    setSelection((s) => ({ ...s, [attrName]: valueId }));
 
   /* ── RENDER ── */
   return (
@@ -240,8 +373,8 @@ export default function ProductDetailPage() {
             {product.name}
           </h1>
 
-          {product.sku && (
-            <p className="text-xs text-slate-400">SKU: <span className="font-mono">{product.sku}</span></p>
+          {displaySku && (
+            <p className="text-xs text-slate-400">SKU: <span className="font-mono">{displaySku}</span></p>
           )}
 
           {/* Rating */}
@@ -260,10 +393,10 @@ export default function ProductDetailPage() {
 
           {/* Price */}
           <div className="flex items-end gap-3">
-            <span className="text-4xl font-bold text-slate-900">৳{price.toLocaleString()}</span>
+            <span className="text-4xl font-bold text-slate-900">৳{Number(price).toLocaleString()}</span>
             {comparePrice && comparePrice > price && (
               <>
-                <span className="text-xl line-through text-slate-400">৳{comparePrice.toLocaleString()}</span>
+                <span className="text-xl line-through text-slate-400">৳{Number(comparePrice).toLocaleString()}</span>
                 <span className="text-sm font-bold text-emerald-600">Save {discount}%</span>
               </>
             )}
@@ -293,12 +426,19 @@ export default function ProductDetailPage() {
           )}
 
           {/* Variant picker */}
-          {product.variants?.length > 0 && (
+          {attrGroups.length > 0 && (
             <VariantPicker
-              variants={product.variants}
-              selected={selectedVar}
-              onSelect={setSelectedVar}
+              groups={attrGroups}
+              variants={variants}
+              selection={selection}
+              onChange={onSelectAttr}
             />
+          )}
+
+          {activeVariant?.variantTitle && (
+            <p className="text-xs text-emerald-700">
+              Selected: <span className="font-semibold">{activeVariant.variantTitle}</span>
+            </p>
           )}
 
           {/* Tags */}
@@ -330,11 +470,12 @@ export default function ProductDetailPage() {
             </div>
 
             <button
-              disabled={!inStock}
+              disabled={!inStock || (attrGroups.length > 0 && !activeVariant)}
               onClick={handleAddToCart}
               className="flex-1 min-w-48 inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-semibold transition"
             >
-              <ShoppingCart className="w-5 h-5" /> Add to cart
+              <ShoppingCart className="w-5 h-5" />
+              {attrGroups.length > 0 && !activeVariant ? 'Select options' : 'Add to cart'}
             </button>
 
             <button
@@ -449,5 +590,3 @@ export default function ProductDetailPage() {
     </div>
   );
 }
-
-

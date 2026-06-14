@@ -7,7 +7,7 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { variantService } from '@/services/variantService';
+import { variantService } from '@/services/Variantservice';
 
 // ── Stock badge ────────────────────────────────────────────────────────────────
 function StockBadge({ stock }) {

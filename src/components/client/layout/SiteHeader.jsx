@@ -1,15 +1,38 @@
 "use client";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Search, ShoppingCart, Heart, User, MapPin, Menu,
   Bell, Globe, ChevronDown, Phone, Mail, Truck,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCategories } from "@/hooks/client/useCategories";
 
 export function SiteHeader() {
   const [megaOpen, setMegaOpen] = useState(false);
   const { data: categories = [] } = useCategories();
+
+  // ── Amazon-style global search (header only) ──
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [q, setQ] = useState("");
+  const [category, setCategory] = useState("");
+
+  // Pre-fill from URL when on /search page (so input reflects current query)
+  useEffect(() => {
+    setQ(searchParams?.get("q") ?? "");
+    setCategory(searchParams?.get("category") ?? "");
+  }, [searchParams]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    const query = q.trim();
+    if (query) params.set("q", query);
+    if (category) params.set("category", category);
+    params.set("page", "1");
+    router.push(`/search?${params.toString()}`);
+  };
 
   return (
     <header className="sticky top-0 z-50">
@@ -57,24 +80,37 @@ export function SiteHeader() {
             </div>
           </div>
 
-          {/* Search */}
-          <div className="flex-1 min-w-0">
-            <div className="flex h-11 overflow-hidden rounded-lg bg-white shadow-sm">
-              <select className="hidden md:block border-r border-border bg-emerald-50 px-3 text-xs text-emerald-900 outline-none shrink-0">
+          {/* ── Search (Amazon-style, global) ── */}
+          <form onSubmit={handleSearch} className="flex-1 min-w-0" role="search">
+            <div className="flex h-11 overflow-hidden rounded-lg bg-white shadow-sm focus-within:ring-2 focus-within:ring-amber-400">
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="hidden md:block border-r border-border bg-emerald-50 px-3 text-xs text-emerald-900 outline-none shrink-0 max-w-[140px]"
+              >
                 <option value="">All Categories</option>
                 {categories.map((c) => (
                   <option key={c._id} value={c.slug}>{c.name}</option>
                 ))}
               </select>
               <input
+                type="search"
+                name="q"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
                 placeholder="Search for products, brands, vendors..."
                 className="flex-1 min-w-0 px-4 text-sm text-foreground outline-none"
+                autoComplete="off"
               />
-              <button className="shrink-0 bg-gradient-to-r from-emerald-500 to-emerald-600 px-5 text-white hover:from-emerald-600 hover:to-emerald-700">
+              <button
+                type="submit"
+                aria-label="Search"
+                className="shrink-0 bg-gradient-to-r from-emerald-500 to-emerald-600 px-5 text-white hover:from-emerald-600 hover:to-emerald-700"
+              >
                 <Search className="h-5 w-5" />
               </button>
             </div>
-          </div>
+          </form>
 
           {/* Actions */}
           <div className="flex items-center gap-1 md:gap-2 shrink-0">

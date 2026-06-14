@@ -3,6 +3,7 @@ import SectionHeader from "./SectionHeader";
 import { ProductCard } from "../product/ProductCard";
 import { TrendingUp } from "lucide-react";
 import { useShopProducts } from "@/hooks/client/useShopProducts";
+import ProductSlider from "./ProductSlider";
 
 function SkeletonCard() {
   return (
@@ -21,6 +22,10 @@ const Trending = () => {
   const { data, isLoading } = useShopProducts(1, { sort: "sold:desc" });
   const products = data?.results ?? [];
 
+  const cards = isLoading
+    ? Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
+    : products.slice(0, 12).map((p) => <ProductCard key={p._id} p={p} />);
+
   return (
     <section>
       <SectionHeader
@@ -28,12 +33,9 @@ const Trending = () => {
         title="Trending Now"
         link="/shop"
       />
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-        {isLoading
-          ? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
-          : products.slice(0, 6).map((p) => <ProductCard key={p._id} p={p} />)
-        }
-      </div>
+      <ProductSlider autoPlay={4000}>
+        {cards}
+      </ProductSlider>
     </section>
   );
 };
