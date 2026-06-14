@@ -76,8 +76,16 @@ export function useAddToCart() {
       qc.setQueryData(CART_KEY, normalizeCart(data?.data));
       toast.success('Added to cart');
     },
-    onError: (err) =>
-      toast.error(err?.response?.data?.message || 'Could not add to cart'),
+    onError: (err) => {
+      const status  = err?.response?.status;
+      const message = err?.response?.data?.message;
+      if (status === 409) {
+        // stock শেষ — backend এর message দেখাও (e.g. "Only 2 item(s) left in stock.")
+        toast.error(message || 'Not enough stock available');
+      } else {
+        toast.error(message || 'Could not add to cart');
+      }
+    },
   });
 }
 
@@ -110,7 +118,13 @@ export function useUpdateCartItem() {
     },
     onError: (err, _v, ctx) => {
       if (ctx?.prev) qc.setQueryData(CART_KEY, ctx.prev);
-      toast.error(err?.response?.data?.message || 'Could not update quantity');
+      const status  = err?.response?.status;
+      const message = err?.response?.data?.message;
+      if (status === 409) {
+        toast.error(message || 'Not enough stock available');
+      } else {
+        toast.error(message || 'Could not update quantity');
+      }
     },
     onSuccess: ({ data }) => {
       const cart = normalizeCart(data?.data);
@@ -146,7 +160,7 @@ export function useClearCart() {
     mutationFn: () => cartService.clearCart(),
     onSuccess: ({ data }) => {
       qc.setQueryData(CART_KEY, normalizeCart(data?.data));
-      removeCoupon(); // coupon টাও clear হবে
+      removeCoupon();
       toast.success('Cart cleared');
     },
     onError: (err) =>

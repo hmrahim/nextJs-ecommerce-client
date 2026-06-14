@@ -1,12 +1,12 @@
 'use client';
 import { useState } from 'react';
 import Image from 'next/image';
-import { useCart } from '@/hooks/useCart';
+import { useAddToCart } from '@/hooks/useCart';
 import { formatPrice } from '@/lib/utils';
 
 export default function ProductGallery({ product }) {
   const [selected, setSelected] = useState(0);
-  const { addToCart } = useCart();
+  const addToCart = useAddToCart();
 
   return (
     <div className="grid grid-cols-2 gap-10">
@@ -34,9 +34,10 @@ export default function ProductGallery({ product }) {
           )}
         </div>
         <p className="text-gray-600 mb-6">{product.description}</p>
-        <button onClick={() => addToCart(product)}
-          className="w-full bg-gray-900 text-white py-3 rounded-xl font-medium hover:bg-gray-700 transition-colors">
-          Add to Cart
+        <button onClick={() => addToCart.mutateAsync({ product })}
+          disabled={addToCart.isPending}
+          className="w-full bg-gray-900 text-white py-3 rounded-xl font-medium hover:bg-gray-700 transition-colors disabled:opacity-50">
+          {addToCart.isPending ? 'Adding...' : 'Add to Cart'}
         </button>
       </div>
     </div>

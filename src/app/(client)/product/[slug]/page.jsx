@@ -7,7 +7,7 @@ import { useParams } from 'next/navigation';
 import {
   Star, Heart, ShoppingCart, Truck, ShieldCheck,
   RotateCcw, Minus, Plus, Share2, Check, Package,
-  Tag, AlertCircle, Loader2, Ban,
+  Tag, AlertCircle,
 } from 'lucide-react';
 import { useAddToCart }     from '@/hooks/useCart';
 import { useWishlistStore } from '@/store/wishlistStore';
@@ -19,6 +19,12 @@ import {
 } from '@/hooks/client/useShopProducts';
 import { variantService } from '@/services/Variantservice';
 
+/* ─────────────────────────────────────────────────────────────
+   Helpers — build attribute groups from variants and locate the
+   matching active variant. Backend (ProductVariantModel) shape:
+     variant.attributes = [{ attributeName, attributeSlug,
+                             valueId, valueLabel, valueData }]
+───────────────────────────────────────────────────────────── */
 function buildAttrGroups(variants = []) {
   const map = {};
   for (const v of variants) {
@@ -54,6 +60,7 @@ function findMatchingVariant(variants, selection) {
   );
 }
 
+/* Skeleton */
 function Skeleton({ className }) {
   return <div className={`animate-pulse rounded bg-slate-200 ${className}`} />;
 }
@@ -61,7 +68,7 @@ function PageSkeleton() {
   return (
     <div className="container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-2 gap-10">
       <div className="space-y-3">
-        <Skeleton className="aspect-[4/3] w-full rounded-2xl" />
+        <Skeleton className="aspect-square w-full rounded-2xl" />
         <div className="grid grid-cols-5 gap-2">
           {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="aspect-square rounded-lg" />)}
         </div>
@@ -78,6 +85,12 @@ function PageSkeleton() {
   );
 }
 
+/* ─────────────────────────────────────────────────────────────
+   Variant Picker — renders one group per attribute. Colour-type
+   attributes render as colour swatches (uses valueData as hex),
+   everything else renders as labelled chips. Disables values
+   that have no in-stock matching variant given current selection.
+───────────────────────────────────────────────────────────── */
 function VariantPicker({ groups, variants, selection, onChange }) {
   if (!groups.length) return null;
 
@@ -105,10 +118,11 @@ function VariantPicker({ groups, variants, selection, onChange }) {
               {g.name}:{' '}
               <span className="font-normal text-slate-500">{selectedLabel || '—'}</span>
             </p>
-            <div className="flex flex-wrap gap-2">
+
+            <div className={isColor ? 'flex flex-wrap gap-2' : 'flex flex-wrap gap-2'}>
               {g.values.map((val) => {
-                const active    = val.valueId === selectedValueId;
-                const reachable = isReachable(g.name, val.valueId);
+                const active     = val.valueId === selectedValueId;
+                const reachable  = isReachable(g.name, val.valueId);
 
                 if (isColor) {
                   return (
@@ -148,38 +162,36 @@ function VariantPicker({ groups, variants, selection, onChange }) {
   );
 }
 
-/* ── Out of Stock Banner ── */
-function OutOfStockBanner() {
-  return (
-    <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3.5 flex items-start gap-3">
-      <Ban className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
-      <div>
-        <p className="text-sm font-semibold text-rose-700">এই পণ্যটি এখন স্টকে নেই</p>
-        <p className="text-xs text-rose-500 mt-0.5">
-          দুঃখিত, এই মুহূর্তে পণ্যটি পাওয়া যাচ্ছে না। পরে আবার চেক করুন।
-        </p>
-      </div>
-    </div>
-  );
-}
-
+/* ══════════════════════════════════════════════════════════
+   MAIN PAGE
+══════════════════════════════════════════════════════════ */
 export default function ProductDetailPage() {
   const { slug } = useParams();
 
+  /* data */
   const { data: product, isLoading, isError } = useShopProductBySlug(slug);
   const { data: related = [] } = useShopRelatedProducts(product?._id);
 
-  const addToCart    = useAddToCart();
-  const toggleWish   = useWishlistStore((s) => s.toggle);
-  const isWishlisted = useWishlistStore((s) => s.isWishlisted);
+  /* stores */
+  const addToCart  = useAddToCart();
+  const toggleWish    = useWishlistStore((s) => s.toggle);
+  const isWishlisted  = useWishlistStore((s) => s.isWishlisted);
 
+  /* local state */
   const [imgIdx,    setImgIdx]    = useState(0);
-  const [selection, setSelection] = useState({});
-  const [variants,  setVariants]  = useState([]);
+  const [selection, setSelection] = useState({}); // { [attributeName]: valueId }
+  const [variants,  setVariants]  = useState([]); // populated from product or fallback fetch
   const [qty,       setQty]       = useState(1);
   const [tab,       setTab]       = useState('description');
   const [copied,    setCopied]    = useState(false);
 
+  /*
+   * Always fetch full variant docs from the public endpoint — the embedded
+   * `product.variants` array stores a compact { sku, attrs, price, stock }
+   * shape for order/cart use, but the picker needs the rich attribute
+   * metadata (valueId, valueData/hex, valueLabel) that only the
+   * ProductVariantModel collection carries.
+   */
   useEffect(() => {
     if (!product?._id) return;
     let cancelled = false;
@@ -195,6 +207,7 @@ export default function ProductDetailPage() {
     return () => { cancelled = true; };
   }, [product?._id]);
 
+  /* Derived attribute groups + auto-select first option per group */
   const attrGroups = useMemo(() => buildAttrGroups(variants), [variants]);
 
   useEffect(() => {
@@ -217,6 +230,7 @@ export default function ProductDetailPage() {
     [variants, selection],
   );
 
+  /* loading / error */
   if (isLoading) return <PageSkeleton />;
   if (isError || !product) {
     return (
@@ -230,6 +244,7 @@ export default function ProductDetailPage() {
     );
   }
 
+  /* derived values */
   const images       = product.images ?? [];
   const variantImage = activeVariant?.image?.url || activeVariant?.image;
   const activeImage  = variantImage || images[imgIdx]?.url || '/placeholder.png';
@@ -246,21 +261,22 @@ export default function ProductDetailPage() {
   const wishlisted   = isWishlisted(product._id);
   const displaySku   = activeVariant?.sku || product.sku;
 
+  /* handlers */
   const handleAddToCart = async () => {
-    if (!inStock) return;
     if (attrGroups.length && !activeVariant) return;
+
     await addToCart.mutateAsync({
       product: { ...product, id: product._id },
       quantity: qty,
       variant: activeVariant
         ? {
-            id:         activeVariant._id,
-            _id:        activeVariant._id,
-            sku:        activeVariant.sku,
-            price:      activeVariant.price,
-            title:      activeVariant.variantTitle,
+            id:    activeVariant._id,
+            _id:   activeVariant._id,
+            sku:   activeVariant.sku,
+            price: activeVariant.price,
+            title: activeVariant.variantTitle,
             attributes: activeVariant.attributes,
-            image:      variantImage || null,
+            image: variantImage || null,
           }
         : null,
     });
@@ -282,6 +298,7 @@ export default function ProductDetailPage() {
   const onSelectAttr = (attrName, valueId) =>
     setSelection((s) => ({ ...s, [attrName]: valueId }));
 
+  /* ── RENDER ── */
   return (
     <div className="bg-white min-h-screen">
 
@@ -301,46 +318,37 @@ export default function ProductDetailPage() {
       </div>
 
       {/* Main grid */}
-      <div className="container mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+      <div className="container mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-2 gap-10">
 
-        {/* ✅ Image gallery — sticky on desktop, height capped */}
-        <div className="lg:sticky lg:top-4">
-          <div className="relative w-full h-[340px] sm:h-[400px] lg:h-[440px] bg-slate-100 rounded-2xl overflow-hidden">
+        {/* Image gallery */}
+        <div>
+          <div className="relative aspect-square bg-slate-100 rounded-2xl overflow-hidden">
             <Image
               src={activeImage}
               alt={product.name}
               fill
-              className={`object-cover transition-all duration-300 ${!inStock ? 'grayscale opacity-60' : ''}`}
+              className="object-cover"
               sizes="(max-width:1024px) 100vw, 50vw"
               priority
             />
-            {!inStock && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="bg-slate-900/80 text-white text-sm font-bold px-4 py-2 rounded-full tracking-wide">
-                  স্টক নেই
-                </span>
-              </div>
-            )}
-            {inStock && discount > 0 && (
+            {discount > 0 && (
               <span className="absolute top-3 left-3 bg-rose-500 text-white text-xs font-bold px-2 py-1 rounded-md">
                 -{discount}%
               </span>
             )}
-            {inStock && product.featured && (
+            {product.featured && (
               <span className="absolute top-3 right-3 bg-emerald-600 text-white text-xs font-bold px-2 py-1 rounded-md">
                 Featured
               </span>
             )}
           </div>
-
-          {/* Thumbnails */}
           {images.length > 1 && (
             <div className="mt-3 grid grid-cols-5 gap-2">
               {images.map((img, i) => (
                 <button
                   key={i}
                   onClick={() => setImgIdx(i)}
-                  className={`relative h-16 rounded-lg overflow-hidden border-2 transition ${
+                  className={`relative aspect-square rounded-lg overflow-hidden border-2 transition ${
                     i === imgIdx ? 'border-emerald-500' : 'border-transparent hover:border-slate-300'
                   }`}
                 >
@@ -382,10 +390,8 @@ export default function ProductDetailPage() {
 
           {/* Price */}
           <div className="flex items-end gap-3">
-            <span className={`text-4xl font-bold ${inStock ? 'text-slate-900' : 'text-slate-400'}`}>
-              ৳{Number(price).toLocaleString()}
-            </span>
-            {comparePrice && comparePrice > price && inStock && (
+            <span className="text-4xl font-bold text-slate-900">৳{Number(price).toLocaleString()}</span>
+            {comparePrice && comparePrice > price && (
               <>
                 <span className="text-xl line-through text-slate-400">৳{Number(comparePrice).toLocaleString()}</span>
                 <span className="text-sm font-bold text-emerald-600">Save {discount}%</span>
@@ -393,26 +399,21 @@ export default function ProductDetailPage() {
             )}
           </div>
 
-          {/* Stock status */}
+          {/* Stock */}
           <div>
             {inStock ? (
               <span className="inline-flex items-center gap-1.5 text-sm text-emerald-600 font-medium">
                 <Check className="w-4 h-4" /> In stock
                 {stock > 0 && stock <= 10 && (
-                  <span className="ml-2 text-amber-600 text-xs font-semibold animate-pulse">
-                    ⚠️ মাত্র {stock}টি বাকি!
-                  </span>
+                  <span className="ml-2 text-amber-600 text-xs font-semibold">Only {stock} left!</span>
                 )}
               </span>
             ) : (
               <span className="inline-flex items-center gap-1.5 text-sm text-rose-500 font-medium">
-                <Ban className="w-4 h-4" /> Out of stock
+                <AlertCircle className="w-4 h-4" /> Out of stock
               </span>
             )}
           </div>
-
-          {/* Out of stock warning banner */}
-          {!inStock && <OutOfStockBanner />}
 
           {/* Short description */}
           {product.shortDescription && (
@@ -455,45 +456,24 @@ export default function ProductDetailPage() {
 
           {/* Qty + actions */}
           <div className="flex flex-wrap items-center gap-3">
-            {inStock && (
-              <div className="flex items-center border border-border rounded-lg">
-                <button onClick={() => setQty(Math.max(1, qty - 1))} className="p-2.5 hover:bg-slate-50 rounded-l-lg">
-                  <Minus className="w-4 h-4" />
-                </button>
-                <span className="w-12 text-center font-semibold">{qty}</span>
-                <button onClick={() => setQty(Math.min(stock || 99, qty + 1))} className="p-2.5 hover:bg-slate-50 rounded-r-lg">
-                  <Plus className="w-4 h-4" />
-                </button>
-              </div>
-            )}
+            <div className="flex items-center border border-border rounded-lg">
+              <button onClick={() => setQty(Math.max(1, qty - 1))} className="p-2.5 hover:bg-slate-50 rounded-l-lg">
+                <Minus className="w-4 h-4" />
+              </button>
+              <span className="w-12 text-center font-semibold">{qty}</span>
+              <button onClick={() => setQty(Math.min(stock || 99, qty + 1))} className="p-2.5 hover:bg-slate-50 rounded-r-lg">
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
 
-            {inStock ? (
-              <button
-                disabled={(attrGroups.length > 0 && !activeVariant) || addToCart.isPending}
-                onClick={handleAddToCart}
-                className="flex-1 min-w-48 inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-semibold transition"
-              >
-                {addToCart.isPending ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Adding...
-                  </>
-                ) : (
-                  <>
-                    <ShoppingCart className="w-5 h-5" />
-                    {attrGroups.length > 0 && !activeVariant ? 'Select options' : 'Add to cart'}
-                  </>
-                )}
-              </button>
-            ) : (
-              <button
-                disabled
-                className="flex-1 min-w-48 inline-flex items-center justify-center gap-2 bg-slate-200 text-slate-400 cursor-not-allowed px-6 py-3 rounded-lg font-semibold"
-              >
-                <Ban className="w-5 h-5" />
-                Stock নেই
-              </button>
-            )}
+            <button
+              disabled={!inStock || (attrGroups.length > 0 && !activeVariant)}
+              onClick={handleAddToCart}
+              className="flex-1 min-w-48 inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-semibold transition"
+            >
+              <ShoppingCart className="w-5 h-5" />
+              {attrGroups.length > 0 && !activeVariant ? 'Select options' : 'Add to cart'}
+            </button>
 
             <button
               onClick={() => toggleWish({ ...product, id: product._id })}

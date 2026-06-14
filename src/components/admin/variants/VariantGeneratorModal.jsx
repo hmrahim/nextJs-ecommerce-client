@@ -1,4 +1,4 @@
-// 📁 PATH: src/components/admin/variants/VariantGeneratorModal.jsx
+
 'use client';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import toast from 'react-hot-toast';
@@ -13,18 +13,34 @@ function AttributeSetRow({ attr, selectedValues, onChange }) {
   const toggleValue = (val) => {
     const exists = selectedValues.some(v => v.valueId === val._id);
     if (exists) onChange(selectedValues.filter(v => v.valueId !== val._id));
-    else onChange([...selectedValues, { valueId: val._id, valueLabel: val.label, valueData: val.valueData || val.value || '' }]);
+    else onChange([
+      ...selectedValues,
+      {
+        valueId:    val._id,
+        valueLabel: val.label,
+        // valueData: hex for color, actual value for others — fallback chain
+        valueData:  val.valueData ?? val.value ?? val.hex ?? '',
+      },
+    ]);
   };
 
-  const selectAll = () => onChange(activeValues.map(v => ({ valueId: v._id, valueLabel: v.label, valueData: v.valueData || v.value || '' })));
-  const clearAll  = () => onChange([]);
+  const selectAll = () => onChange(
+    activeValues.map(v => ({
+      valueId:    v._id,
+      valueLabel: v.label,
+      valueData:  v.valueData ?? v.value ?? v.hex ?? '',
+    }))
+  );
+  const clearAll = () => onChange([]);
 
   return (
     <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold text-white">{attr.name}</span>
-          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20 font-mono">{attr.type}</span>
+          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20 font-mono">
+            {attr.type}
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={selectAll} className="text-[10px] text-amber-400 hover:text-amber-300 transition-colors">All</button>
@@ -36,8 +52,10 @@ function AttributeSetRow({ attr, selectedValues, onChange }) {
 
       <div className="flex flex-wrap gap-2">
         {activeValues.map(val => {
-          const selected = selectedValues.some(v => v.valueId === val._id);
-          const colorVal = val.valueData || val.value;
+          const selected  = selectedValues.some(v => v.valueId === val._id);
+          // color value এর hex — backend schema অনুযায়ী সব fallback চেষ্টা করো
+          const colorHex  = val.valueData ?? val.value ?? val.hex ?? null;
+          const isColor   = attr.type === 'color' && colorHex && colorHex.startsWith('#');
           return (
             <button
               key={val._id}
@@ -48,11 +66,14 @@ function AttributeSetRow({ attr, selectedValues, onChange }) {
                   : 'border-[#2a2a3e] bg-[#16161f] text-slate-400 hover:border-slate-500'
               }`}
             >
-              {attr.type === 'color' && colorVal && (
-                <span className="w-3 h-3 rounded-full border border-white/20 flex-shrink-0" style={{ backgroundColor: colorVal }} />
+              {isColor && (
+                <span
+                  className="w-3 h-3 rounded-full border border-white/20 flex-shrink-0"
+                  style={{ backgroundColor: colorHex }}
+                />
               )}
               {val.label}
-              {selected && <span className="text-amber-400">✓</span>}
+              {selected && <span className="text-amber-400 text-[10px]">✓</span>}
             </button>
           );
         })}
@@ -65,11 +86,16 @@ function AttributeSetRow({ attr, selectedValues, onChange }) {
 }
 
 // ── Helper: cartesian product ──────────────────────────────────────────────────
+// activeSets: array of attribute objects (each has ._id, .name, .slug)
+// selections: { [attrId]: [{ valueId, valueLabel, valueData }] }
 function buildCartesian(activeSets, selections) {
   if (!activeSets.length) return [];
-  return activeSets.reduce((acc, attr) =>
-    acc.flatMap(combo =>
-      selections[attr._id].map(val => [
+
+  return activeSets.reduce((acc, attr) => {
+    const vals = selections[attr._id] || [];
+    if (!vals.length) return acc; // shouldn't happen since activeSets is pre-filtered
+    return acc.flatMap(combo =>
+      vals.map(val => [
         ...combo,
         {
           attributeId:   attr._id,
@@ -80,7 +106,8 @@ function buildCartesian(activeSets, selections) {
           valueData:     val.valueData || '',
         },
       ])
-    ), [[]]);
+    );
+  }, [[]]);
 }
 
 function buildTitle(combo) {
@@ -88,7 +115,7 @@ function buildTitle(combo) {
 }
 
 // ── Main Modal ─────────────────────────────────────────────────────────────────
-export default function VariantGeneratorModal({ attributes = [], onClose }) {
+export default function VariantGeneratorModal({ attributes = [], onClose, onSuccess }) {
   const [step, setStep]         = useState(1);
   const [products, setProducts] = useState([]);
   const [productSearch, setProductSearch] = useState('');
@@ -103,13 +130,9 @@ export default function VariantGeneratorModal({ attributes = [], onClose }) {
   );
 
   // ── Pricing mode ────────────────────────────────────────────────────────────
-  // 'same'       → সব variant এর একই price
-  // 'individual' → প্রতিটা variant এর আলাদা price
   const [pricingMode, setPricingMode] = useState('same');
   const [defaultPrice, setDefaultPrice] = useState('');
   const [defaultStock, setDefaultStock] = useState('');
-
-  // per-variant prices: { [variantTitle]: string }
   const [variantPrices, setVariantPrices] = useState({});
 
   const [generating, setGenerating] = useState(false);
@@ -135,12 +158,17 @@ export default function VariantGeneratorModal({ attributes = [], onClose }) {
     return () => clearTimeout(debounceRef.current);
   }, [step, productSearch]);
 
-  // ── Counts & combinations ────────────────────────────────────────────────────
+  // ── Combinations ─────────────────────────────────────────────────────────────
+  // activeSets = attributes যেগুলোতে কমপক্ষে ১টা value select করা হয়েছে
   const activeSets = variantAttrs.filter(a => (selections[a._id]?.length || 0) > 0);
-  const combinations = useMemo(() => buildCartesian(activeSets, selections), [activeSets, selections]);
+  const combinations = useMemo(
+    () => buildCartesian(activeSets, selections),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [JSON.stringify(activeSets.map(a => a._id)), JSON.stringify(selections)]
+  );
   const totalCombinations = combinations.length;
 
-  // When combinations change & mode is individual → seed prices from defaultPrice
+  // Seed individual prices when combinations change
   useEffect(() => {
     if (pricingMode !== 'individual') return;
     setVariantPrices(prev => {
@@ -151,9 +179,9 @@ export default function VariantGeneratorModal({ attributes = [], onClose }) {
       });
       return next;
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [combinations, pricingMode]);
 
-  // When switching to individual mode → seed all from defaultPrice
   const handlePricingModeChange = (mode) => {
     setPricingMode(mode);
     if (mode === 'individual') {
@@ -166,7 +194,6 @@ export default function VariantGeneratorModal({ attributes = [], onClose }) {
     }
   };
 
-  // Fill all individual prices with defaultPrice at once
   const fillAllPrices = () => {
     const next = {};
     combinations.forEach(combo => { next[buildTitle(combo)] = defaultPrice || ''; });
@@ -184,11 +211,16 @@ export default function VariantGeneratorModal({ attributes = [], onClose }) {
     if (!canGenerate) return;
     setGenerating(true);
 
+    // attributeSets: প্রতিটা active attribute এর selected values পাঠাও
     const attributeSets = activeSets.map(attr => ({
       attributeId:   attr._id,
       attributeName: attr.name,
       attributeSlug: attr.slug,
-      values:        selections[attr._id],
+      values:        selections[attr._id].map(v => ({
+        valueId:    v.valueId,
+        valueLabel: v.valueLabel,
+        valueData:  v.valueData || '',
+      })),
     }));
 
     const payload = {
@@ -207,11 +239,43 @@ export default function VariantGeneratorModal({ attributes = [], onClose }) {
       setResult(res.data?.data || res.data);
       setStep(3);
       toast.success(`✅ ${res.data?.data?.created || 0} variants generated!`);
+      onSuccess?.();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to generate variants');
     } finally {
       setGenerating(false);
     }
+  };
+
+  // ── Preview: combination list preview ────────────────────────────────────────
+  const PreviewList = () => {
+    if (!totalCombinations) return null;
+    const preview = combinations.slice(0, 12);
+    return (
+      <div className="rounded-xl border border-[#1e1e2e] bg-[#0a0a0f] p-3 space-y-1.5">
+        <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold mb-2">Preview combinations</p>
+        <div className="flex flex-wrap gap-1.5">
+          {preview.map((combo, i) => {
+            const title = buildTitle(combo);
+            // color dot থেকে প্রথম color attribute
+            const colorAttr = combo.find(a => a.attributeSlug === 'color');
+            return (
+              <span key={i} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#16161f] border border-[#1e1e2e] text-xs text-slate-300">
+                {colorAttr?.valueData && colorAttr.valueData.startsWith('#') && (
+                  <span className="w-2.5 h-2.5 rounded-full border border-white/20" style={{ backgroundColor: colorAttr.valueData }} />
+                )}
+                {title}
+              </span>
+            );
+          })}
+          {totalCombinations > 12 && (
+            <span className="px-2 py-1 rounded-lg bg-[#16161f] border border-[#1e1e2e] text-xs text-slate-500">
+              +{totalCombinations - 12} more
+            </span>
+          )}
+        </div>
+      </div>
+    );
   };
 
   // ── Render ───────────────────────────────────────────────────────────────────
@@ -227,7 +291,7 @@ export default function VariantGeneratorModal({ attributes = [], onClose }) {
           <div>
             <h2 className="text-base font-bold text-white">Generate Product Variants</h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              Attribute combinations থেকে variants তৈরি করো
+              Color × Size → Red/S, Red/M, Green/S… সব combinations auto-তৈরি
             </p>
           </div>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-white/5 text-slate-500 hover:text-slate-300 transition-colors">
@@ -315,9 +379,18 @@ export default function VariantGeneratorModal({ attributes = [], onClose }) {
               <div className="flex items-center gap-3 p-3 rounded-xl bg-amber-500/5 border border-amber-500/20">
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-white">{selectedProduct?.name}</p>
-                  <p className="text-xs text-slate-500">প্রতিটি combination এ একটা variant হবে</p>
+                  <p className="text-xs text-slate-500">প্রতিটি attribute combination এ একটা variant হবে</p>
                 </div>
                 <button onClick={() => setStep(1)} className="text-xs text-slate-500 hover:text-amber-400 transition-colors">Change</button>
+              </div>
+
+              {/* ── Info box: how combinations work ── */}
+              <div className="p-3 rounded-xl bg-blue-500/5 border border-blue-500/15 text-xs text-blue-300 flex gap-2">
+                <span className="text-blue-400 flex-shrink-0">ℹ️</span>
+                <span>
+                  সব attribute থেকে values select করো। উদাহরণ: Color (Red, Green) + Size (S, M, L)
+                  {' '}= <strong>6টা</strong> combination (Red/S, Red/M, Red/L, Green/S, Green/M, Green/L)
+                </span>
               </div>
 
               {variantAttrs.length === 0 ? (
@@ -334,6 +407,9 @@ export default function VariantGeneratorModal({ attributes = [], onClose }) {
                       onChange={vals => setSelections(prev => ({ ...prev, [attr._id]: vals }))}
                     />
                   ))}
+
+                  {/* ── Combination preview ── */}
+                  {totalCombinations > 0 && <PreviewList />}
 
                   {/* ── Stock field ── */}
                   <div>
@@ -372,7 +448,6 @@ export default function VariantGeneratorModal({ attributes = [], onClose }) {
                       </button>
                     </div>
 
-                    {/* Same price input */}
                     {pricingMode === 'same' && (
                       <div>
                         <label className="block text-xs text-slate-400 mb-1.5">
@@ -384,14 +459,11 @@ export default function VariantGeneratorModal({ attributes = [], onClose }) {
                           placeholder="e.g. 500"
                           className="w-full h-9 px-3 rounded-lg border border-[#1e1e2e] bg-[#0a0a0f] text-sm text-white focus:outline-none focus:border-amber-500/50 transition-colors"
                         />
-                        <p className="text-[10px] text-slate-600 mt-1">পরে প্রতিটা variant এ আলাদা করা যাবে</p>
                       </div>
                     )}
 
-                    {/* Individual price table */}
                     {pricingMode === 'individual' && totalCombinations > 0 && (
                       <div className="space-y-2">
-                        {/* Quick fill */}
                         <div className="flex items-center gap-2">
                           <input
                             type="number" min="0" value={defaultPrice}
@@ -406,17 +478,19 @@ export default function VariantGeneratorModal({ attributes = [], onClose }) {
                             সবগুলোতে দাও
                           </button>
                         </div>
-                        <p className="text-[10px] text-slate-600">উপরের দাম দিয়ে সবগুলো fill করো, তারপর আলাদা করে edit করো।</p>
 
-                        {/* Per-variant price rows */}
                         <div className="rounded-lg border border-[#1e1e2e] overflow-hidden max-h-52 overflow-y-auto">
                           {combinations.map((combo, i) => {
                             const title = buildTitle(combo);
+                            const colorAttr = combo.find(a => a.attributeSlug === 'color');
                             return (
                               <div
                                 key={title}
                                 className={`flex items-center gap-3 px-3 py-2 ${i % 2 === 0 ? 'bg-[#0a0a0f]' : 'bg-[#0f0f17]'}`}
                               >
+                                {colorAttr?.valueData && colorAttr.valueData.startsWith('#') && (
+                                  <span className="w-3 h-3 rounded-full border border-white/20 flex-shrink-0" style={{ backgroundColor: colorAttr.valueData }} />
+                                )}
                                 <span className="flex-1 text-xs text-slate-300 font-medium">{title}</span>
                                 <div className="flex items-center gap-1">
                                   <span className="text-xs text-slate-500">৳</span>
@@ -447,6 +521,9 @@ export default function VariantGeneratorModal({ attributes = [], onClose }) {
                     <div className="p-3 rounded-xl bg-violet-500/5 border border-violet-500/20 text-center">
                       <span className="text-violet-400 font-bold text-lg">{totalCombinations}</span>
                       <span className="text-slate-400 text-sm ml-2">টি variant তৈরি হবে</span>
+                      <p className="text-[10px] text-slate-600 mt-1">
+                        {activeSets.map(a => `${a.name}(${selections[a._id].length})`).join(' × ')}
+                      </p>
                     </div>
                   )}
                 </>
