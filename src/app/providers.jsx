@@ -9,7 +9,13 @@ export default function Providers({ children, session }) {
   const [queryClient] = useState(
     () => new QueryClient({
       defaultOptions: {
-        queries: { staleTime: 60 * 1000, retry: 1 },
+        queries: {
+          staleTime:            60 * 1000,       // 1 মিনিট — refetch বন্ধ থাকবে
+          gcTime:               5 * 60 * 1000,   // 5 মিনিট memory তে cache থাকবে
+          retry:                1,
+          refetchOnWindowFocus: false,            // ✅ Tab switch এ refetch বন্ধ
+          refetchOnReconnect:   false,            // ✅ Network reconnect এ refetch বন্ধ
+        },
       },
     })
   );

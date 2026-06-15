@@ -1,6 +1,9 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { orderService } from '@/services/orderService';
+import { useOrderSocket } from '@/hooks/useOrderSocket';
+import toast from 'react-hot-toast';
 
 /* ── Dummy Data ─────────────────────────────────────────── */
 const STATS = [
@@ -106,6 +109,8 @@ const STATUS_CFG = {
   processing: { label: 'Processing', cls: 'bg-violet-500/10 text-violet-400 border-violet-500/20' },
   shipped:    { label: 'Shipped',    cls: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
   delivered:  { label: 'Delivered',  cls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+  cancelled:  { label: 'Cancelled',  cls: 'bg-red-500/10 text-red-400 border-red-500/20' },
+  refunded:   { label: 'Refunded',   cls: 'bg-slate-500/10 text-slate-400 border-slate-500/20' },
 };
 
 const COLOR_MAP = {
@@ -242,8 +247,69 @@ function OrdersBar() {
 export default function DashboardPage() {
   const today = new Date().toLocaleDateString('en-BD', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
+  const [stats, setStats] = useState(STATS);
+  const [recentOrders, setRecentOrders] = useState(RECENT_ORDERS);
+  const [usingDummy, setUsingDummy] = useState(false);
+
+  const fetchDashboardData = useCallback(async () => {
+    try {
+      const [statsRes, ordersRes] = await Promise.all([
+        orderService.adminStats(),
+        orderService.adminGetAll({ page: 1, limit: 6, sort: 'placedAt:desc' }),
+      ]);
+
+      const s = statsRes?.data?.data || statsRes?.data;
+      if (s) {
+        setStats(prev => prev.map(stat => {
+          if (stat.key === 'revenue' && s.revenue != null) return { ...stat, value: `৳${Number(s.revenue).toLocaleString('en-BD')}` };
+          if (stat.key === 'orders' && s.total != null) return { ...stat, value: Number(s.total).toLocaleString('en-BD') };
+          if (stat.key === 'pending' && s.pending != null) return { ...stat, value: String(s.pending) };
+          return stat;
+        }));
+      }
+
+      const orders = ordersRes?.data?.orders || ordersRes?.data?.data || [];
+      if (Array.isArray(orders) && orders.length) {
+        setRecentOrders(orders.map(o => ({
+          id: o.orderNumber || o._id,
+          customer: o.customerName || o.customer?.name || 'Customer',
+          amount: `৳${Number(o.totalAmount || 0).toLocaleString('en-BD')}`,
+          status: o.status || 'pending',
+          time: new Date(o.placedAt || o.createdAt).toLocaleString('en-BD', { hour: '2-digit', minute: '2-digit' }),
+          items: o.items?.length || 0,
+        })));
+      }
+      setUsingDummy(false);
+    } catch {
+      // Backend না থাকলে demo data দিয়ে চলবে
+      setUsingDummy(true);
+    }
+  }, []);
+
+  useEffect(() => { fetchDashboardData(); }, [fetchDashboardData]);
+
+  // ── Realtime: নতুন order এলে বা order update হলে dashboard instantly refresh হবে ──
+  const handleOrderEvent = useCallback((type, payload) => {
+    if (type === 'order_created') {
+      toast.success(`New order received${payload?.orderNumber ? ` — ${payload.orderNumber}` : ''}`);
+    }
+    fetchDashboardData();
+  }, [fetchDashboardData]);
+
+  useOrderSocket(handleOrderEvent);
+
   return (
     <div className="space-y-6">
+
+      {/* Demo notice */}
+      {usingDummy && (
+        <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 text-sm">
+          <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Showing demo data — backend API not connected yet. Live updates will activate once connected.
+        </div>
+      )}
 
       {/* ── Header ── */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -266,7 +332,7 @@ export default function DashboardPage() {
 
       {/* ── Stats Grid ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {STATS.map(s => {
+        {stats.map(s => {
           const c = COLOR_MAP[s.color];
           return (
             <div key={s.key}
@@ -346,8 +412,8 @@ export default function DashboardPage() {
             </Link>
           </div>
           <div className="divide-y divide-white/5">
-            {RECENT_ORDERS.map(o => {
-              const s = STATUS_CFG[o.status];
+            {recentOrders.map(o => {
+              const s = STATUS_CFG[o.status] || STATUS_CFG.pending;
               return (
                 <div key={o.id} className="flex items-center gap-3 px-5 py-3 hover:bg-white/[0.02] transition-colors">
                   <div className="w-8 h-8 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center flex-shrink-0">

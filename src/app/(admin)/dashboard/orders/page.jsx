@@ -5,6 +5,8 @@ import { orderService } from '@/services/orderService';
 import OrdersTable from '@/components/admin/orders/OrdersTable';
 import OrderFilters from '@/components/admin/orders/OrderFilters';
 import OrderDetailModal from '@/components/admin/orders/OrderDetailModal';
+import { useOrderSocket } from '@/hooks/useOrderSocket';
+import toast from 'react-hot-toast';
 
 const ITEMS_PER_PAGE = 12;
 
@@ -75,6 +77,17 @@ export default function OrdersPage() {
   }, [pagination.page, filters]);
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
+
+  // ── Realtime: নতুন order এলে বা status update হলে instantly table refresh হবে ──
+  const handleOrderEvent = useCallback((type, payload) => {
+    if (usingDummy) return; // ডামি ডেটায় থাকলে SSE ইগনোর করবে
+    if (type === 'order_created') {
+      toast.success(`New order received${payload?.orderNumber ? ` — ${payload.orderNumber}` : ''}`);
+    }
+    fetchOrders();
+  }, [fetchOrders, usingDummy]);
+
+  useOrderSocket(handleOrderEvent);
 
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);

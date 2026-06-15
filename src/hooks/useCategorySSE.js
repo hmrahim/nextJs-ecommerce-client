@@ -2,27 +2,48 @@
 
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { getSession } from 'next-auth/react';
 
 export const useCategorySSE = () => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const es = new EventSource(
-      `${process.env.NEXT_PUBLIC_API_URL}/admin/categories/events`,
-      { withCredentials: true }
-    );
+    let es;
+    let reconnectTimer;
+    let isUnmounted = false;
 
-    es.addEventListener('category_updated', () => {
-          console.log('SSE event received ✅')
-      queryClient.invalidateQueries({ queryKey: ['admin-categories'] });
-    });
+    const connect = async () => {
+      // EventSource কাস্টম হেডার পাঠাতে পারে না, তাই token কে query param এ পাঠাতে হবে
+      const session = await getSession();
+      const token = session?.accessToken || session?.user?.token;
+      if (!token) {
+        reconnectTimer = setTimeout(connect, 5000);
+        return;
+      }
 
-    es.onerror = () => {
-      es.close();
-      // 5s পরে reconnect
-      setTimeout(() => {}, 5000);
+      es = new EventSource(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/categories/events?token=${encodeURIComponent(token)}`,
+        { withCredentials: true }
+      );
+
+      es.addEventListener('category_updated', () => {
+        console.log('SSE event received ✅');
+        queryClient.invalidateQueries({ queryKey: ['admin-categories'] });
+      });
+
+      es.onerror = () => {
+        es.close();
+        if (isUnmounted) return;
+        reconnectTimer = setTimeout(connect, 5000);
+      };
     };
 
-    return () => es.close();
+    connect();
+
+    return () => {
+      isUnmounted = true;
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      if (es) es.close();
+    };
   }, [queryClient]);
 };

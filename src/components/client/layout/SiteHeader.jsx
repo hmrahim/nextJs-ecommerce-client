@@ -7,10 +7,17 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCategories } from "@/hooks/client/useCategories";
+import { useCart } from "@/hooks/useCart";
+import { UserAccountMenu } from "@/components/client/layout/UserAccountMenu";
+import { useAuth } from "@/hooks/useAuth";
 
 export function SiteHeader() {
   const [megaOpen, setMegaOpen] = useState(false);
   const { data: categories = [] } = useCategories();
+  const { data: cart } = useCart();
+  const cartItemCount = cart?.itemCount ?? 0;
+  const cartSubtotal = cart?.subtotal ?? 0;
+  const { isLoggedIn } = useAuth();
 
   // ── Amazon-style global search (header only) ──
   const router = useRouter();
@@ -126,20 +133,29 @@ export function SiteHeader() {
               </div>
               <span className="absolute -top-1 -right-1 grid h-5 min-w-5 place-items-center rounded-full bg-amber-400 px-1 text-[10px] font-bold text-emerald-950">12</span>
             </Link>
-            <Link href="/account" className="hidden md:flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-white/10">
-              <User className="h-5 w-5" />
-              <div className="hidden xl:block text-xs leading-tight">
-                <div className="text-emerald-200/70">Hello, Sign in</div>
-                <div className="font-semibold">Account & Lists</div>
-              </div>
-            </Link>
+            {/* Account menu — dropdown if logged in, sign-in CTA if not */}
+            <UserAccountMenu />
+
+            {/* Compact Sign-In button for tablets where xl: account label is hidden */}
+            {!isLoggedIn && (
+              <Link
+                href="/auth/login"
+                className="hidden md:inline-flex xl:hidden items-center gap-1.5 rounded-lg bg-amber-400 px-3 py-2 text-xs font-bold text-emerald-950 hover:bg-amber-500"
+              >
+                Sign In
+              </Link>
+            )}
             <Link href="/cart" className="flex items-center gap-2 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 px-3 py-2 relative">
               <ShoppingCart className="h-5 w-5" />
               <div className="hidden lg:block text-xs leading-tight">
                 <div className="text-emerald-200/70">My Cart</div>
-                <div className="font-semibold">৳ 4,280</div>
+                <div className="font-semibold">৳ {cartSubtotal.toLocaleString("en-BD")}</div>
               </div>
-              <span className="absolute -top-1 -right-1 grid h-5 min-w-5 place-items-center rounded-full bg-amber-400 px-1 text-[10px] font-bold text-emerald-950">3</span>
+              {cartItemCount > 0 && (
+                <span className="absolute -top-1 -right-1 grid h-5 min-w-5 place-items-center rounded-full bg-amber-400 px-1 text-[10px] font-bold text-emerald-950">
+                  {cartItemCount}
+                </span>
+              )}
             </Link>
           </div>
         </div>
@@ -196,9 +212,9 @@ export function SiteHeader() {
                 {c.name}
               </Link>
             ))}
-            <Link href="/vendors"      className="whitespace-nowrap rounded-md px-3 py-1.5 hover:bg-white/10 shrink-0">Vendors</Link>
-            <Link href="/shop"         className="whitespace-nowrap rounded-md px-3 py-1.5 hover:bg-white/10 shrink-0">All Products</Link>
-            <Link href="/blog"         className="whitespace-nowrap rounded-md px-3 py-1.5 hover:bg-white/10 shrink-0">Blog</Link>
+            <Link href="/vendors" className="whitespace-nowrap rounded-md px-3 py-1.5 hover:bg-white/10 shrink-0">Vendors</Link>
+            <Link href="/shop" className="whitespace-nowrap rounded-md px-3 py-1.5 hover:bg-white/10 shrink-0">All Products</Link>
+            <Link href="/blog" className="whitespace-nowrap rounded-md px-3 py-1.5 hover:bg-white/10 shrink-0">Blog</Link>
           </div>
 
           {/* Flash sale badge — fixed on right, never pushes items */}
@@ -210,4 +226,4 @@ export function SiteHeader() {
 
     </header>
   );
-}
+} 

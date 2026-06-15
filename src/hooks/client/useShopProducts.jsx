@@ -1,5 +1,5 @@
 'use client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import { productService } from '@/services/productService';
 
 const ITEMS_PER_PAGE = 20;
@@ -11,8 +11,9 @@ export const shopProductKeys = {
   sku:        (sku)     => ['shop-products', 'sku',      sku],
   search:     (params)  => ['shop-products', 'search',   params],
   featured:   (limit)   => ['shop-products', 'featured', limit],
-  related:    (slug)    => ['shop-products', 'related',  slug],
+  related:    (id)      => ['shop-products', 'related',  id],
   byCategory: (slug, f) => ['shop-products', 'category', slug, f],
+  variants:   (id)      => ['shop-products', 'variants', id],
 };
 
 export function useShopProducts(page = 1, filters = {}) {
@@ -36,8 +37,8 @@ export function useShopProducts(page = 1, filters = {}) {
       });
       return res.data;
     },
-    staleTime:        1000 * 60 * 2,
-    keepPreviousData: true,
+    staleTime:        1000 * 60 * 5,  // 5 মিনিট — আগে 2 মিনিট ছিল
+    placeholderData:  (prev) => prev,  // keepPreviousData এর নতুন API
   });
 }
 
@@ -49,7 +50,7 @@ export function useShopProductBySlug(slug) {
       return res.data?.data ?? res.data;
     },
     enabled:   !!slug,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 10, // 10 মিনিট — product details বেশিক্ষণ fresh থাকে
   });
 }
 
@@ -61,7 +62,7 @@ export function useShopProductBySku(sku) {
       return res.data?.data ?? res.data;
     },
     enabled:   !!sku,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 10,
   });
 }
 
@@ -74,8 +75,8 @@ export function useShopSearch(params = {}) {
       return res.data;
     },
     enabled:          !!q?.trim(),
-    staleTime:        1000 * 60,
-    keepPreviousData: true,
+    staleTime:        1000 * 60 * 2,
+    placeholderData:  (prev) => prev,
   });
 }
 
@@ -86,19 +87,19 @@ export function useShopFeaturedProducts(limit = 10) {
       const res = await productService.getFeatured({ limit });
       return res.data?.results ?? res.data;
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 10,
   });
 }
 
-export function useShopRelatedProducts(slug, limit = 8) {
+export function useShopRelatedProducts(productId, limit = 8) {
   return useQuery({
-    queryKey: shopProductKeys.related(slug),
+    queryKey: shopProductKeys.related(productId),
     queryFn: async () => {
-      const res = await productService.getRelated(slug, { limit });
+      const res = await productService.getRelated(productId, { limit });
       return res.data?.results ?? res.data;
     },
-    enabled:   !!slug,
-    staleTime: 1000 * 60 * 5,
+    enabled:   !!productId,
+    staleTime: 1000 * 60 * 10,
   });
 }
 
@@ -122,16 +123,29 @@ export function useShopProductsByCategory(categorySlug, page = 1, filters = {}) 
       });
       return res.data;
     },
-    enabled:          !!categorySlug,
-    staleTime:        1000 * 60 * 2,
-    keepPreviousData: true,
+    enabled:         !!categorySlug,
+    staleTime:       1000 * 60 * 5,
+    placeholderData: (prev) => prev,
   });
 }
 
+// ✅ Variants কে React Query তে নিয়ে এলাম — useEffect + useState এর বদলে
+// ProductDetailPage এ variantService.getPublic() সরাসরি call হচ্ছিল, cache ছিল না
+export function useProductVariants(productId) {
+  return useQuery({
+    queryKey: shopProductKeys.variants(productId),
+    queryFn: async () => {
+      const { variantService } = await import('@/services/Variantservice');
+      const res  = await variantService.getPublic(productId);
+      const list = res.data?.data || res.data?.results || res.data || [];
+      return Array.isArray(list) ? list : [];
+    },
+    enabled:   !!productId,
+    staleTime: 1000 * 60 * 10, // 10 মিনিট cache
+  });
+}
 
-/* ── useInfiniteShopProducts — shop page infinite scroll ── */
 export function useInfiniteShopProducts(filters = {}) {
-  const { useInfiniteQuery } = require('@tanstack/react-query');
   return useInfiniteQuery({
     queryKey: ['shop-infinite', filters],
     queryFn: async ({ pageParam = 1 }) => {
@@ -143,6 +157,7 @@ export function useInfiniteShopProducts(filters = {}) {
       return res.data;
     },
     getNextPageParam: (last) => last.page < last.pages ? last.page + 1 : undefined,
-    keepPreviousData: true,
+    placeholderData:  (prev) => prev,
+    staleTime:        1000 * 60 * 5,
   });
 }
