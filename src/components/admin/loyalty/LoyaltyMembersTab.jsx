@@ -1,5 +1,5 @@
 // 📁 PATH: src/components/admin/loyalty/LoyaltyMembersTab.jsx
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল
+// ⚠️  This is a completely new file
 
 'use client';
 import { useState, useMemo } from 'react';
@@ -70,7 +70,7 @@ export default function LoyaltyMembersTab({ members, onAdjust }) {
                     <td className="px-4 py-3"><p className="text-sm font-bold text-orange-400">{new Intl.NumberFormat().format(m.points || 0)}</p></td>
                     <td className="px-4 py-3 text-sm text-emerald-400">{new Intl.NumberFormat().format(m.lifetimeEarned || 0)}</td>
                     <td className="px-4 py-3 text-sm text-slate-400">{new Intl.NumberFormat().format(m.lifetimeSpent || 0)}</td>
-                    <td className="px-4 py-3 text-xs text-slate-500">{m.lastActivityAt ? new Date(m.lastActivityAt).toLocaleDateString('en-BD', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</td>
+                    <td className="px-4 py-3 text-xs text-slate-500">{m.lastActivityAt ? new Date(m.lastActivityAt).toLocaleDateString('en-SA', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</td>
                     <td className="px-4 py-3 text-right">
                       <button onClick={() => setTarget(m)} className="px-3 py-1 rounded-md border border-[#1e1e2e] text-xs text-slate-300 hover:bg-white/5">Adjust</button>
                     </td>

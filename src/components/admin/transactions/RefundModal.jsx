@@ -25,15 +25,15 @@ export default function RefundModal({ txn, onClose, onConfirm }) {
         <form onSubmit={submit} className="p-6 space-y-4">
           <div className="bg-[#111118] border border-white/5 rounded-lg p-3 text-sm">
             <div className="flex justify-between"><span className="text-gray-400">Transaction</span><span className="text-white">{txn.id}</span></div>
-            <div className="flex justify-between"><span className="text-gray-400">Original Amount</span><span className="text-white">৳{txn.amount.toLocaleString()}</span></div>
+            <div className="flex justify-between"><span className="text-gray-400">Original Amount</span><span className="text-white">SAR {txn.amount.toLocaleString()}</span></div>
             <div className="flex justify-between"><span className="text-gray-400">Customer</span><span className="text-white">{txn.customer.name}</span></div>
           </div>
 
           <div>
-            <label className="block text-xs text-gray-400 mb-1">Refund Amount (৳)</label>
+            <label className="block text-xs text-gray-400 mb-1">Refund Amount (SAR )</label>
             <input type="number" min="1" max={txn.amount} value={amount} onChange={e => setAmount(e.target.value)}
               className="w-full bg-[#111118] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500/50" />
-            <p className="text-xs text-gray-500 mt-1">Max ৳{txn.amount.toLocaleString()} • Partial refunds allowed</p>
+            <p className="text-xs text-gray-500 mt-1">Max SAR {txn.amount.toLocaleString()} • Partial refunds allowed</p>
           </div>
 
           <div>

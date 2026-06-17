@@ -16,8 +16,8 @@ import { ProductCard }      from '@/components/client/product/ProductCard';
 import {
   useShopProductBySlug,
   useShopRelatedProducts,
+  useProductVariants,       // ✅ useEffect+useState instead of this React Query
 } from '@/hooks/client/useShopProducts';
-import { variantService } from '@/services/Variantservice';
 
 function buildAttrGroups(variants = []) {
   const map = {};
@@ -61,9 +61,9 @@ function PageSkeleton() {
   return (
     <div className="container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-2 gap-10">
       <div className="space-y-3">
-        <Skeleton className="aspect-[4/3] w-full rounded-2xl" />
+        <Skeleton className="w-full h-[340px] rounded-2xl" />
         <div className="grid grid-cols-5 gap-2">
-          {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="aspect-square rounded-lg" />)}
+          {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-lg" />)}
         </div>
       </div>
       <div className="space-y-4 pt-4">
@@ -148,15 +148,14 @@ function VariantPicker({ groups, variants, selection, onChange }) {
   );
 }
 
-/* ── Out of Stock Banner ── */
 function OutOfStockBanner() {
   return (
     <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3.5 flex items-start gap-3">
       <Ban className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
       <div>
-        <p className="text-sm font-semibold text-rose-700">এই পণ্যটি এখন স্টকে নেই</p>
+        <p className="text-sm font-semibold text-rose-700">This product is currently out of stock</p>
         <p className="text-xs text-rose-500 mt-0.5">
-          দুঃখিত, এই মুহূর্তে পণ্যটি পাওয়া যাচ্ছে না। পরে আবার চেক করুন।
+          Sorry, this product is not available at the moment। Check again later।
         </p>
       </div>
     </div>
@@ -167,7 +166,9 @@ export default function ProductDetailPage() {
   const { slug } = useParams();
 
   const { data: product, isLoading, isError } = useShopProductBySlug(slug);
-  const { data: related = [] } = useShopRelatedProducts(product?._id);
+  const { data: related = [] }                = useShopRelatedProducts(product?._id);
+  // ✅ useEffect+variantService by removing React Query — cache will be, route If you come back re-fetch will not be
+  const { data: variants = [] }               = useProductVariants(product?._id);
 
   const addToCart    = useAddToCart();
   const toggleWish   = useWishlistStore((s) => s.toggle);
@@ -175,25 +176,9 @@ export default function ProductDetailPage() {
 
   const [imgIdx,    setImgIdx]    = useState(0);
   const [selection, setSelection] = useState({});
-  const [variants,  setVariants]  = useState([]);
   const [qty,       setQty]       = useState(1);
   const [tab,       setTab]       = useState('description');
   const [copied,    setCopied]    = useState(false);
-
-  useEffect(() => {
-    if (!product?._id) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const res  = await variantService.getPublic(product._id);
-        const list = res.data?.data || res.data?.results || res.data || [];
-        if (!cancelled) setVariants(Array.isArray(list) ? list : []);
-      } catch {
-        if (!cancelled) setVariants([]);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [product?._id]);
 
   const attrGroups = useMemo(() => buildAttrGroups(variants), [variants]);
 
@@ -256,7 +241,7 @@ export default function ProductDetailPage() {
         ? {
             id:         activeVariant._id,
             _id:        activeVariant._id,
-            sku:        activeVariant.sku,
+            sku:        activeVariant.sku || String(activeVariant._id),
             price:      activeVariant.price,
             title:      activeVariant.variantTitle,
             attributes: activeVariant.attributes,
@@ -303,7 +288,7 @@ export default function ProductDetailPage() {
       {/* Main grid */}
       <div className="container mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
 
-        {/* ✅ Image gallery — sticky on desktop, height capped */}
+        {/* ✅ Image gallery — sticky on desktop, height fixed */}
         <div className="lg:sticky lg:top-4">
           <div className="relative w-full h-[340px] sm:h-[400px] lg:h-[440px] bg-slate-100 rounded-2xl overflow-hidden">
             <Image
@@ -317,7 +302,7 @@ export default function ProductDetailPage() {
             {!inStock && (
               <div className="absolute inset-0 flex items-center justify-center">
                 <span className="bg-slate-900/80 text-white text-sm font-bold px-4 py-2 rounded-full tracking-wide">
-                  স্টক নেই
+                  Out of stock
                 </span>
               </div>
             )}
@@ -332,8 +317,6 @@ export default function ProductDetailPage() {
               </span>
             )}
           </div>
-
-          {/* Thumbnails */}
           {images.length > 1 && (
             <div className="mt-3 grid grid-cols-5 gap-2">
               {images.map((img, i) => (
@@ -383,11 +366,11 @@ export default function ProductDetailPage() {
           {/* Price */}
           <div className="flex items-end gap-3">
             <span className={`text-4xl font-bold ${inStock ? 'text-slate-900' : 'text-slate-400'}`}>
-              ৳{Number(price).toLocaleString()}
+              SAR {Number(price).toLocaleString()}
             </span>
             {comparePrice && comparePrice > price && inStock && (
               <>
-                <span className="text-xl line-through text-slate-400">৳{Number(comparePrice).toLocaleString()}</span>
+                <span className="text-xl line-through text-slate-400">SAR {Number(comparePrice).toLocaleString()}</span>
                 <span className="text-sm font-bold text-emerald-600">Save {discount}%</span>
               </>
             )}
@@ -400,7 +383,7 @@ export default function ProductDetailPage() {
                 <Check className="w-4 h-4" /> In stock
                 {stock > 0 && stock <= 10 && (
                   <span className="ml-2 text-amber-600 text-xs font-semibold animate-pulse">
-                    ⚠️ মাত্র {stock}টি বাকি!
+                    ⚠️ only {stock}remaining!
                   </span>
                 )}
               </span>
@@ -411,17 +394,14 @@ export default function ProductDetailPage() {
             )}
           </div>
 
-          {/* Out of stock warning banner */}
           {!inStock && <OutOfStockBanner />}
 
-          {/* Short description */}
           {product.shortDescription && (
             <p className="text-slate-600 leading-relaxed text-sm border-l-2 border-emerald-200 pl-3">
               {product.shortDescription}
             </p>
           )}
 
-          {/* Variant picker */}
           {attrGroups.length > 0 && (
             <VariantPicker
               groups={attrGroups}
@@ -437,7 +417,6 @@ export default function ProductDetailPage() {
             </p>
           )}
 
-          {/* Tags */}
           {product.tags?.length > 0 && (
             <div className="flex flex-wrap gap-1.5 items-center">
               <Tag className="w-3.5 h-3.5 text-slate-400" />
@@ -474,24 +453,14 @@ export default function ProductDetailPage() {
                 className="flex-1 min-w-48 inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-semibold transition"
               >
                 {addToCart.isPending ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Adding...
-                  </>
+                  <><Loader2 className="w-5 h-5 animate-spin" /> Adding...</>
                 ) : (
-                  <>
-                    <ShoppingCart className="w-5 h-5" />
-                    {attrGroups.length > 0 && !activeVariant ? 'Select options' : 'Add to cart'}
-                  </>
+                  <><ShoppingCart className="w-5 h-5" />{attrGroups.length > 0 && !activeVariant ? 'Select options' : 'Add to cart'}</>
                 )}
               </button>
             ) : (
-              <button
-                disabled
-                className="flex-1 min-w-48 inline-flex items-center justify-center gap-2 bg-slate-200 text-slate-400 cursor-not-allowed px-6 py-3 rounded-lg font-semibold"
-              >
-                <Ban className="w-5 h-5" />
-                Stock নেই
+              <button disabled className="flex-1 min-w-48 inline-flex items-center justify-center gap-2 bg-slate-200 text-slate-400 cursor-not-allowed px-6 py-3 rounded-lg font-semibold">
+                <Ban className="w-5 h-5" /> Stock isn't
               </button>
             )}
 
@@ -510,7 +479,7 @@ export default function ProductDetailPage() {
           {/* Trust badges */}
           <div className="grid grid-cols-3 gap-3 text-xs pt-2">
             {[
-              { Icon: Truck,       title: 'Free shipping',   sub: 'On orders ৳999+' },
+              { Icon: Truck,       title: 'Free shipping',   sub: 'On orders SAR 999+' },
               { Icon: ShieldCheck, title: '2-year warranty', sub: 'Authentic guarantee' },
               { Icon: RotateCcw,   title: '30-day returns',  sub: 'Easy & free' },
             ].map(({ Icon, title, sub }) => (
@@ -524,7 +493,6 @@ export default function ProductDetailPage() {
             ))}
           </div>
 
-          {/* Category */}
           {categoryName && (
             <p className="text-xs text-slate-400 flex items-center gap-1">
               <Package className="w-3.5 h-3.5" />
@@ -562,7 +530,6 @@ export default function ProductDetailPage() {
               {product.description || <span className="text-slate-400">No description available.</span>}
             </p>
           )}
-
           {tab === 'attributes' && (
             <>
               {product.attributes?.length > 0 ? (
@@ -587,7 +554,6 @@ export default function ProductDetailPage() {
               )}
             </>
           )}
-
           {tab === 'reviews' && <ProductReviews productId={product._id} />}
         </div>
       </div>

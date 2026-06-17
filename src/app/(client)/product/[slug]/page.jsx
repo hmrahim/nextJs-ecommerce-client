@@ -16,7 +16,7 @@ import { ProductCard }      from '@/components/client/product/ProductCard';
 import {
   useShopProductBySlug,
   useShopRelatedProducts,
-  useProductVariants,       // ✅ useEffect+useState এর বদলে React Query
+  useProductVariants,       // ✅ useEffect+useState instead of this React Query
 } from '@/hooks/client/useShopProducts';
 
 function buildAttrGroups(variants = []) {
@@ -153,9 +153,9 @@ function OutOfStockBanner() {
     <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3.5 flex items-start gap-3">
       <Ban className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
       <div>
-        <p className="text-sm font-semibold text-rose-700">এই পণ্যটি এখন স্টকে নেই</p>
+        <p className="text-sm font-semibold text-rose-700">This product is currently out of stock</p>
         <p className="text-xs text-rose-500 mt-0.5">
-          দুঃখিত, এই মুহূর্তে পণ্যটি পাওয়া যাচ্ছে না। পরে আবার চেক করুন।
+          Sorry, this product is not available at the moment। Check again later।
         </p>
       </div>
     </div>
@@ -167,7 +167,7 @@ export default function ProductDetailPage() {
 
   const { data: product, isLoading, isError } = useShopProductBySlug(slug);
   const { data: related = [] }                = useShopRelatedProducts(product?._id);
-  // ✅ useEffect+variantService সরিয়ে React Query — cache হবে, route ফিরে এলে re-fetch হবে না
+  // ✅ useEffect+variantService by removing React Query — cache will be, route If you come back re-fetch will not be
   const { data: variants = [] }               = useProductVariants(product?._id);
 
   const addToCart    = useAddToCart();
@@ -241,7 +241,7 @@ export default function ProductDetailPage() {
         ? {
             id:         activeVariant._id,
             _id:        activeVariant._id,
-            sku:        activeVariant.sku,
+            sku:        activeVariant.sku || String(activeVariant._id),
             price:      activeVariant.price,
             title:      activeVariant.variantTitle,
             attributes: activeVariant.attributes,
@@ -302,7 +302,7 @@ export default function ProductDetailPage() {
             {!inStock && (
               <div className="absolute inset-0 flex items-center justify-center">
                 <span className="bg-slate-900/80 text-white text-sm font-bold px-4 py-2 rounded-full tracking-wide">
-                  স্টক নেই
+                  Out of stock
                 </span>
               </div>
             )}
@@ -366,11 +366,11 @@ export default function ProductDetailPage() {
           {/* Price */}
           <div className="flex items-end gap-3">
             <span className={`text-4xl font-bold ${inStock ? 'text-slate-900' : 'text-slate-400'}`}>
-              ৳{Number(price).toLocaleString()}
+              SAR {Number(price).toLocaleString()}
             </span>
             {comparePrice && comparePrice > price && inStock && (
               <>
-                <span className="text-xl line-through text-slate-400">৳{Number(comparePrice).toLocaleString()}</span>
+                <span className="text-xl line-through text-slate-400">SAR {Number(comparePrice).toLocaleString()}</span>
                 <span className="text-sm font-bold text-emerald-600">Save {discount}%</span>
               </>
             )}
@@ -383,7 +383,7 @@ export default function ProductDetailPage() {
                 <Check className="w-4 h-4" /> In stock
                 {stock > 0 && stock <= 10 && (
                   <span className="ml-2 text-amber-600 text-xs font-semibold animate-pulse">
-                    ⚠️ মাত্র {stock}টি বাকি!
+                    ⚠️ only {stock}remaining!
                   </span>
                 )}
               </span>
@@ -460,7 +460,7 @@ export default function ProductDetailPage() {
               </button>
             ) : (
               <button disabled className="flex-1 min-w-48 inline-flex items-center justify-center gap-2 bg-slate-200 text-slate-400 cursor-not-allowed px-6 py-3 rounded-lg font-semibold">
-                <Ban className="w-5 h-5" /> Stock নেই
+                <Ban className="w-5 h-5" /> Stock isn't
               </button>
             )}
 
@@ -479,7 +479,7 @@ export default function ProductDetailPage() {
           {/* Trust badges */}
           <div className="grid grid-cols-3 gap-3 text-xs pt-2">
             {[
-              { Icon: Truck,       title: 'Free shipping',   sub: 'On orders ৳999+' },
+              { Icon: Truck,       title: 'Free shipping',   sub: 'On orders SAR 999+' },
               { Icon: ShieldCheck, title: '2-year warranty', sub: 'Authentic guarantee' },
               { Icon: RotateCcw,   title: '30-day returns',  sub: 'Easy & free' },
             ].map(({ Icon, title, sub }) => (

@@ -1,5 +1,5 @@
 // 📁 PATH: src/hooks/useCoupons.js
-// react-query hooks — useBrands.js pattern follow করা হয়েছে
+// react-query hooks — useBrands.js pattern follow has been done
 // Optimistic updates + cache patching + toast notifications
 
 'use client';
@@ -56,9 +56,9 @@ function removeFromLists(qc, ids) {
   });
 }
 
-// Backend response কে normalize করি — backend যেকোনো shape এ পাঠাতে পারে
+// Backend response Whom normalize Do — backend any shape Can send to this
 function normalizeList(payload) {
-  // আশা করি backend: { success, data: { coupons, total, pages, stats? } }
+  // I hope backend: { success, data: { coupons, total, pages, stats? } }
   const data = payload?.data ?? payload;
   const coupons = data?.coupons || data?.data || data?.items || [];
   return {

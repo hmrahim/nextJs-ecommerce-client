@@ -111,9 +111,9 @@ export default function AttributesPage() {
   const attributes = data?.attributes ?? [];
   const stats      = data?.stats      ?? {};
 
-  // ── Client-side filtering (যদি backend filter না করে) ────────────────────
+  // ── Client-side filtering (If backend filter without doing) ────────────────────
   const filtered = useMemo(() => {
-    // যদি backend filtering করে তাহলে এই block টা সরিয়ে শুধু `attributes` return করো
+    // If backend filtering If you do, then this block Remove it and just `attributes` return Do
     let list = [...attributes];
     if (search)       list = list.filter(a => a.name.toLowerCase().includes(search.toLowerCase()) || a.slug.includes(search.toLowerCase()));
     if (typeFilter)   list = list.filter(a => a.type === typeFilter);

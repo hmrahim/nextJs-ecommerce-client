@@ -20,8 +20,8 @@ function ConfirmDelete({ brand, onConfirm, onCancel }) {
         </div>
         <h3 className="text-white font-semibold text-center mb-1">Delete Brand?</h3>
         <p className="text-slate-400 text-sm text-center mb-4">
-          <span className="text-white font-medium">{brand?.name}</span> permanently delete হবে।
-          এই brand এর সাথে linked products গুলো unbranded হয়ে যাবে।
+          <span className="text-white font-medium">{brand?.name}</span> permanently delete will be।
+          This brand with it linked products s unbranded will be done।
         </p>
         <div className="flex gap-3">
           <button

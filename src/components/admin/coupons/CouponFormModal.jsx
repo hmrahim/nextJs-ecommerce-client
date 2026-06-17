@@ -123,7 +123,7 @@ export default function CouponFormModal({ editing, onSave, onClose, saving = fal
   const previewLabel = () => {
     if (!values.value && values.type !== 'shipping') return null;
     if (values.type === 'percent')  return `${values.value}% off`;
-    if (values.type === 'fixed')    return `৳${values.value} off`;
+    if (values.type === 'fixed')    return `SAR ${values.value} off`;
     if (values.type === 'shipping') return 'Free Shipping';
     return null;
   };
@@ -186,7 +186,7 @@ export default function CouponFormModal({ editing, onSave, onClose, saving = fal
                   )}
                   {Number(values.minOrderAmount) > 0 && (
                     <span className="text-xs text-slate-400">
-                      on orders above ৳{values.minOrderAmount}
+                      on orders above SAR {values.minOrderAmount}
                     </span>
                   )}
                 </div>
@@ -264,7 +264,7 @@ export default function CouponFormModal({ editing, onSave, onClose, saving = fal
               <Field label="Discount Type" required error={errors.type?.message}>
                 <select {...register('type')} className={sel}>
                   <option value="percent">% Percentage off</option>
-                  <option value="fixed">৳ Fixed amount off</option>
+                  <option value="fixed">SAR  Fixed amount off</option>
                   <option value="shipping">🚚 Free shipping</option>
                 </select>
               </Field>
@@ -274,15 +274,15 @@ export default function CouponFormModal({ editing, onSave, onClose, saving = fal
                   values.type === 'percent'
                     ? 'Percentage (%)'
                     : values.type === 'shipping'
-                    ? 'Shipping Value (৳)'
-                    : 'Amount (৳)'
+                    ? 'Shipping Value (SAR )'
+                    : 'Amount (SAR )'
                 }
                 required={values.type !== 'shipping'}
                 error={errors.value?.message}
               >
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs">
-                    {values.type === 'percent' ? '%' : '৳'}
+                    {values.type === 'percent' ? '%' : 'SAR '}
                   </span>
                   <input
                     type="number"
@@ -297,13 +297,13 @@ export default function CouponFormModal({ editing, onSave, onClose, saving = fal
             </div>
 
             <Field
-              label="Minimum Order Amount (৳)"
+              label="Minimum Order Amount (SAR )"
               hint="Leave 0 for no minimum"
               error={errors.minOrderAmount?.message}
             >
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs">
-                  ৳
+                  SAR 
                 </span>
                 <input
                   type="number"

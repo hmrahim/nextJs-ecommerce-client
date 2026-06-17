@@ -3,6 +3,8 @@ import { useState } from 'react';
 import AdminSidebar from '@/components/admin/layout/AdminSidebar';
 import AdminHeader from '@/components/admin/layout/AdminHeader';
 import { useRealtimeSync } from '@/hooks/useRealtimeSync';
+import TopLoadingBarWrapper from '@/components/common/Toploadingbarwrapper';
+
 
 export default function AdminLayoutClient({ children }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -14,6 +16,9 @@ export default function AdminLayoutClient({ children }) {
 
   return (
     <div className="admin-layout-new">
+      {/* ── Premium top loading bar (purple, matches admin accent) ── */}
+      <TopLoadingBarWrapper variant="admin" />
+
       <AdminSidebar
         collapsed={collapsed}
         onToggle={() => setCollapsed(p => !p)}

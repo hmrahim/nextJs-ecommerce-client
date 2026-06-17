@@ -37,8 +37,8 @@ export function useShopProducts(page = 1, filters = {}) {
       });
       return res.data;
     },
-    staleTime:        1000 * 60 * 5,  // 5 মিনিট — আগে 2 মিনিট ছিল
-    placeholderData:  (prev) => prev,  // keepPreviousData এর নতুন API
+    staleTime:        1000 * 60 * 5,  // 5 minutes — before 2 minutes were
+    placeholderData:  (prev) => prev,  // keepPreviousData its new API
   });
 }
 
@@ -50,7 +50,7 @@ export function useShopProductBySlug(slug) {
       return res.data?.data ?? res.data;
     },
     enabled:   !!slug,
-    staleTime: 1000 * 60 * 10, // 10 মিনিট — product details বেশিক্ষণ fresh থাকে
+    staleTime: 1000 * 60 * 10, // 10 minute — product details Too long fresh is
   });
 }
 
@@ -129,8 +129,8 @@ export function useShopProductsByCategory(categorySlug, page = 1, filters = {}) 
   });
 }
 
-// ✅ Variants কে React Query তে নিয়ে এলাম — useEffect + useState এর বদলে
-// ProductDetailPage এ variantService.getPublic() সরাসরি call হচ্ছিল, cache ছিল না
+// ✅ Variants Whom React Query Brought it to — useEffect + useState instead of this
+// ProductDetailPage In variantService.getPublic() direct call was happening, cache was not
 export function useProductVariants(productId) {
   return useQuery({
     queryKey: shopProductKeys.variants(productId),
@@ -141,7 +141,7 @@ export function useProductVariants(productId) {
       return Array.isArray(list) ? list : [];
     },
     enabled:   !!productId,
-    staleTime: 1000 * 60 * 10, // 10 মিনিট cache
+    staleTime: 1000 * 60 * 10, // 10 minute cache
   });
 }
 

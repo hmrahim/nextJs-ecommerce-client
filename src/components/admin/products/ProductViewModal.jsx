@@ -130,7 +130,7 @@ function VariantsSection({ variants = [] }) {
                     title={v.valueLabel}
                   />
                   <span className="text-[10px] text-slate-400 leading-none">{v.valueLabel}</span>
-                  <span className="text-[10px] text-slate-300 font-semibold leading-none">৳{v.price}</span>
+                  <span className="text-[10px] text-slate-300 font-semibold leading-none">SAR {v.price}</span>
                 </div>
               ) : (
                 <div
@@ -138,7 +138,7 @@ function VariantsSection({ variants = [] }) {
                   className="flex flex-col items-center justify-center px-3 py-2 rounded-lg border border-[#2a2a3a] bg-[#1a1a24] hover:border-violet-500/50 transition-colors min-w-[64px]"
                 >
                   <span className="text-xs text-slate-200 font-medium">{v.valueLabel}</span>
-                  <span className="text-[10px] text-slate-400 mt-0.5">৳{v.price}</span>
+                  <span className="text-[10px] text-slate-400 mt-0.5">SAR {v.price}</span>
                   {!v.isActive && <span className="text-[9px] text-red-400 mt-0.5">Inactive</span>}
                 </div>
               )
@@ -171,7 +171,7 @@ function Section({ title, children }) {
 export default function ProductViewModal({ product: listProduct, onClose, onToggleStatus, onEdit }) {
   if (!listProduct) return null;
 
-  // list data তে variants থাকে না — full data fetch করো
+  // list data In variants is not there — full data fetch Do
   const { data: fullProduct, isLoading } = useAdminProductById(listProduct._id);
   const product = fullProduct ?? listProduct;
 
@@ -281,12 +281,12 @@ export default function ProductViewModal({ product: listProduct, onClose, onTogg
               {/* Price */}
               <div className="flex items-baseline gap-3">
                 <span className="text-2xl font-bold text-white">
-                  ৳{product.price?.toLocaleString()}
+                  SAR {product.price?.toLocaleString()}
                 </span>
                 {product.comparePrice && product.comparePrice > product.price && (
                   <>
                     <span className="text-sm text-slate-500 line-through">
-                      ৳{product.comparePrice?.toLocaleString()}
+                      SAR {product.comparePrice?.toLocaleString()}
                     </span>
                     <span className="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 text-xs font-semibold">
                       -{discount}%
@@ -314,7 +314,7 @@ export default function ProductViewModal({ product: listProduct, onClose, onTogg
                 <InfoRow label="Category">{product.category?.name ?? '—'}</InfoRow>
                 {product.subCategory && <InfoRow label="Sub Category">{product.subCategory?.name}</InfoRow>}
                 {product.brand && <InfoRow label="Brand">{product.brand?.name}</InfoRow>}
-                <InfoRow label="Cost">{product.cost ? `৳${product.cost}` : '—'}</InfoRow>
+                <InfoRow label="Cost">{product.cost ? `SAR ${product.cost}` : '—'}</InfoRow>
                 <InfoRow label="Weight">{product.weight ? `${product.weight} kg` : '—'}</InfoRow>
                 {(product.dimensions?.length || product.dimensions?.width || product.dimensions?.height) && (
                   <InfoRow label="Dimensions">
@@ -359,7 +359,7 @@ export default function ProductViewModal({ product: listProduct, onClose, onTogg
                     <div key={i} className="flex items-center justify-between text-sm">
                       <span className="text-slate-400">Buy {d.minQty}+ units</span>
                       <span className="text-emerald-400 font-medium">
-                        {d.type === 'percent' ? `${d.discount}% off` : `৳${d.discount} off`}
+                        {d.type === 'percent' ? `${d.discount}% off` : `SAR ${d.discount} off`}
                       </span>
                     </div>
                   ))}

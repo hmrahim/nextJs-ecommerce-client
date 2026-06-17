@@ -19,7 +19,7 @@ export default function CategoriesPage() {
   const [editing, setEditing]     = useState(null);
   const [parentFor, setParentFor] = useState(null);
 
-  // ── useQuery দিয়ে real data fetch ─────────────────────────────────────────
+  // ── useQuery by real data fetch ─────────────────────────────────────────
   const { data, isLoading, isError } = useQuery({
     queryKey: ['admin-categories'],
     queryFn:  categoryService.adminGetTree,
@@ -96,12 +96,12 @@ const toggleMutation = useMutation({
     return (
       <div className="flex flex-col items-center justify-center h-64 gap-3 text-center">
         <span className="text-4xl">⚠️</span>
-        <p className="text-slate-300 font-medium">Categories load করা যায়নি।</p>
+        <p className="text-slate-300 font-medium">Categories load could not be done।</p>
         <button
           onClick={refetch}
           className="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-black text-sm font-semibold transition-colors"
         >
-          আবার চেষ্টা করো
+          Try again
         </button>
       </div>
     );

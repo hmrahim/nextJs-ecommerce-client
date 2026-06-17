@@ -1,5 +1,5 @@
 // 📁 PATH: src/hooks/useFlashSales.js
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল — src/hooks/ ফোল্ডারে রাখো
+// ⚠️  This is a completely new file — src/hooks/ Keep in folder
 
 import { useState, useCallback } from 'react';
 import { flashSaleService } from '@/services/flashSaleService';

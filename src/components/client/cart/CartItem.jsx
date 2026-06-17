@@ -56,16 +56,16 @@ export default function CartItem({ item }) {
         {/* price row */}
         <div className="flex items-baseline gap-2 mt-0.5">
           <span className="text-base font-bold text-primary">
-            ৳{(price * item.quantity).toLocaleString()}
+            SAR {(price * item.quantity).toLocaleString()}
           </span>
           {comparePrice && comparePrice > price && (
             <span className="text-xs text-muted-foreground line-through">
-              ৳{(comparePrice * item.quantity).toLocaleString()}
+              SAR {(comparePrice * item.quantity).toLocaleString()}
             </span>
           )}
           {item.quantity > 1 && (
             <span className="text-xs text-muted-foreground">
-              (৳{price.toLocaleString()} each)
+              (SAR {price.toLocaleString()} each)
             </span>
           )}
         </div>

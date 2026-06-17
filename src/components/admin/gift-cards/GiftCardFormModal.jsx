@@ -10,7 +10,7 @@ const INITIAL = {
   type: 'digital',
   initialValue: '',
   balance: '',
-  currency: 'BDT',
+  currency: 'SAR',
   recipientName: '',
   recipientEmail: '',
   senderName: '',
@@ -66,7 +66,7 @@ export default function GiftCardFormModal({ editing, onSave, onClose }) {
     type:           editing.type           || 'digital',
     initialValue:   editing.initialValue   ?? '',
     balance:        editing.balance        ?? editing.initialValue ?? '',
-    currency:       editing.currency       || 'BDT',
+    currency:       editing.currency       || 'SAR',
     recipientName:  editing.recipientName  || '',
     recipientEmail: editing.recipientEmail || '',
     senderName:     editing.senderName     || '',
@@ -104,7 +104,7 @@ export default function GiftCardFormModal({ editing, onSave, onClose }) {
 
     const iv = Number(data.initialValue);
     if (!data.initialValue || isNaN(iv) || iv <= 0) e.initialValue = 'Valid amount required';
-    if (iv > 1000000) e.initialValue = 'Amount too large (max ৳10,00,000)';
+    if (iv > 1000000) e.initialValue = 'Amount too large (max SAR 10,00,000)';
 
     if (isEdit) {
       const bal = Number(data.balance);
@@ -176,7 +176,7 @@ export default function GiftCardFormModal({ editing, onSave, onClose }) {
                 <div>
                   <p className="text-[10px] uppercase tracking-widest text-orange-300/80 mb-1">Gift Card</p>
                   <p className="text-2xl font-bold text-white">
-                    ৳{form.initialValue ? Number(form.initialValue).toLocaleString() : '0'}
+                    SAR {form.initialValue ? Number(form.initialValue).toLocaleString() : '0'}
                   </p>
                   {form.recipientName && <p className="text-xs text-slate-300 mt-2">For: <span className="font-medium">{form.recipientName}</span></p>}
                   {form.senderName    && <p className="text-xs text-slate-400">From: {form.senderName}</p>}
@@ -230,8 +230,8 @@ export default function GiftCardFormModal({ editing, onSave, onClose }) {
               </Field>
               <Field label="Currency">
                 <select className={sel} value={form.currency} onChange={e => set('currency', e.target.value)}>
-                  <option value="BDT">৳ BDT</option>
-                  <option value="USD">$ USD</option>
+                  <option value="SAR">SAR  SAR</option>
+                  <option value="SAR">$ SAR</option>
                   <option value="EUR">€ EUR</option>
                 </select>
               </Field>
@@ -240,9 +240,9 @@ export default function GiftCardFormModal({ editing, onSave, onClose }) {
 
           {/* Section: Value */}
           <Section title="Value & Balance">
-            <Field label="Initial Value (৳)" required error={errors.initialValue}>
+            <Field label="Initial Value (SAR )" required error={errors.initialValue}>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs">৳</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs">SAR </span>
                 <input
                   type="number" min="1" step="1"
                   className={`${inp} pl-6`}
@@ -264,7 +264,7 @@ export default function GiftCardFormModal({ editing, onSave, onClose }) {
                           : 'border-[#1e1e2e] text-slate-500 hover:text-slate-300 hover:bg-white/5'
                       }`}
                     >
-                      ৳{a.toLocaleString()}
+                      SAR {a.toLocaleString()}
                     </button>
                   ))}
                 </div>
@@ -272,9 +272,9 @@ export default function GiftCardFormModal({ editing, onSave, onClose }) {
             </Field>
 
             {isEdit && (
-              <Field label="Current Balance (৳)" required error={errors.balance} hint="Admin adjustment — use with care">
+              <Field label="Current Balance (SAR )" required error={errors.balance} hint="Admin adjustment — use with care">
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs">৳</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs">SAR </span>
                   <input
                     type="number" min="0" step="1"
                     className={`${inp} pl-6`}

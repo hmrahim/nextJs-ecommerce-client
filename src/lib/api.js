@@ -2,8 +2,8 @@ import axios from 'axios';
 import { getSession } from 'next-auth/react';
 import { getSessionId } from './session';
 
-// ✅ Session cache — getSession() network call টা প্রতিটা request এ না করে
-// একবার fetch করে 30 সেকেন্ড cache করে রাখে।
+// ✅ Session cache — getSession() network call each one request instead of this
+// once fetch Do 30 second cache keeps it।
 let _cachedSession = null;
 let _cacheExpiry   = 0;
 
@@ -13,11 +13,11 @@ async function getCachedSession() {
     return _cachedSession;
   }
   _cachedSession = await getSession();
-  _cacheExpiry   = now + 30_000; // 30 সেকেন্ড cache
+  _cacheExpiry   = now + 30_000; // 30 second cache
   return _cachedSession;
 }
 
-// Session cache clear করার function (logout এ call করো)
+// Session cache clear to do function (logout In call Do)
 export function clearSessionCache() {
   _cachedSession = null;
   _cacheExpiry   = 0;
@@ -29,7 +29,7 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// ✅ Cached session use করে — প্রতিটা request এ network call হবে না
+// ✅ Cached session use Do — each request In network call will not be
 api.interceptors.request.use(
   async (config) => {
     const session = await getCachedSession();
@@ -54,7 +54,7 @@ api.interceptors.response.use(
   (res) => res,
   (error) => {
     if (error.response?.status === 401) {
-      // 401 এলে session cache clear করো যাতে next request এ fresh session নেয়
+      // 401 If you come session cache clear do so that next request In fresh session takes
       clearSessionCache();
       if (typeof window !== 'undefined') window.location.href = '/auth/login';
     }

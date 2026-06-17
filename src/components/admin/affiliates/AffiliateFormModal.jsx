@@ -1,5 +1,5 @@
 // 📁 PATH: src/components/admin/affiliates/AffiliateFormModal.jsx
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল
+// ⚠️  This is a completely new file
 
 'use client';
 import { useState, useEffect } from 'react';
@@ -114,7 +114,7 @@ export default function AffiliateFormModal({ affiliate, onSave, onClose }) {
                 <input value={form.payoutAccount} onChange={e => set('payoutAccount', e.target.value)} className={ipt} placeholder="Acc no / wallet" />
                 {errors.payoutAccount && <p className="text-xs text-red-400 mt-1">{errors.payoutAccount}</p>}
               </div>
-              <div><label className={lbl}>Min Payout Threshold ৳</label><input type="number" min={0} value={form.minPayoutThreshold} onChange={e => set('minPayoutThreshold', +e.target.value)} className={ipt} /></div>
+              <div><label className={lbl}>Min Payout Threshold SAR </label><input type="number" min={0} value={form.minPayoutThreshold} onChange={e => set('minPayoutThreshold', +e.target.value)} className={ipt} /></div>
             </div>
           </div>
 

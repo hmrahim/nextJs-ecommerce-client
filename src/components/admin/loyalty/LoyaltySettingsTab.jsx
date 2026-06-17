@@ -1,5 +1,5 @@
 // 📁 PATH: src/components/admin/loyalty/LoyaltySettingsTab.jsx
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল
+// ⚠️  This is a completely new file
 
 'use client';
 import { useState, useEffect } from 'react';
@@ -28,9 +28,9 @@ export default function LoyaltySettingsTab({ settings, onSave }) {
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className={lbl}>Redemption Rate (pts → ৳1)</label>
+          <label className={lbl}>Redemption Rate (pts → SAR 1)</label>
           <input type="number" min={1} value={form.redemptionRate} onChange={e => set('redemptionRate', +e.target.value)} className={ipt} />
-          <p className="text-xs text-slate-500 mt-1">{form.redemptionRate} pts = ৳1 cart discount</p>
+          <p className="text-xs text-slate-500 mt-1">{form.redemptionRate} pts = SAR 1 cart discount</p>
         </div>
         <div>
           <label className={lbl}>Min Points to Redeem</label>

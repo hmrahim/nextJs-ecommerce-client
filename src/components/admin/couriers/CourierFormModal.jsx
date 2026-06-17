@@ -129,10 +129,10 @@ export default function CourierFormModal({ open, editing, onSave, onClose }) {
           <div className="border-t border-[#1e1e2e] pt-4">
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">💰 Rates</p>
             <div className="grid grid-cols-4 gap-3">
-              <div><label className={lbl}>Base ৳</label><input type="number" min="0" className={inp} value={form.baseRate} onChange={e => upd('baseRate', e.target.value)} /></div>
-              <div><label className={lbl}>Per Kg ৳</label><input type="number" min="0" className={inp} value={form.perKgRate} onChange={e => upd('perKgRate', e.target.value)} /></div>
+              <div><label className={lbl}>Base SAR </label><input type="number" min="0" className={inp} value={form.baseRate} onChange={e => upd('baseRate', e.target.value)} /></div>
+              <div><label className={lbl}>Per Kg SAR </label><input type="number" min="0" className={inp} value={form.perKgRate} onChange={e => upd('perKgRate', e.target.value)} /></div>
               <div><label className={lbl}>COD %</label><input type="number" min="0" step="0.1" className={inp} value={form.codChargePercent} onChange={e => upd('codChargePercent', e.target.value)} /></div>
-              <div><label className={lbl}>Pickup ৳</label><input type="number" min="0" className={inp} value={form.pickupCharge} onChange={e => upd('pickupCharge', e.target.value)} /></div>
+              <div><label className={lbl}>Pickup SAR </label><input type="number" min="0" className={inp} value={form.pickupCharge} onChange={e => upd('pickupCharge', e.target.value)} /></div>
             </div>
           </div>
 

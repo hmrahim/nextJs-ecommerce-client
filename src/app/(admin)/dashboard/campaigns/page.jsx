@@ -1,5 +1,5 @@
 // 📁 PATH: src/app/(admin)/dashboard/campaigns/page.jsx
-// ⚠️  পুরোনো page.jsx এর জায়গায় REPLACE করো (অথবা নতুন)
+// ⚠️  old page.jsx instead of REPLACE Do (or new)
 
 'use client';
 import { useState, useEffect, useCallback } from 'react';
@@ -18,8 +18,8 @@ const DUMMY = [
   { _id: 'cmp03', name: 'Flash Friday SMS Blast', channel: 'sms',     goal: 'sales',    subject: '',                                       message: 'Flash Friday: 3 hours only — extra 15% off everything. Code FLASH15. Shop now: bit.ly/ff15', segment: 'VIP / Top Spenders', audienceSize: 5200, sentCount: 5200, openCount: 4980, clickCount: 1102, conversions: 412, revenue: 312000, status: 'scheduled', scheduledAt: f(1), createdAt: p(1), couponCode: 'FLASH15' },
   { _id: 'cmp04', name: 'New Arrivals Push',      channel: 'push',    goal: 'awareness',subject: 'New drops are live ✨',                  message: 'Discover this week\'s freshest arrivals before they sell out.', segment: 'Mobile App Users', audienceSize: 28900, sentCount: 28900, openCount: 9200, clickCount: 2410, conversions: 514, revenue: 184200, status: 'completed', scheduledAt: p(3), createdAt: p(10) },
   { _id: 'cmp05', name: 'Abandoned Cart Recovery',channel: 'whatsapp',goal: 'retention',subject: '',                                       message: 'Hey! You left items in your cart 🛒 — complete the order in the next hour and get free shipping.', segment: 'Abandoned Cart Users', audienceSize: 1340, sentCount: 1340, openCount: 1290, clickCount: 412, conversions: 167, revenue: 89400, status: 'running', scheduledAt: p(1), createdAt: p(3) },
-  { _id: 'cmp06', name: 'Loyalty Tier Upgrade',   channel: 'in_app',  goal: 'retention',subject: '🎉 You\'re close to Gold tier!',         message: 'Spend ৳1,500 more this month to unlock Gold tier benefits.', segment: 'Repeat Buyers', audienceSize: 9120, sentCount: 0, openCount: 0, clickCount: 0, conversions: 0, revenue: 0, status: 'draft', scheduledAt: null, createdAt: p(1) },
-  { _id: 'cmp07', name: 'Pohela Boishakh Festival',channel: 'email',  goal: 'launch',   subject: 'শুভ নববর্ষ — celebrate with us 🌸',     message: 'Festive collection live now. Discover handcrafted pieces curated for the season.', segment: 'All Customers', audienceSize: 50100, sentCount: 0, openCount: 0, clickCount: 0, conversions: 0, revenue: 0, status: 'scheduled', scheduledAt: f(15), createdAt: p(2), couponCode: 'NOBOBORSHO25' },
+  { _id: 'cmp06', name: 'Loyalty Tier Upgrade',   channel: 'in_app',  goal: 'retention',subject: '🎉 You\'re close to Gold tier!',         message: 'Spend SAR 1,500 more this month to unlock Gold tier benefits.', segment: 'Repeat Buyers', audienceSize: 9120, sentCount: 0, openCount: 0, clickCount: 0, conversions: 0, revenue: 0, status: 'draft', scheduledAt: null, createdAt: p(1) },
+  { _id: 'cmp07', name: 'Pohela Boishakh Festival',channel: 'email',  goal: 'launch',   subject: 'Happy New Year — celebrate with us 🌸',     message: 'Festive collection live now. Discover handcrafted pieces curated for the season.', segment: 'All Customers', audienceSize: 50100, sentCount: 0, openCount: 0, clickCount: 0, conversions: 0, revenue: 0, status: 'scheduled', scheduledAt: f(15), createdAt: p(2), couponCode: 'NOBOBORSHO25' },
   { _id: 'cmp08', name: 'VIP Early Access Drop',  channel: 'email',   goal: 'sales',    subject: 'VIP only — early access starts in 24h', message: 'You get first dibs on our limited-edition drop before anyone else.', segment: 'VIP / Top Spenders', audienceSize: 1820, sentCount: 1820, openCount: 1410, clickCount: 612, conversions: 248, revenue: 412000, status: 'completed', scheduledAt: p(14), createdAt: p(20) },
   { _id: 'cmp09', name: 'Weekend SMS Reminder',   channel: 'sms',     goal: 'sales',    subject: '',                                       message: 'Weekend is here! Up to 40% off across electronics. Reply STOP to unsubscribe.', segment: 'All Customers', audienceSize: 38400, sentCount: 0, openCount: 0, clickCount: 0, conversions: 0, revenue: 0, status: 'paused', scheduledAt: f(2), createdAt: p(4) },
   { _id: 'cmp10', name: 'Birthday Wish Automation',channel: 'email',  goal: 'retention',subject: '🎂 Happy Birthday — a gift from us',    message: 'Your special day deserves something special. Enjoy 25% off any order this week.', segment: 'All Customers', audienceSize: 0, sentCount: 8420, openCount: 5210, clickCount: 1812, conversions: 612, revenue: 184500, status: 'running', scheduledAt: p(30), createdAt: p(45), couponCode: 'BDAY25' },
@@ -127,7 +127,7 @@ export default function CampaignsPage() {
           { l: 'Scheduled',   v: stats.scheduled,                   c: 'text-sky-400' },
           { l: 'Sent',        v: new Intl.NumberFormat().format(stats.sent), c: 'text-violet-400' },
           { l: 'Conversions', v: new Intl.NumberFormat().format(stats.conversions), c: 'text-orange-400' },
-          { l: 'Revenue',     v: '৳' + new Intl.NumberFormat().format(stats.revenue), c: 'text-emerald-400' },
+          { l: 'Revenue',     v: 'SAR ' + new Intl.NumberFormat().format(stats.revenue), c: 'text-emerald-400' },
         ].map(s => (
           <div key={s.l} className="rounded-xl border border-[#1e1e2e] bg-[#16161f] p-4">
             <p className="text-[10px] uppercase tracking-wider text-slate-500">{s.l}</p>

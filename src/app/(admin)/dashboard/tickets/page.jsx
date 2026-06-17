@@ -70,7 +70,7 @@ const PRIORITY_META = {
 const STATUSES = ["Open", "In Progress", "Waiting", "Escalated", "Resolved", "Closed"];
 const PRIORITIES = ["Urgent", "High", "Medium", "Low"];
 
-const fmtBDT = (n) => "৳" + Number(n || 0).toLocaleString("en-BD");
+const fmtSAR = (n) => "SAR " + Number(n || 0).toLocaleString("en-SA");
 
 /* ----------------------------- atoms ----------------------------- */
 function Pill({ children, bg, fg, dot }) {
@@ -228,11 +228,11 @@ function TicketDrawer({ ticket, onClose, agents, onUpdate }) {
               <Row k="Name" v={ticket.customer} />
               <Row k="Email" v={ticket.email} />
               <Row k="Loyalty" v="Gold · 24 orders" />
-              <Row k="LTV" v={fmtBDT(184750)} />
+              <Row k="LTV" v={fmtSAR(184750)} />
             </Section>
             <Section title="Order">
               <Row k="Order ID" v={ticket.order} />
-              <Row k="Amount" v={fmtBDT(ticket.amount)} />
+              <Row k="Amount" v={fmtSAR(ticket.amount)} />
               <Row k="Payment" v="bKash · Paid" />
               <Row k="Seller" v="TechZone BD" />
             </Section>

@@ -245,7 +245,7 @@ export const DUMMY_SHIPMENTS = [
       { status: 'picked_up',        location: 'Mirpur WH',       operator: 'PF-09', hoursLater: 10 },
       { status: 'at_hub',           location: 'Paperfly Hub',    hoursLater: 18 },
       { status: 'out_for_delivery', location: 'Bashundhara Hub', operator: 'PF-22', hoursLater: 5 },
-      { status: 'delivered',        location: 'Customer Address',note: 'Cash collected ৳2800' },
+      { status: 'delivered',        location: 'Customer Address',note: 'Cash collected SAR 2800' },
     ], 72),
   },
 ];

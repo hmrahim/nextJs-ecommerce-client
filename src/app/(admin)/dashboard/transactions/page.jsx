@@ -72,13 +72,13 @@ export default function TransactionsPage() {
       const newTimeline = [...t.timeline, {
         time: new Date().toISOString(),
         title: isFull ? 'Refund Issued' : 'Partial Refund Issued',
-        desc: `৳${amount.toLocaleString()} refunded - ${reason}${note ? ` (${note})` : ''}`,
+        desc: `SAR ${amount.toLocaleString()} refunded - ${reason}${note ? ` (${note})` : ''}`,
       }];
       return { ...t, status: isFull ? 'REFUNDED' : t.status, notes: note || t.notes, timeline: newTimeline, updatedAt: new Date().toISOString() };
     }));
     setRefund(null);
     setDetail(null);
-    showToast(`Refund of ৳${amount.toLocaleString()} processed`);
+    showToast(`Refund of SAR ${amount.toLocaleString()} processed`);
   };
 
   // Method breakdown
@@ -109,10 +109,10 @@ export default function TransactionsPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
         <StatCard label="Total Txns"    value={stats.total}        sub={`${stats.successRate}% success`} />
-        <StatCard label="Gross Revenue" value={`৳${stats.gross.toLocaleString()}`} sub="from successful" color="text-green-400" />
-        <StatCard label="Net Revenue"   value={`৳${stats.net.toLocaleString()}`}   sub={`Fees ৳${stats.fees.toLocaleString()}`} color="text-orange-400" />
+        <StatCard label="Gross Revenue" value={`SAR ${stats.gross.toLocaleString()}`} sub="from successful" color="text-green-400" />
+        <StatCard label="Net Revenue"   value={`SAR ${stats.net.toLocaleString()}`}   sub={`Fees SAR ${stats.fees.toLocaleString()}`} color="text-orange-400" />
         <StatCard label="Pending"       value={stats.pendingCount} sub="awaiting" color="text-yellow-400" />
-        <StatCard label="Refunds"       value={stats.refundCount}  sub={`৳${stats.refundAmt.toLocaleString()}`} color="text-purple-400" />
+        <StatCard label="Refunds"       value={stats.refundCount}  sub={`SAR ${stats.refundAmt.toLocaleString()}`} color="text-purple-400" />
         <StatCard label="Disputes"      value={stats.disputeCount} sub="needs action" color="text-red-400" />
       </div>
 
@@ -129,7 +129,7 @@ export default function TransactionsPage() {
                 <div className="h-full bg-gradient-to-r from-orange-500 to-orange-400" style={{ width: `${(m.amount / maxMethodAmount) * 100}%` }} />
               </div>
               <div className="w-32 text-right text-xs">
-                <span className="text-white font-medium">৳{m.amount.toLocaleString()}</span>
+                <span className="text-white font-medium">SAR {m.amount.toLocaleString()}</span>
                 <span className="text-gray-500 ml-2">({m.count})</span>
               </div>
             </div>

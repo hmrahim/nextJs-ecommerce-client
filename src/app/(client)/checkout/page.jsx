@@ -196,7 +196,7 @@ function LocationPickerMap({ value, onChange }) {
         <input
           value={search}
           onChange={(e) => handleSearch(e.target.value)}
-          placeholder="এলাকা / রাস্তা খুঁজুন…"
+          placeholder="area / Find route…"
           className="w-full rounded-lg border border-border bg-background pl-9 pr-4 py-2.5 text-sm
             outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
         />
@@ -221,7 +221,7 @@ function LocationPickerMap({ value, onChange }) {
         {loading && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-muted/80 gap-2">
             <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
-            <span className="text-xs text-muted-foreground">ম্যাপ লোড হচ্ছে…</span>
+            <span className="text-xs text-muted-foreground">Map is loading…</span>
           </div>
         )}
         <div ref={mapRef} className="h-full w-full" />
@@ -238,13 +238,13 @@ function LocationPickerMap({ value, onChange }) {
           {locating
             ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
             : <Navigation className="h-3.5 w-3.5 text-emerald-600" />}
-          আমার অবস্থান
+          My location
         </button>
 
         {/* hint */}
         <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[500] pointer-events-none">
           <div className="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-[11px] font-medium text-muted-foreground shadow border border-border whitespace-nowrap">
-            📍 Pin টি drag করুন বা map এ click করুন
+            📍 Pin The drag do or map In click do
           </div>
         </div>
       </div>
@@ -353,7 +353,7 @@ function OrderSummary({ items, subtotal, shippingCost, coupon, couponDiscount, t
       <div className="px-5 py-3 space-y-3 max-h-52 overflow-y-auto">
         {items.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-4">
-            Cart খালি।{' '}<Link href="/cart" className="text-emerald-600 underline">Cart এ যান</Link>
+            Cart empty।{' '}<Link href="/cart" className="text-emerald-600 underline">Cart Go to</Link>
           </p>
         ) : items.map((it) => (
           <div key={it.key} className="flex gap-3 items-start">
@@ -373,7 +373,7 @@ function OrderSummary({ items, subtotal, shippingCost, coupon, couponDiscount, t
               )}
             </div>
             <span className="text-sm font-bold text-emerald-700 whitespace-nowrap">
-              ৳{it.lineTotal.toLocaleString()}
+              SAR {it.lineTotal.toLocaleString()}
             </span>
           </div>
         ))}
@@ -387,28 +387,28 @@ function OrderSummary({ items, subtotal, shippingCost, coupon, couponDiscount, t
 
       <div className="px-5 py-4 border-t border-border space-y-2 text-sm">
         <div className="flex justify-between text-muted-foreground">
-          <span>Subtotal</span><span>৳{subtotal.toLocaleString()}</span>
+          <span>Subtotal</span><span>SAR {subtotal.toLocaleString()}</span>
         </div>
         <div className="flex justify-between text-muted-foreground">
           <span>Shipping</span>
           <span className={shippingCost === 0 ? 'text-emerald-700 font-semibold' : ''}>
-            {shippingCost === 0 ? 'FREE' : `৳${shippingCost}`}
+            {shippingCost === 0 ? 'FREE' : `SAR ${shippingCost}`}
           </span>
         </div>
         {couponDiscount > 0 && (
           <div className="flex justify-between text-emerald-700 font-semibold">
-            <span>Coupon discount</span><span>-৳{couponDiscount.toLocaleString()}</span>
+            <span>Coupon discount</span><span>-SAR {couponDiscount.toLocaleString()}</span>
           </div>
         )}
         <div className="flex justify-between border-t border-border pt-3 font-bold text-base">
           <span>Total</span>
-          <span className="text-emerald-700">৳{total.toLocaleString()}</span>
+          <span className="text-emerald-700">SAR {total.toLocaleString()}</span>
         </div>
       </div>
 
       {couponDiscount > 0 && (
         <div className="mx-5 mb-4 rounded-lg bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 text-center">
-          🎉 Coupon এ ৳{couponDiscount.toLocaleString()} সাশ্রয়!
+          🎉 Coupon At SAR {couponDiscount.toLocaleString()} save!
         </div>
       )}
     </div>
@@ -443,13 +443,13 @@ function StepAddress({ form, setForm, onNext }) {
         <div className="flex items-center gap-2 mb-3">
           <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-600 text-white text-xs font-bold">1</span>
           <h2 className="text-sm font-bold uppercase tracking-wider">
-            ডেলিভারি লোকেশন বেছে নিন <span className="text-rose-500">*</span>
+            Choose delivery location <span className="text-rose-500">*</span>
           </h2>
         </div>
         <LocationPickerMap value={form.location} onChange={setLocation} />
         {!form.location?.lat && (
           <p className="mt-2 text-xs text-rose-500 font-medium flex items-center gap-1">
-            ⚠ Map এ আপনার সঠিক অবস্থান mark করুন — ডেলিভারির জন্য এটি প্রয়োজনীয়।
+            ⚠ Map Your correct location in this mark Do — it is required for delivery।
           </p>
         )}
       </div>
@@ -458,7 +458,7 @@ function StepAddress({ form, setForm, onNext }) {
       <div>
         <div className="flex items-center gap-2 mb-3">
           <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-600 text-white text-xs font-bold">2</span>
-          <h2 className="text-sm font-bold uppercase tracking-wider">যোগাযোগের তথ্য</h2>
+          <h2 className="text-sm font-bold uppercase tracking-wider">Contact information</h2>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="First Name" value={form.firstName} onChange={set('firstName')} required />
@@ -474,8 +474,8 @@ function StepAddress({ form, setForm, onNext }) {
       <div>
         <div className="flex items-center gap-2 mb-3">
           <span className="flex h-6 w-6 items-center justify-center rounded-full bg-muted border border-border text-muted-foreground text-xs font-bold">3</span>
-          <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">অতিরিক্ত ঠিকানা</h2>
-          <span className="text-xs text-muted-foreground">(ঐচ্ছিক)</span>
+          <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Additional address</h2>
+          <span className="text-xs text-muted-foreground">(optional)</span>
         </div>
 
         {!showExtra ? (
@@ -486,7 +486,7 @@ function StepAddress({ form, setForm, onNext }) {
               transition-all w-full justify-center group"
           >
             <Plus className="h-4 w-4 group-hover:scale-110 transition-transform" />
-            ফ্ল্যাট নম্বর / তলা / গলি — extra details যোগ করুন
+            Flat number / Floor / Lane — extra details Add
           </button>
         ) : (
           <div className="rounded-xl border border-emerald-200 bg-emerald-50/30 p-4 space-y-3
@@ -506,25 +506,25 @@ function StepAddress({ form, setForm, onNext }) {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <Field label="বাড়ি / ফ্ল্যাট নম্বর" placeholder="যেমন: Flat 3B, House 12"
+              <Field label="home / Flat number" placeholder="such as: Flat 3B, House 12"
                 value={form.houseNo} onChange={set('houseNo')} full />
-              <Field label="রোড / গলি" placeholder="যেমন: Road 5, Dhanmondi"
+              <Field label="Road / Lane" placeholder="such as: Road 5, Dhanmondi"
                 value={form.road} onChange={set('road')} />
-              <Field label="এলাকা / থানা" placeholder="যেমন: Mohammadpur"
+              <Field label="area / police station" placeholder="such as: Mohammadpur"
                 value={form.area} onChange={set('area')} />
-              <Field label="শহর" placeholder="Dhaka"
+              <Field label="City" placeholder="Dhaka"
                 value={form.city} onChange={set('city')} />
               <Field label="Postal Code" placeholder="1207"
                 value={form.postal} onChange={set('postal')} />
-              <Field label="Landmark" placeholder="কাছের পরিচিত জায়গা"
+              <Field label="Landmark" placeholder="Nearby familiar places"
                 value={form.landmark} onChange={set('landmark')} />
-              <Field label="Delivery Note" placeholder="গেট বন্ধ থাকলে call করুন…"
+              <Field label="Delivery Note" placeholder="If the gate is closed call do…"
                 full value={form.note} onChange={set('note')} />
             </div>
 
             <button onClick={() => setShowExtra(false)}
               className="flex items-center gap-1 text-xs text-muted-foreground hover:text-rose-600 transition-colors">
-              <X className="h-3.5 w-3.5" /> বন্ধ করুন
+              <X className="h-3.5 w-3.5" /> Close
             </button>
           </div>
         )}
@@ -537,7 +537,7 @@ function StepAddress({ form, setForm, onNext }) {
         className="w-full rounded-xl bg-emerald-600 py-3.5 font-bold text-white hover:bg-emerald-700
           disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-sm"
       >
-        Delivery Method বেছে নিন <ChevronRight className="h-4 w-4" />
+        Delivery Method Choose <ChevronRight className="h-4 w-4" />
       </button>
     </div>
   );
@@ -551,7 +551,7 @@ function StepDelivery({ delivery, setDelivery, freeShip, onNext, onBack }) {
     <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-300">
       <div>
         <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
-          <Truck className="h-4 w-4" /> Delivery Method বেছে নিন
+          <Truck className="h-4 w-4" /> Delivery Method Choose
         </h2>
         <div className="space-y-3">
           {DELIVERY_OPTIONS.map((d) => (
@@ -580,14 +580,14 @@ function StepDelivery({ delivery, setDelivery, freeShip, onNext, onBack }) {
                 </div>
               </div>
               <span className={`font-bold text-sm ${d.price === 0 || freeShip ? 'text-emerald-700' : ''}`}>
-                {d.price === 0 || freeShip ? 'FREE' : `৳${d.price}`}
+                {d.price === 0 || freeShip ? 'FREE' : `SAR ${d.price}`}
               </span>
             </label>
           ))}
         </div>
         {freeShip && (
           <p className="mt-3 text-xs text-emerald-700 font-semibold bg-emerald-50 rounded-lg px-3 py-2 text-center">
-            🎉 আপনার order এ free shipping আছে!
+            🎉 Your order In free shipping is!
           </p>
         )}
       </div>
@@ -598,7 +598,7 @@ function StepDelivery({ delivery, setDelivery, freeShip, onNext, onBack }) {
         </button>
         <button onClick={onNext}
           className="flex-1 rounded-xl bg-emerald-600 py-3.5 font-bold text-white hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 shadow-sm">
-          Payment Method বেছে নিন <ChevronRight className="h-4 w-4" />
+          Payment Method Choose <ChevronRight className="h-4 w-4" />
         </button>
       </div>
     </div>
@@ -658,7 +658,7 @@ function StepPayment({ payment, setPayment, cardForm, setCardForm, onNext, onBac
           <div className="mt-4 rounded-xl border border-pink-200 bg-pink-50/50 p-4 text-xs text-pink-800 space-y-1
             animate-in fade-in slide-in-from-top-2 duration-200">
             <p className="font-bold">Mobile Banking Instructions</p>
-            <p>Order confirm হলে আপনার নম্বরে payment link পাঠানো হবে।</p>
+            <p>Order confirm If so, to your number payment link will be sent।</p>
           </div>
         )}
       </div>
@@ -670,7 +670,7 @@ function StepPayment({ payment, setPayment, cardForm, setCardForm, onNext, onBac
         <button onClick={onNext} disabled={!valid}
           className="flex-1 rounded-xl bg-emerald-600 py-3.5 font-bold text-white hover:bg-emerald-700
             disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-sm">
-          Order Review করুন <ChevronRight className="h-4 w-4" />
+          Order Review do <ChevronRight className="h-4 w-4" />
         </button>
       </div>
     </div>
@@ -693,7 +693,7 @@ function StepConfirm({ form, delivery, payment, total, shippingCost, couponDisco
       <div className="grid gap-3 sm:grid-cols-2">
         {/* location */}
         <div className="rounded-xl border border-border bg-muted/30 p-4 sm:col-span-2">
-          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">📍 ডেলিভারি লোকেশন</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">📍 Delivery location</p>
           <p className="text-xs text-muted-foreground leading-relaxed">{form.location?.address}</p>
           {form.houseNo && (
             <p className="text-xs font-medium mt-1">
@@ -705,7 +705,7 @@ function StepConfirm({ form, delivery, payment, total, shippingCost, couponDisco
         </div>
 
         <div className="rounded-xl border border-border bg-muted/30 p-4">
-          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">👤 যোগাযোগ</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">👤 contact</p>
           <p className="font-semibold text-sm">{form.firstName} {form.lastName}</p>
           <p className="text-xs text-muted-foreground mt-0.5">{form.phone}</p>
           {form.email && <p className="text-xs text-muted-foreground">{form.email}</p>}
@@ -716,7 +716,7 @@ function StepConfirm({ form, delivery, payment, total, shippingCost, couponDisco
           <p className="font-semibold text-sm">{dOpt?.label}</p>
           <p className="text-xs text-muted-foreground mt-0.5">{dOpt?.sub}</p>
           <p className="mt-1.5 text-xs font-bold text-emerald-700">
-            {shippingCost === 0 ? 'FREE' : `৳${shippingCost}`}
+            {shippingCost === 0 ? 'FREE' : `SAR ${shippingCost}`}
           </p>
         </div>
       </div>
@@ -730,16 +730,16 @@ function StepConfirm({ form, delivery, payment, total, shippingCost, couponDisco
         <div className="space-y-1.5 border-t border-border pt-3 text-sm">
           {couponDiscount > 0 && (
             <div className="flex justify-between text-emerald-700 font-semibold">
-              <span>Coupon discount</span><span>-৳{couponDiscount.toLocaleString()}</span>
+              <span>Coupon discount</span><span>-SAR {couponDiscount.toLocaleString()}</span>
             </div>
           )}
           <div className="flex justify-between text-muted-foreground">
             <span>Shipping</span>
-            <span>{shippingCost === 0 ? 'FREE' : `৳${shippingCost}`}</span>
+            <span>{shippingCost === 0 ? 'FREE' : `SAR ${shippingCost}`}</span>
           </div>
           <div className="flex items-center justify-between border-t border-border pt-2 font-bold text-base">
             <span>Total to pay</span>
-            <span className="text-emerald-700 text-xl">৳{total.toLocaleString()}</span>
+            <span className="text-emerald-700 text-xl">SAR {total.toLocaleString()}</span>
           </div>
         </div>
       </div>
@@ -753,8 +753,8 @@ function StepConfirm({ form, delivery, payment, total, shippingCost, couponDisco
           className="flex-1 rounded-xl bg-amber-400 py-3.5 font-bold text-emerald-950 hover:bg-amber-300
             disabled:opacity-60 transition-all flex items-center justify-center gap-2 shadow-md shadow-amber-200 text-base">
           {placing
-            ? <><Loader2 className="h-5 w-5 animate-spin" /> অপেক্ষা করুন…</>
-            : '✓ Order Confirm করুন'}
+            ? <><Loader2 className="h-5 w-5 animate-spin" /> Please wait…</>
+            : '✓ Order Confirm do'}
         </button>
       </div>
 
@@ -866,14 +866,14 @@ export default function CheckoutPage() {
 
       if (status === 409) {
         // Stock conflict — item out of stock since cart was loaded
-        toast.error(message || 'একটি পণ্যের stock শেষ হয়ে গেছে। Cart চেক করুন।');
+        toast.error(message || 'of a product stock Has finished। Cart Check।');
       } else if (status === 400) {
-        toast.error(message || 'Order information সঠিক নয়। আবার চেষ্টা করুন।');
+        toast.error(message || 'Order information incorrect। Try again।');
       } else if (status === 401) {
-        toast.error('Login করুন এবং আবার try করুন।');
+        toast.error('Login Do and again try do।');
         router.push('/auth/login');
       } else {
-        toast.error(message || 'Order place করা যায়নি। একটু পরে আবার চেষ্টা করুন।');
+        toast.error(message || 'Order place could not be done। Please try again later।');
       }
 
       setPlacing(false);
@@ -883,7 +883,7 @@ export default function CheckoutPage() {
   if (isLoading) {
     return (
       <div className="container-x py-20 flex items-center justify-center gap-3 text-muted-foreground">
-        <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />লোড হচ্ছে…
+        <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />Loading…
       </div>
     );
   }
@@ -899,7 +899,7 @@ export default function CheckoutPage() {
         </div>
         <Link href="/cart"
           className="text-xs font-semibold text-muted-foreground hover:text-emerald-700 flex items-center gap-1 transition-colors">
-          <ArrowLeft className="h-3.5 w-3.5" /> Cart এ ফিরে যান
+          <ArrowLeft className="h-3.5 w-3.5" /> Cart Go back to
         </Link>
       </div>
 

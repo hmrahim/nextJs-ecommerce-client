@@ -1,13 +1,13 @@
 // 📁 PATH: src/components/admin/flash-sales/FlashSaleTable.jsx
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল
+// ⚠️  This is a completely new file
 
 'use client';
 import { useState } from 'react';
 import CountdownTimer from './CountdownTimer';
 
 /* ── helpers ────────────────────────────────────────────────────── */
-function fmt(d)  { return new Date(d).toLocaleString('en-BD', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }); }
-function fmtBDT(n){ return `৳${Number(n).toLocaleString('en-BD')}`; }
+function fmt(d)  { return new Date(d).toLocaleString('en-SA', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }); }
+function fmtSAR(n){ return `SAR ${Number(n).toLocaleString('en-SA')}`; }
 
 const STATUS_STYLE = {
   active:    'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
@@ -139,7 +139,7 @@ export default function FlashSaleTable({ sales, loading, onEdit, onDelete, onTog
                       {sale.name}
                     </button>
                     <span className="text-[11px] px-2 py-0.5 rounded-full bg-[#1e1e2e] text-slate-400 font-mono flex-shrink-0">
-                      {sale.discountType === 'percent' ? `${sale.discountValue}% OFF` : `৳${sale.discountValue} OFF`}
+                      {sale.discountType === 'percent' ? `${sale.discountValue}% OFF` : `SAR ${sale.discountValue} OFF`}
                     </span>
                   </div>
                   <div className="flex items-center gap-3 mt-0.5">
@@ -169,7 +169,7 @@ export default function FlashSaleTable({ sales, loading, onEdit, onDelete, onTog
 
                 {/* Revenue */}
                 <div className="w-24 hidden xl:block flex-shrink-0">
-                  <p className="text-sm font-semibold text-emerald-400">{fmtBDT(sale.revenue || 0)}</p>
+                  <p className="text-sm font-semibold text-emerald-400">{fmtSAR(sale.revenue || 0)}</p>
                 </div>
 
                 {/* Actions */}
@@ -217,8 +217,8 @@ export default function FlashSaleTable({ sales, loading, onEdit, onDelete, onTog
                           <p className="text-[10px] text-slate-600 font-mono">{p.sku}</p>
                         </div>
                         <div className="text-right flex-shrink-0">
-                          <p className="text-xs font-bold text-orange-400">{fmtBDT(p.salePrice)}</p>
-                          <p className="text-[10px] text-slate-600 line-through">{fmtBDT(p.originalPrice)}</p>
+                          <p className="text-xs font-bold text-orange-400">{fmtSAR(p.salePrice)}</p>
+                          <p className="text-[10px] text-slate-600 line-through">{fmtSAR(p.originalPrice)}</p>
                         </div>
                         <div className="text-right flex-shrink-0 hidden sm:block">
                           <p className="text-[10px] text-slate-400">{p.sold}/{p.stock} sold</p>

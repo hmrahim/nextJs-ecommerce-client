@@ -13,7 +13,7 @@ export const useCategorySSE = () => {
     let isUnmounted = false;
 
     const connect = async () => {
-      // EventSource কাস্টম হেডার পাঠাতে পারে না, তাই token কে query param এ পাঠাতে হবে
+      // EventSource Cannot send custom headers, so token Whom query param Must be sent to
       const session = await getSession();
       const token = session?.accessToken || session?.user?.token;
       if (!token) {

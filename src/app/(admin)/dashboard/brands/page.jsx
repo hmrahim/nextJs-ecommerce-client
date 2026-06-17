@@ -46,7 +46,7 @@ export default function BrandsPage() {
   const brands = data?.brands ?? [];
   const stats  = data?.stats  ?? {};
 
-  // ── Client-side filter (fallback যদি backend filter না করে) ──────────────
+  // ── Client-side filter (fallback If backend filter without doing) ──────────────
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
     return brands.filter((b) => {

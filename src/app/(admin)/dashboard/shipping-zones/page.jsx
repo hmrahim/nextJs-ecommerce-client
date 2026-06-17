@@ -62,7 +62,7 @@ export default function ShippingZonesPage() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Shipping Zones</h1>
-          <p className="text-sm text-slate-400 mt-0.5">Region-wise delivery rates, COD options & courier mapping configure করো।</p>
+          <p className="text-sm text-slate-400 mt-0.5">Region-wise delivery rates, COD options & courier mapping configure Do।</p>
         </div>
         <div className="flex items-center gap-2">
           {selected.length > 0 && (
@@ -84,7 +84,7 @@ export default function ShippingZonesPage() {
           { label: 'Total Zones',  value: stats.total,      color: 'text-white' },
           { label: 'Active',       value: stats.active,     color: 'text-emerald-400' },
           { label: 'Inactive',     value: stats.inactive,   color: 'text-slate-400' },
-          { label: 'Avg Rate',     value: `৳${stats.avgRate}`, color: 'text-orange-400' },
+          { label: 'Avg Rate',     value: `SAR ${stats.avgRate}`, color: 'text-orange-400' },
           { label: 'COD Zones',    value: stats.codZones,   color: 'text-sky-400' },
           { label: 'Orders (30d)', value: stats.orders30d.toLocaleString(), color: 'text-violet-400' },
         ].map(s => (

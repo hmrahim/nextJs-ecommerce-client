@@ -126,7 +126,7 @@ export default function BannersPage() {
   const banners = data?.banners ?? [];
   const stats   = data?.stats   ?? {};
 
-  // ── Client-side filter (debounce ছাড়া কাজ করার জন্য) ───────────────────────
+  // ── Client-side filter (debounce to work without it) ───────────────────────
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
     return banners.filter((b) => {

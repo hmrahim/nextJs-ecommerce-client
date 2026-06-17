@@ -10,7 +10,7 @@ export const reviewKeys = {
   byProduct: (productId, filters) => ['client-reviews', 'product', productId, filters],
 };
 
-/** productId-র সব review queries invalidate করে — filters যাই হোক */
+/** productId-'s all review queries invalidate Do — filters anyway */
 function invalidateProduct(queryClient, productId) {
   queryClient.invalidateQueries({
     queryKey: ['client-reviews', 'product', productId],

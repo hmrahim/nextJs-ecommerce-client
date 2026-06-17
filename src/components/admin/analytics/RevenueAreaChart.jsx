@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 
 function formatK(n) {
-  return n >= 1000 ? '$' + (n / 1000).toFixed(1) + 'k' : '$' + n;
+  return n >= 1000 ? 'SAR' + (n / 1000).toFixed(1) + 'k' : 'SAR' + n;
 }
 
 export default function RevenueAreaChart({ data = [], height = 240 }) {

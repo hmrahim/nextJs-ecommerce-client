@@ -1,7 +1,7 @@
 'use client';
 
 function formatValue(value, type) {
-  if (type === 'currency') return '$' + value.toLocaleString('en', { minimumFractionDigits: 0 });
+  if (type === 'currency') return 'SAR' + value.toLocaleString('en', { minimumFractionDigits: 0 });
   if (type === 'percent') return value.toFixed(1) + '%';
   if (type === 'number') return value.toLocaleString('en');
   return value;

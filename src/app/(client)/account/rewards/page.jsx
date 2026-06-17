@@ -5,16 +5,16 @@ import toast from 'react-hot-toast';
 const HISTORY = [
   { id: 1, label: 'Order ORD-10001', date: 'Jun 09, 2026', points: +124, type: 'earn' },
   { id: 2, label: 'Birthday bonus', date: 'May 14, 2026', points: +200, type: 'earn' },
-  { id: 3, label: 'Redeemed ৳200 voucher', date: 'May 02, 2026', points: -400, type: 'redeem' },
+  { id: 3, label: 'Redeemed SAR 200 voucher', date: 'May 02, 2026', points: -400, type: 'redeem' },
   { id: 4, label: 'Order ORD-09823', date: 'Apr 28, 2026', points: +88, type: 'earn' },
   { id: 5, label: 'Product review bonus', date: 'Apr 20, 2026', points: +50, type: 'earn' },
 ];
 
 const REWARDS = [
-  { id: 1, title: '৳100 off voucher', cost: 200, icon: Gift, color: 'from-emerald-500 to-emerald-700' },
-  { id: 2, title: '৳500 off voucher', cost: 900, icon: Gift, color: 'from-amber-500 to-orange-600' },
+  { id: 1, title: 'SAR 100 off voucher', cost: 200, icon: Gift, color: 'from-emerald-500 to-emerald-700' },
+  { id: 2, title: 'SAR 500 off voucher', cost: 900, icon: Gift, color: 'from-amber-500 to-orange-600' },
   { id: 3, title: 'Free shipping for a month', cost: 1500, icon: Zap, color: 'from-sky-500 to-blue-700' },
-  { id: 4, title: '৳1,000 cashback', cost: 1800, icon: Award, color: 'from-rose-500 to-pink-700' },
+  { id: 4, title: 'SAR 1,000 cashback', cost: 1800, icon: Award, color: 'from-rose-500 to-pink-700' },
 ];
 
 const TIERS = [
@@ -43,7 +43,7 @@ export default function RewardsPage() {
           </div>
           <div className="text-right">
             <p className="text-xs uppercase tracking-wider opacity-80">Lifetime spent</p>
-            <p className="text-2xl font-bold">৳48,200</p>
+            <p className="text-2xl font-bold">SAR 48,200</p>
           </div>
         </div>
         <div className="relative mt-5">

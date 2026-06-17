@@ -86,7 +86,7 @@ export default function TrackingTable({ shipments, loading, onView }) {
                     <p className="text-xs text-slate-300 max-w-[140px] truncate" title={s.currentLocation}>📍 {s.currentLocation}</p>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap">
-                    <p className="text-sm text-white font-semibold">৳{s.value.toLocaleString()}</p>
+                    <p className="text-sm text-white font-semibold">SAR {s.value.toLocaleString()}</p>
                     {s.isCod && <p className="text-[10px] text-amber-400">COD</p>}
                   </td>
                   <td className="px-4 py-3">

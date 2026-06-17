@@ -1,5 +1,5 @@
 // 📁 PATH: src/components/admin/loyalty/LoyaltyTiersTab.jsx
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল
+// ⚠️  This is a completely new file
 
 'use client';
 import { useState } from 'react';
@@ -34,7 +34,7 @@ export default function LoyaltyTiersTab({ tiers, onSave, onDelete }) {
               {isEditing ? (
                 <div className="space-y-2">
                   <input value={draft.name} onChange={e => setDraft({ ...draft, name: e.target.value })} className={ipt} placeholder="Tier name" />
-                  <input type="number" min={0} value={draft.threshold} onChange={e => setDraft({ ...draft, threshold: +e.target.value })} className={ipt} placeholder="Threshold (pts/৳)" />
+                  <input type="number" min={0} value={draft.threshold} onChange={e => setDraft({ ...draft, threshold: +e.target.value })} className={ipt} placeholder="Threshold (pts/SAR )" />
                   <input type="number" step={0.1} min={1} value={draft.multiplier} onChange={e => setDraft({ ...draft, multiplier: +e.target.value })} className={ipt} placeholder="Earn multiplier" />
                   <input value={draft.perks} onChange={e => setDraft({ ...draft, perks: e.target.value })} className={ipt} placeholder="Perks (comma separated)" />
                   <div className="flex gap-2 pt-2">
@@ -69,7 +69,7 @@ export default function LoyaltyTiersTab({ tiers, onSave, onDelete }) {
         {draft && editing === null && (
           <div className="rounded-xl border border-orange-500/30 bg-orange-500/5 p-4 space-y-2">
             <input value={draft.name} onChange={e => setDraft({ ...draft, name: e.target.value })} className={ipt} placeholder="Tier name" />
-            <input type="number" min={0} value={draft.threshold} onChange={e => setDraft({ ...draft, threshold: +e.target.value })} className={ipt} placeholder="Threshold (pts/৳)" />
+            <input type="number" min={0} value={draft.threshold} onChange={e => setDraft({ ...draft, threshold: +e.target.value })} className={ipt} placeholder="Threshold (pts/SAR )" />
             <input type="number" step={0.1} min={1} value={draft.multiplier} onChange={e => setDraft({ ...draft, multiplier: +e.target.value })} className={ipt} placeholder="Earn multiplier" />
             <input value={draft.perks} onChange={e => setDraft({ ...draft, perks: e.target.value })} className={ipt} placeholder="Perks (comma separated)" />
             <div className="flex gap-2 pt-2">

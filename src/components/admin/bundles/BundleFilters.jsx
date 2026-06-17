@@ -1,5 +1,5 @@
 // 📁 PATH: src/components/admin/bundles/BundleFilters.jsx
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল
+// ⚠️  This is a completely new file
 
 'use client';
 import { useState, useEffect } from 'react';

@@ -101,7 +101,7 @@ export function useConfirmOrder() {
       qc.invalidateQueries({ queryKey: ['admin-order', vars.id] });
       qc.invalidateQueries({ queryKey: ['admin-order-stats'] });
       qc.invalidateQueries({ queryKey: ['admin-riders'] });
-      toast.success('Order confirmed & rider assigned');
+      toast.success(vars.riderId ? 'Order confirmed & rider assigned' : 'Order confirmed');
     },
     onError: (e) => toast.error(e?.response?.data?.message || 'Could not confirm order'),
   });
@@ -193,6 +193,3 @@ export function useRiderDeliver() {
     onError: (e) => toast.error(e?.response?.data?.message || 'Could not complete delivery'),
   });
 }
-
-
-

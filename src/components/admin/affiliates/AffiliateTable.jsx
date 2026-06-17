@@ -1,5 +1,5 @@
 // 📁 PATH: src/components/admin/affiliates/AffiliateTable.jsx
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল
+// ⚠️  This is a completely new file
 
 'use client';
 import { useState } from 'react';
@@ -94,8 +94,8 @@ export default function AffiliateTable({ affiliates, loading, selected, onSelect
                       <div><p className="text-slate-500">Conv.</p><p className="text-violet-400 font-semibold">{new Intl.NumberFormat().format(a.conversions || 0)}</p></div>
                     </div>
                   </td>
-                  <td className="px-4 py-3"><p className="text-sm text-emerald-400 font-semibold">৳{new Intl.NumberFormat().format(a.totalRevenue || 0)}</p></td>
-                  <td className="px-4 py-3"><p className="text-sm text-amber-400 font-semibold">৳{new Intl.NumberFormat().format(a.pendingPayout || 0)}</p></td>
+                  <td className="px-4 py-3"><p className="text-sm text-emerald-400 font-semibold">SAR {new Intl.NumberFormat().format(a.totalRevenue || 0)}</p></td>
+                  <td className="px-4 py-3"><p className="text-sm text-amber-400 font-semibold">SAR {new Intl.NumberFormat().format(a.pendingPayout || 0)}</p></td>
                   <td className="px-4 py-3"><span className={`px-2 py-1 rounded-md border text-xs font-medium ${st.cls}`}>{st.label}</span></td>
                   <td className="px-4 py-3 text-right">
                     <div className="relative inline-block">
@@ -107,7 +107,7 @@ export default function AffiliateTable({ affiliates, loading, selected, onSelect
                             <button onClick={() => { setMenuFor(null); onEdit(a); }} className="w-full text-left px-3 py-2 text-sm text-slate-300 hover:bg-white/5">✏️ Edit</button>
                             {a.status === 'pending'  && <button onClick={() => { setMenuFor(null); onApprove(a._id); }} className="w-full text-left px-3 py-2 text-sm text-emerald-400 hover:bg-white/5">✅ Approve</button>}
                             {a.status === 'approved' && <button onClick={() => { setMenuFor(null); setConfirmAction({ type: 'suspend', id: a._id, name: a.name }); }} className="w-full text-left px-3 py-2 text-sm text-amber-400 hover:bg-white/5">🚫 Suspend</button>}
-                            {a.pendingPayout > 0     && <button onClick={() => { setMenuFor(null); onPayout(a); }} className="w-full text-left px-3 py-2 text-sm text-sky-400 hover:bg-white/5">💸 Pay out ৳{new Intl.NumberFormat().format(a.pendingPayout)}</button>}
+                            {a.pendingPayout > 0     && <button onClick={() => { setMenuFor(null); onPayout(a); }} className="w-full text-left px-3 py-2 text-sm text-sky-400 hover:bg-white/5">💸 Pay out SAR {new Intl.NumberFormat().format(a.pendingPayout)}</button>}
                             <div className="border-t border-[#1e1e2e] my-1" />
                             <button onClick={() => { setMenuFor(null); setConfirmAction({ type: 'delete', id: a._id, name: a.name }); }} className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-white/5">🗑 Delete</button>
                           </div>
@@ -121,8 +121,8 @@ export default function AffiliateTable({ affiliates, loading, selected, onSelect
           </tbody>
         </table>
       </div>
-      {confirmAction?.type === 'delete' && <ConfirmModal title="Delete Affiliate?" message={`"${confirmAction.name}" permanently delete হবে।`} confirmLabel="Delete" onConfirm={() => { onDelete(confirmAction.id); setConfirmAction(null); }} onCancel={() => setConfirmAction(null)} />}
-      {confirmAction?.type === 'suspend' && <ConfirmModal title="Suspend Affiliate?" message={`"${confirmAction.name}" suspended করা হবে — referral tracking বন্ধ থাকবে।`} confirmLabel="Suspend" confirmCls="bg-amber-600 hover:bg-amber-500" onConfirm={() => { onSuspend(confirmAction.id); setConfirmAction(null); }} onCancel={() => setConfirmAction(null)} />}
+      {confirmAction?.type === 'delete' && <ConfirmModal title="Delete Affiliate?" message={`"${confirmAction.name}" permanently delete will be।`} confirmLabel="Delete" onConfirm={() => { onDelete(confirmAction.id); setConfirmAction(null); }} onCancel={() => setConfirmAction(null)} />}
+      {confirmAction?.type === 'suspend' && <ConfirmModal title="Suspend Affiliate?" message={`"${confirmAction.name}" suspended will be done — referral tracking will be closed।`} confirmLabel="Suspend" confirmCls="bg-amber-600 hover:bg-amber-500" onConfirm={() => { onSuspend(confirmAction.id); setConfirmAction(null); }} onCancel={() => setConfirmAction(null)} />}
     </div>
   );
 }

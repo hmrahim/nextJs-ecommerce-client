@@ -1,5 +1,5 @@
 // 📁 PATH: src/app/(admin)/dashboard/promotions/page.jsx
-// ⚠️  পুরোনো page.jsx এর জায়গায় REPLACE করো (অথবা নতুন)
+// ⚠️  old page.jsx instead of REPLACE Do (or new)
 
 'use client';
 import { useState, useEffect, useCallback } from 'react';
@@ -15,13 +15,13 @@ const p = (d) => new Date(now.getTime() - d * 86400000).toISOString();
 const DUMMY = [
   { _id: 'pr01', name: 'Buy 2 Get 1 Free — T-Shirts', type: 'buy_x_get_y', appliesTo: 'Specific Categories', buyQty: 2, getQty: 1, priority: 100, stackable: false, isActive: true,  startsAt: p(10), endsAt: f(20), redeemCount: 842,  totalDiscount: 168400, description: 'Mix & match any t-shirts', rewardLabel: 'Buy 2 Get 1' },
   { _id: 'pr02', name: 'Flat 15% off Cart',           type: 'cart_percent',appliesTo: 'All Products',         discountPercent: 15, minOrderAmount: 1500, maxDiscount: 500, priority: 90,  stackable: true,  isActive: true,  startsAt: p(5),  endsAt: f(10), redeemCount: 1542, totalDiscount: 462000, description: 'Sitewide cart discount', rewardLabel: '15% off cart' },
-  { _id: 'pr03', name: 'Spend ৳3000 — Free Gift',     type: 'free_gift',   appliesTo: 'All Products',         minOrderAmount: 3000, freeGiftProduct: 'Premium Tote Bag', priority: 70, stackable: true, isActive: true, startsAt: p(2), endsAt: f(30), redeemCount: 218, totalDiscount: 65400, description: 'Free branded tote on big orders', rewardLabel: 'Free gift' },
+  { _id: 'pr03', name: 'Spend SAR 3000 — Free Gift',     type: 'free_gift',   appliesTo: 'All Products',         minOrderAmount: 3000, freeGiftProduct: 'Premium Tote Bag', priority: 70, stackable: true, isActive: true, startsAt: p(2), endsAt: f(30), redeemCount: 218, totalDiscount: 65400, description: 'Free branded tote on big orders', rewardLabel: 'Free gift' },
   { _id: 'pr04', name: 'Electronics Bundle Deal',     type: 'bundle_deal', appliesTo: 'Specific Products',    discountPercent: 20, priority: 80, stackable: false, isActive: true, startsAt: p(15), endsAt: f(5), redeemCount: 96, totalDiscount: 384000, description: 'Phone + Earbuds + Case bundle', rewardLabel: 'Bundle: 20% off' },
   { _id: 'pr05', name: 'Tier Discount Ladder',        type: 'tier_discount',appliesTo: 'All Products',        discountPercent: 25, minOrderAmount: 5000, maxDiscount: 1500, priority: 60, stackable: false, isActive: true, startsAt: p(20), endsAt: f(40), redeemCount: 412, totalDiscount: 412000, description: 'Spend more, save more — up to 25%', rewardLabel: 'Up to 25% off' },
-  { _id: 'pr06', name: 'Free Shipping Over ৳800',     type: 'free_shipping',appliesTo: 'All Products',        minOrderAmount: 800, priority: 50, stackable: true, isActive: true, startsAt: p(60), endsAt: null, redeemCount: 5240, totalDiscount: 314400, description: 'Sitewide free shipping threshold', rewardLabel: 'Free shipping' },
+  { _id: 'pr06', name: 'Free Shipping Over SAR 800',     type: 'free_shipping',appliesTo: 'All Products',        minOrderAmount: 800, priority: 50, stackable: true, isActive: true, startsAt: p(60), endsAt: null, redeemCount: 5240, totalDiscount: 314400, description: 'Sitewide free shipping threshold', rewardLabel: 'Free shipping' },
   { _id: 'pr07', name: 'New Year Mega — 30% off',     type: 'cart_percent',appliesTo: 'All Products',         discountPercent: 30, minOrderAmount: 2000, maxDiscount: 1000, priority: 120, stackable: false, isActive: true, startsAt: f(20), endsAt: f(35), redeemCount: 0, totalDiscount: 0, description: 'Pre-scheduled new year campaign', rewardLabel: '30% off cart' },
   { _id: 'pr08', name: 'BOGO Cosmetics',              type: 'bogo',        appliesTo: 'Specific Categories',  buyQty: 1, getQty: 1, priority: 85, stackable: false, isActive: false, startsAt: p(30), endsAt: p(2), redeemCount: 612, totalDiscount: 244800, description: 'Expired BOGO on cosmetics', rewardLabel: 'Buy 1 Get 1 Free' },
-  { _id: 'pr09', name: 'VIP Cart ৳500 off',           type: 'cart_fixed',  appliesTo: 'Customer Group',       discountAmount: 500, minOrderAmount: 4000, priority: 95, stackable: false, isActive: true, startsAt: p(10), endsAt: f(60), redeemCount: 142, totalDiscount: 71000, description: 'VIP customers only', rewardLabel: '৳500 off cart' },
+  { _id: 'pr09', name: 'VIP Cart SAR 500 off',           type: 'cart_fixed',  appliesTo: 'Customer Group',       discountAmount: 500, minOrderAmount: 4000, priority: 95, stackable: false, isActive: true, startsAt: p(10), endsAt: f(60), redeemCount: 142, totalDiscount: 71000, description: 'VIP customers only', rewardLabel: 'SAR 500 off cart' },
   { _id: 'pr10', name: 'Kitchen Bundle 25% off',      type: 'bundle_deal', appliesTo: 'Specific Categories',  discountPercent: 25, priority: 75, stackable: false, isActive: true, startsAt: p(7), endsAt: f(7), redeemCount: 84, totalDiscount: 168000, description: '3-piece kitchenware bundle', rewardLabel: 'Bundle: 25% off' },
 ];
 
@@ -114,7 +114,7 @@ export default function PromotionsPage() {
           { l: 'Active',           v: stats.active, c: 'text-emerald-400' },
           { l: 'Scheduled',        v: stats.scheduled, c: 'text-sky-400' },
           { l: 'Total Redemptions',v: new Intl.NumberFormat().format(stats.redeems), c: 'text-violet-400' },
-          { l: 'Discount Given',   v: '৳' + new Intl.NumberFormat().format(stats.discount), c: 'text-orange-400' },
+          { l: 'Discount Given',   v: 'SAR ' + new Intl.NumberFormat().format(stats.discount), c: 'text-orange-400' },
         ].map(s => (
           <div key={s.l} className="rounded-xl border border-[#1e1e2e] bg-[#16161f] p-4">
             <p className="text-[10px] uppercase tracking-wider text-slate-500">{s.l}</p>

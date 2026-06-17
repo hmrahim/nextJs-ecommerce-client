@@ -17,7 +17,7 @@ function ConfirmDeleteModal({ zone, onConfirm, onCancel }) {
         </div>
         <h3 className="text-white font-semibold text-center mb-1">Delete Shipping Zone?</h3>
         <p className="text-slate-400 text-sm text-center mb-5">
-          "<span className="text-orange-400 font-semibold">{zone?.name}</span>" permanently delete হবে।
+          "<span className="text-orange-400 font-semibold">{zone?.name}</span>" permanently delete will be।
         </p>
         <div className="flex gap-3">
           <button onClick={onCancel} className="flex-1 px-4 py-2 rounded-lg border border-[#1e1e2e] text-slate-400 text-sm hover:bg-white/5 transition-colors">Cancel</button>
@@ -99,13 +99,13 @@ export default function ZoneTable({ zones, loading, selected, onSelectChange, on
                         <p className="text-[10px] text-slate-600 mt-0.5">{z.regions.length} areas</p>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-slate-200 font-semibold whitespace-nowrap">৳{z.baseRate}</td>
-                    <td className="px-4 py-3 text-slate-400 whitespace-nowrap">৳{z.perKgRate}/kg</td>
-                    <td className="px-4 py-3 text-emerald-400 text-xs whitespace-nowrap">{z.freeShippingThreshold ? `৳${z.freeShippingThreshold.toLocaleString()}` : '—'}</td>
+                    <td className="px-4 py-3 text-slate-200 font-semibold whitespace-nowrap">SAR {z.baseRate}</td>
+                    <td className="px-4 py-3 text-slate-400 whitespace-nowrap">SAR {z.perKgRate}/kg</td>
+                    <td className="px-4 py-3 text-emerald-400 text-xs whitespace-nowrap">{z.freeShippingThreshold ? `SAR ${z.freeShippingThreshold.toLocaleString()}` : '—'}</td>
                     <td className="px-4 py-3 text-slate-300 text-xs whitespace-nowrap">{z.estimatedDays.min}-{z.estimatedDays.max}d</td>
                     <td className="px-4 py-3">
                       {z.codAvailable
-                        ? <span className="inline-flex items-center gap-1 text-xs text-emerald-400"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> ৳{z.codCharge}</span>
+                        ? <span className="inline-flex items-center gap-1 text-xs text-emerald-400"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> SAR {z.codCharge}</span>
                         : <span className="text-xs text-slate-600">No COD</span>}
                     </td>
                     <td className="px-4 py-3 text-slate-300 text-sm font-semibold">{z.orders30d.toLocaleString()}</td>

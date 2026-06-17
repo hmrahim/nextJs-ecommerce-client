@@ -1,4 +1,3 @@
-
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { orderService } from '@/services/orderService';
@@ -12,14 +11,98 @@ const ITEMS_PER_PAGE = 12;
 
 // ── Dummy orders (used while backend not ready) ───────────────────────────────
 const DUMMY_ORDERS = [
-  { _id: 'ord001', orderNumber: 'ORD-10421', customerName: 'Sarah Johnson', customerEmail: 'sarah@example.com', items: [{ name: 'Premium Wireless Headphones', quantity: 1, price: 129.99 }, { name: 'Leather Wallet', quantity: 2, price: 49.99 }], subtotal: 229.97, taxAmount: 18.40, shippingAmount: 9.99, discountAmount: 0, totalAmount: 258.36, status: 'delivered', paymentStatus: 'paid', paymentMethod: 'credit_card', shippingAddress: { street: '123 Maple Ave', city: 'New York', state: 'NY', zip: '10001', country: 'US' }, placedAt: new Date(Date.now() - 86400000 * 5).toISOString(), statusHistory: [{ status: 'pending', changedAt: new Date(Date.now() - 86400000 * 5).toISOString() }, { status: 'confirmed', changedAt: new Date(Date.now() - 86400000 * 4).toISOString() }, { status: 'shipped', changedAt: new Date(Date.now() - 86400000 * 2).toISOString() }, { status: 'delivered', changedAt: new Date(Date.now() - 86400000).toISOString() }] },
-  { _id: 'ord002', orderNumber: 'ORD-10422', customerName: 'Michael Chen', customerEmail: 'mchen@example.com', items: [{ name: 'Yoga Mat Premium', quantity: 1, price: 64.99 }], subtotal: 64.99, taxAmount: 5.20, shippingAmount: 0, discountAmount: 6.50, totalAmount: 63.69, status: 'shipped', paymentStatus: 'paid', paymentMethod: 'paypal', shippingAddress: { street: '456 Oak Street', city: 'San Francisco', state: 'CA', zip: '94105', country: 'US' }, placedAt: new Date(Date.now() - 86400000 * 3).toISOString(), statusHistory: [{ status: 'pending', changedAt: new Date(Date.now() - 86400000 * 3).toISOString() }, { status: 'confirmed', changedAt: new Date(Date.now() - 86400000 * 2.5).toISOString() }, { status: 'shipped', changedAt: new Date(Date.now() - 86400000).toISOString(), note: 'Tracking: FX38271002' }] },
-  { _id: 'ord003', orderNumber: 'ORD-10423', customerName: 'Emily Rodriguez', customerEmail: 'emily.r@example.com', items: [{ name: 'Mechanical Keyboard TKL', quantity: 1, price: 149.99 }, { name: 'Stainless Steel Bottle', quantity: 1, price: 24.99 }], subtotal: 174.98, taxAmount: 14.00, shippingAmount: 9.99, discountAmount: 0, totalAmount: 198.97, status: 'processing', paymentStatus: 'paid', paymentMethod: 'credit_card', shippingAddress: { street: '789 Pine Road', city: 'Chicago', state: 'IL', zip: '60601', country: 'US' }, placedAt: new Date(Date.now() - 86400000 * 1.5).toISOString(), statusHistory: [{ status: 'pending', changedAt: new Date(Date.now() - 86400000 * 1.5).toISOString() }, { status: 'confirmed', changedAt: new Date(Date.now() - 86400000).toISOString() }, { status: 'processing', changedAt: new Date(Date.now() - 3600000 * 6).toISOString() }] },
-  { _id: 'ord004', orderNumber: 'ORD-10424', customerName: 'David Kim', customerEmail: 'dkim@example.com', items: [{ name: 'Merino Wool Blanket', quantity: 2, price: 89.99 }], subtotal: 179.98, taxAmount: 14.40, shippingAmount: 9.99, discountAmount: 18.00, totalAmount: 186.37, status: 'confirmed', paymentStatus: 'paid', paymentMethod: 'apple_pay', shippingAddress: { street: '321 Elm Court', city: 'Seattle', state: 'WA', zip: '98101', country: 'US' }, placedAt: new Date(Date.now() - 3600000 * 10).toISOString(), statusHistory: [{ status: 'pending', changedAt: new Date(Date.now() - 3600000 * 10).toISOString() }, { status: 'confirmed', changedAt: new Date(Date.now() - 3600000 * 8).toISOString() }] },
-  { _id: 'ord005', orderNumber: 'ORD-10425', customerName: 'Jessica Williams', customerEmail: 'jwilliams@example.com', items: [{ name: 'Cold Brew Coffee Maker', quantity: 1, price: 44.99 }, { name: 'Organic Green Tea Set', quantity: 1, price: 34.99 }], subtotal: 79.98, taxAmount: 6.40, shippingAmount: 0, discountAmount: 0, totalAmount: 86.38, status: 'pending', paymentStatus: 'pending', paymentMethod: 'bank_transfer', shippingAddress: { street: '654 Birch Lane', city: 'Austin', state: 'TX', zip: '78701', country: 'US' }, placedAt: new Date(Date.now() - 3600000 * 2).toISOString(), statusHistory: [{ status: 'pending', changedAt: new Date(Date.now() - 3600000 * 2).toISOString() }] },
-  { _id: 'ord006', orderNumber: 'ORD-10426', customerName: 'Robert Nguyen', customerEmail: 'rnguyen@example.com', items: [{ name: 'Artisan Soy Candle Set', quantity: 3, price: 54.99 }], subtotal: 164.97, taxAmount: 13.20, shippingAmount: 9.99, discountAmount: 0, totalAmount: 188.16, status: 'cancelled', paymentStatus: 'failed', paymentMethod: 'credit_card', shippingAddress: { street: '987 Cedar Blvd', city: 'Miami', state: 'FL', zip: '33101', country: 'US' }, placedAt: new Date(Date.now() - 86400000 * 7).toISOString(), statusHistory: [{ status: 'pending', changedAt: new Date(Date.now() - 86400000 * 7).toISOString() }, { status: 'cancelled', changedAt: new Date(Date.now() - 86400000 * 6).toISOString(), note: 'Payment declined' }] },
-  { _id: 'ord007', orderNumber: 'ORD-10427', customerName: 'Amanda Foster', customerEmail: 'afoster@example.com', items: [{ name: 'Bamboo Cutting Board Set', quantity: 1, price: 27.99 }, { name: 'Ceramic Coffee Dripper', quantity: 2, price: 39.99 }], subtotal: 107.97, taxAmount: 8.64, shippingAmount: 0, discountAmount: 10.80, totalAmount: 105.81, status: 'refunded', paymentStatus: 'paid', paymentMethod: 'credit_card', shippingAddress: { street: '246 Walnut Way', city: 'Denver', state: 'CO', zip: '80201', country: 'US' }, placedAt: new Date(Date.now() - 86400000 * 10).toISOString(), statusHistory: [{ status: 'pending', changedAt: new Date(Date.now() - 86400000 * 10).toISOString() }, { status: 'confirmed', changedAt: new Date(Date.now() - 86400000 * 9).toISOString() }, { status: 'delivered', changedAt: new Date(Date.now() - 86400000 * 7).toISOString() }, { status: 'refunded', changedAt: new Date(Date.now() - 86400000 * 5).toISOString(), note: 'Item damaged on arrival' }] },
-  { _id: 'ord008', orderNumber: 'ORD-10428', customerName: 'Thomas Wright', customerEmail: 'twright@example.com', items: [{ name: 'Linen Tote Bag', quantity: 5, price: 19.99 }], subtotal: 99.95, taxAmount: 8.00, shippingAmount: 9.99, discountAmount: 0, totalAmount: 117.94, status: 'processing', paymentStatus: 'paid', paymentMethod: 'paypal', shippingAddress: { street: '135 Spruce St', city: 'Boston', state: 'MA', zip: '02101', country: 'US' }, placedAt: new Date(Date.now() - 86400000 * 2).toISOString(), statusHistory: [{ status: 'pending', changedAt: new Date(Date.now() - 86400000 * 2).toISOString() }, { status: 'confirmed', changedAt: new Date(Date.now() - 86400000 * 1.5).toISOString() }, { status: 'processing', changedAt: new Date(Date.now() - 3600000 * 4).toISOString() }] },
+  {
+    _id: 'ord001', orderNumber: 'ORD-10421', customerName: 'Sarah Johnson', customerEmail: 'sarah@example.com',
+    items: [
+      { productName: 'Premium Wireless Headphones', quantity: 1, unitPrice: 129.99, lineTotal: 129.99, variantSku: 'WH-BLK-NC', variantAttrs: { Color: 'Black', 'Noise Cancelling': 'Yes' }, currentStock: 14, comparePrice: 159.99 },
+      { productName: 'Leather Wallet', quantity: 2, unitPrice: 49.99, lineTotal: 99.98, variantSku: 'LW-BRN-M', variantAttrs: { Color: 'Brown', Size: 'Medium' }, currentStock: 7 },
+    ],
+    subtotal: 229.97, taxAmount: 18.40, shippingCost: 9.99, couponDiscount: 0, total: 258.36,
+    status: 'delivered', paymentStatus: 'paid', paymentMethod: 'credit_card',
+    shippingAddress: { firstName: 'Sarah', lastName: 'Johnson', phone: '+1 212-555-0101', road: '123 Maple Ave', city: 'New York', postalCode: '10001' },
+    placedAt: new Date(Date.now() - 86400000 * 5).toISOString(),
+    statusHistory: [{ status: 'pending', changedAt: new Date(Date.now() - 86400000 * 5).toISOString() }, { status: 'confirmed', changedAt: new Date(Date.now() - 86400000 * 4).toISOString() }, { status: 'shipped', changedAt: new Date(Date.now() - 86400000 * 2).toISOString() }, { status: 'delivered', changedAt: new Date(Date.now() - 86400000).toISOString() }],
+  },
+  {
+    _id: 'ord002', orderNumber: 'ORD-10422', customerName: 'Michael Chen', customerEmail: 'mchen@example.com',
+    items: [
+      { productName: 'Yoga Mat Premium', quantity: 1, unitPrice: 64.99, lineTotal: 64.99, variantSku: 'YM-PRP-6MM', variantAttrs: { Color: 'Purple', Thickness: '6mm' }, currentStock: 22 },
+    ],
+    subtotal: 64.99, taxAmount: 5.20, shippingCost: 0, couponDiscount: 6.50, total: 63.69,
+    status: 'shipped', paymentStatus: 'paid', paymentMethod: 'paypal',
+    shippingAddress: { firstName: 'Michael', lastName: 'Chen', phone: '+1 415-555-0188', road: '456 Oak Street', city: 'San Francisco', postalCode: '94105' },
+    placedAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+    statusHistory: [{ status: 'pending', changedAt: new Date(Date.now() - 86400000 * 3).toISOString() }, { status: 'confirmed', changedAt: new Date(Date.now() - 86400000 * 2.5).toISOString() }, { status: 'shipped', changedAt: new Date(Date.now() - 86400000).toISOString(), note: 'Tracking: FX38271002' }],
+  },
+  {
+    _id: 'ord003', orderNumber: 'ORD-10423', customerName: 'Emily Rodriguez', customerEmail: 'emily.r@example.com',
+    items: [
+      { productName: 'Mechanical Keyboard TKL', quantity: 1, unitPrice: 149.99, lineTotal: 149.99, variantSku: 'KB-TKL-RED', variantAttrs: { Switch: 'Red Linear', Layout: 'TKL', Backlight: 'RGB' }, currentStock: 3 },
+      { productName: 'Stainless Steel Bottle', quantity: 1, unitPrice: 24.99, lineTotal: 24.99, variantSku: 'BTL-SLV-750', variantAttrs: { Color: 'Silver', Capacity: '750ml' }, currentStock: 31 },
+    ],
+    subtotal: 174.98, taxAmount: 14.00, shippingCost: 9.99, couponDiscount: 0, total: 198.97,
+    status: 'processing', paymentStatus: 'paid', paymentMethod: 'credit_card',
+    shippingAddress: { firstName: 'Emily', lastName: 'Rodriguez', phone: '+1 312-555-0134', road: '789 Pine Road', city: 'Chicago', postalCode: '60601' },
+    placedAt: new Date(Date.now() - 86400000 * 1.5).toISOString(),
+    statusHistory: [{ status: 'pending', changedAt: new Date(Date.now() - 86400000 * 1.5).toISOString() }, { status: 'confirmed', changedAt: new Date(Date.now() - 86400000).toISOString() }, { status: 'processing', changedAt: new Date(Date.now() - 3600000 * 6).toISOString() }],
+  },
+  {
+    _id: 'ord004', orderNumber: 'ORD-10424', customerName: 'David Kim', customerEmail: 'dkim@example.com',
+    items: [
+      { productName: 'Merino Wool Blanket', quantity: 2, unitPrice: 89.99, lineTotal: 179.98, variantSku: 'BLK-MRN-GRY-L', variantAttrs: { Color: 'Gray', Size: 'Large' }, currentStock: 9, comparePrice: 110.00 },
+    ],
+    subtotal: 179.98, taxAmount: 14.40, shippingCost: 9.99, couponDiscount: 18.00, total: 186.37,
+    status: 'confirmed', paymentStatus: 'paid', paymentMethod: 'apple_pay',
+    shippingAddress: { firstName: 'David', lastName: 'Kim', phone: '+1 206-555-0177', road: '321 Elm Court', city: 'Seattle', postalCode: '98101' },
+    placedAt: new Date(Date.now() - 3600000 * 10).toISOString(),
+    statusHistory: [{ status: 'pending', changedAt: new Date(Date.now() - 3600000 * 10).toISOString() }, { status: 'confirmed', changedAt: new Date(Date.now() - 3600000 * 8).toISOString() }],
+  },
+  {
+    _id: 'ord005', orderNumber: 'ORD-10425', customerName: 'Jessica Williams', customerEmail: 'jwilliams@example.com',
+    items: [
+      { productName: 'Cold Brew Coffee Maker', quantity: 1, unitPrice: 44.99, lineTotal: 44.99, variantSku: 'CBM-1L-CLR', variantAttrs: { Capacity: '1 Litre', Material: 'Borosilicate Glass' }, currentStock: 18 },
+      { productName: 'Organic Green Tea Set', quantity: 1, unitPrice: 34.99, lineTotal: 34.99, variantSku: 'default', variantAttrs: {}, currentStock: 45 },
+    ],
+    subtotal: 79.98, taxAmount: 6.40, shippingCost: 0, couponDiscount: 0, total: 86.38,
+    status: 'pending', paymentStatus: 'pending', paymentMethod: 'bank_transfer',
+    shippingAddress: { firstName: 'Jessica', lastName: 'Williams', phone: '+1 512-555-0199', road: '654 Birch Lane', city: 'Austin', postalCode: '78701' },
+    placedAt: new Date(Date.now() - 3600000 * 2).toISOString(),
+    statusHistory: [{ status: 'pending', changedAt: new Date(Date.now() - 3600000 * 2).toISOString() }],
+  },
+  {
+    _id: 'ord006', orderNumber: 'ORD-10426', customerName: 'Robert Nguyen', customerEmail: 'rnguyen@example.com',
+    items: [
+      { productName: 'Artisan Soy Candle Set', quantity: 3, unitPrice: 54.99, lineTotal: 164.97, variantSku: 'CND-SOY-LAV', variantAttrs: { Scent: 'Lavender', Size: '200g' }, currentStock: 0 },
+    ],
+    subtotal: 164.97, taxAmount: 13.20, shippingCost: 9.99, couponDiscount: 0, total: 188.16,
+    status: 'cancelled', paymentStatus: 'failed', paymentMethod: 'credit_card',
+    shippingAddress: { firstName: 'Robert', lastName: 'Nguyen', phone: '+1 305-555-0162', road: '987 Cedar Blvd', city: 'Miami', postalCode: '33101' },
+    placedAt: new Date(Date.now() - 86400000 * 7).toISOString(),
+    statusHistory: [{ status: 'pending', changedAt: new Date(Date.now() - 86400000 * 7).toISOString() }, { status: 'cancelled', changedAt: new Date(Date.now() - 86400000 * 6).toISOString(), note: 'Payment declined' }],
+  },
+  {
+    _id: 'ord007', orderNumber: 'ORD-10427', customerName: 'Amanda Foster', customerEmail: 'afoster@example.com',
+    items: [
+      { productName: 'Bamboo Cutting Board Set', quantity: 1, unitPrice: 27.99, lineTotal: 27.99, variantSku: 'default', variantAttrs: {}, currentStock: 12 },
+      { productName: 'Ceramic Coffee Dripper', quantity: 2, unitPrice: 39.99, lineTotal: 79.98, variantSku: 'CCD-WHT-V60', variantAttrs: { Color: 'White', Type: 'V60 Style' }, currentStock: 6 },
+    ],
+    subtotal: 107.97, taxAmount: 8.64, shippingCost: 0, couponDiscount: 10.80, total: 105.81,
+    status: 'refunded', paymentStatus: 'paid', paymentMethod: 'credit_card',
+    shippingAddress: { firstName: 'Amanda', lastName: 'Foster', phone: '+1 720-555-0145', road: '246 Walnut Way', city: 'Denver', postalCode: '80201' },
+    placedAt: new Date(Date.now() - 86400000 * 10).toISOString(),
+    statusHistory: [{ status: 'pending', changedAt: new Date(Date.now() - 86400000 * 10).toISOString() }, { status: 'confirmed', changedAt: new Date(Date.now() - 86400000 * 9).toISOString() }, { status: 'delivered', changedAt: new Date(Date.now() - 86400000 * 7).toISOString() }, { status: 'refunded', changedAt: new Date(Date.now() - 86400000 * 5).toISOString(), note: 'Item damaged on arrival' }],
+  },
+  {
+    _id: 'ord008', orderNumber: 'ORD-10428', customerName: 'Thomas Wright', customerEmail: 'twright@example.com',
+    items: [
+      { productName: 'Linen Tote Bag', quantity: 5, unitPrice: 19.99, lineTotal: 99.95, variantSku: 'TOTE-LIN-NAT-M', variantAttrs: { Color: 'Natural', Size: 'Medium' }, currentStock: 28 },
+    ],
+    subtotal: 99.95, taxAmount: 8.00, shippingCost: 9.99, couponDiscount: 0, total: 117.94,
+    status: 'processing', paymentStatus: 'paid', paymentMethod: 'paypal',
+    shippingAddress: { firstName: 'Thomas', lastName: 'Wright', phone: '+1 617-555-0123', road: '135 Spruce St', city: 'Boston', postalCode: '02101' },
+    placedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+    statusHistory: [{ status: 'pending', changedAt: new Date(Date.now() - 86400000 * 2).toISOString() }, { status: 'confirmed', changedAt: new Date(Date.now() - 86400000 * 1.5).toISOString() }, { status: 'processing', changedAt: new Date(Date.now() - 3600000 * 4).toISOString() }],
+  },
 ];
 
 export default function OrdersPage() {
@@ -78,9 +161,9 @@ export default function OrdersPage() {
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
 
-  // ── Realtime: নতুন order এলে বা status update হলে instantly table refresh হবে ──
+  // ── Realtime: new order if comes or status update If instantly table refresh will be ──
   const handleOrderEvent = useCallback((type, payload) => {
-    if (usingDummy) return; // ডামি ডেটায় থাকলে SSE ইগনোর করবে
+    if (usingDummy) return; // If in dummy data SSE will ignore
     if (type === 'order_created') {
       toast.success(`New order received${payload?.orderNumber ? ` — ${payload.orderNumber}` : ''}`);
     }
@@ -167,7 +250,7 @@ export default function OrdersPage() {
     },
     {
       label: 'Revenue',
-      value: '$' + allOrders.filter(o => o.paymentStatus === 'paid').reduce((sum, o) => sum + (o.totalAmount || 0), 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }),
+      value: 'SAR' + allOrders.filter(o => o.paymentStatus === 'paid').reduce((sum, o) => sum + (o.total || o.totalAmount || 0), 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }),
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -236,6 +319,7 @@ export default function OrdersPage() {
           order={activeOrder}
           onClose={() => setActiveOrder(null)}
           onUpdateStatus={handleUpdateStatus}
+          onUpdated={(updated) => { if (updated) setActiveOrder(prev => ({ ...prev, ...updated })); fetchOrders(); }}
         />
       )}
     </div>

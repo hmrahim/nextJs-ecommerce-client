@@ -1,5 +1,5 @@
 // 📁 PATH: src/services/flashSaleService.js
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল — src/services/ ফোল্ডারে রাখো
+// ⚠️  This is a completely new file — src/services/ Keep in folder
 
 import api from '@/lib/api';
 

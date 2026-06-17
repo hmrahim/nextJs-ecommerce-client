@@ -84,7 +84,7 @@ export default function PaymentPanel({ profile, onDeleteCard }) {
         <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">Wallet balance</h3>
         <div className="flex items-end justify-between">
           <div>
-            <p className="text-3xl font-bold text-white">৳ {(profile?.walletBalance ?? 850).toLocaleString()}</p>
+            <p className="text-3xl font-bold text-white">SAR  {(profile?.walletBalance ?? 850).toLocaleString()}</p>
             <p className="text-slate-500 text-sm mt-1">Available to spend</p>
           </div>
           <button className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-xl transition-colors">
@@ -94,11 +94,11 @@ export default function PaymentPanel({ profile, onDeleteCard }) {
         <div className="mt-4 pt-4 border-t border-[#1e1e2e] grid grid-cols-2 gap-3">
           <div>
             <p className="text-slate-500 text-xs">Total earned (cashback)</p>
-            <p className="text-slate-300 text-sm font-medium mt-0.5">৳ 1,240</p>
+            <p className="text-slate-300 text-sm font-medium mt-0.5">SAR  1,240</p>
           </div>
           <div>
             <p className="text-slate-500 text-xs">Total spent</p>
-            <p className="text-slate-300 text-sm font-medium mt-0.5">৳ 12,450</p>
+            <p className="text-slate-300 text-sm font-medium mt-0.5">SAR  12,450</p>
           </div>
         </div>
       </div>

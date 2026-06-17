@@ -6,8 +6,8 @@ import Image from 'next/image';
 import { Star } from 'lucide-react';
 
 /**
- * ✅ FIX: Link target '/products/${slug}' ছিল — আপনার আসল route '/product/[id]'.
- *         id না থাকলে slug fallback করা হয়েছে।
+ * ✅ FIX: Link target '/products/${slug}' was — your actual route '/product/[id]'.
+ *         id If not available slug fallback has been done।
  */
 export default function SearchResultCard({ product }) {
   const {
@@ -52,7 +52,7 @@ export default function SearchResultCard({ product }) {
         {!inStock && (
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
             <span className="text-white text-xs font-semibold bg-black/60 px-2 py-1 rounded">
-              Stock নেই
+              Stock isn't
             </span>
           </div>
         )}
@@ -78,9 +78,9 @@ export default function SearchResultCard({ product }) {
         )}
 
         <div className="mt-auto pt-1 flex items-baseline gap-2">
-          <span className="text-base font-bold text-gray-900">৳{price}</span>
+          <span className="text-base font-bold text-gray-900">SAR {price}</span>
           {hasDiscount && (
-            <span className="text-xs text-gray-400 line-through">৳{comparePrice}</span>
+            <span className="text-xs text-gray-400 line-through">SAR {comparePrice}</span>
           )}
         </div>
       </div>

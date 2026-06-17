@@ -1,5 +1,5 @@
 // 📁 PATH: src/components/admin/campaigns/CampaignFormModal.jsx
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল
+// ⚠️  This is a completely new file
 
 'use client';
 import { useState, useEffect } from 'react';
@@ -211,7 +211,7 @@ export default function CampaignFormModal({ campaign, onSave, onClose }) {
                     <div>
                       <label className={lbl}>Timezone</label>
                       <select value={form.timezone} onChange={e => set('timezone', e.target.value)} className={ipt}>
-                        <option value="Asia/Dhaka">Asia/Dhaka (BDT)</option>
+                        <option value="Asia/Dhaka">Asia/Dhaka (SAR)</option>
                         <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
                         <option value="Asia/Dubai">Asia/Dubai (GST)</option>
                         <option value="UTC">UTC</option>

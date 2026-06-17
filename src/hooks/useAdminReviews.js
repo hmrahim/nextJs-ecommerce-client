@@ -15,7 +15,7 @@ export const adminReviewKeys = {
 
 /* ── Cache helpers ───────────────────────────────────────────────── */
 
-/** সব admin review list queries invalidate করে — filters যাই হোক */
+/** All admin review list queries invalidate Do — filters anyway */
 function invalidateList(queryClient) {
   queryClient.invalidateQueries({
     queryKey: ['admin-reviews', 'list'],
@@ -23,7 +23,7 @@ function invalidateList(queryClient) {
   });
 }
 
-/** একটি review-এর isApproved field cache-এ patch করো */
+/** a review-Of isApproved field cache-In patch Do */
 function patchApproval(queryClient, id, isApproved) {
   queryClient.setQueriesData({ queryKey: ['admin-reviews', 'list'], exact: false }, (old) => {
     if (!old?.results) return old;
@@ -36,7 +36,7 @@ function patchApproval(queryClient, id, isApproved) {
   });
 }
 
-/** একটি review-এর adminReply field cache-এ patch করো */
+/** a review-Of adminReply field cache-In patch Do */
 function patchReply(queryClient, id, adminReply) {
   queryClient.setQueriesData({ queryKey: ['admin-reviews', 'list'], exact: false }, (old) => {
     if (!old?.results) return old;
@@ -49,7 +49,7 @@ function patchReply(queryClient, id, adminReply) {
   });
 }
 
-/** একাধিক review cache থেকে সরাও */
+/** multiple review cache remove from */
 function removeFromCache(queryClient, ids) {
   queryClient.setQueriesData({ queryKey: ['admin-reviews', 'list'], exact: false }, (old) => {
     if (!old?.results) return old;

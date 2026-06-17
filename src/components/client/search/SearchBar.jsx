@@ -8,13 +8,13 @@ import { useCategories } from '@/hooks/client/useSearch';
 
 /**
  * SearchBar Component
- * - react-hook-form দিয়ে form handle
- * - Category select করলে সেই category অনুযায়ী search হবে
- * - Submit এ /search?q=...&category=... এ navigate করে
+ * - react-hook-form by form handle
+ * - Category select if done that category according to search will be
+ * - Submit In /search?q=...&category=... In navigate Do
  *
  * Props:
- *  - defaultValues: { q: '', category: '' }  (Search page থেকে pre-fill করতে)
- *  - compact: boolean (navbar এ ছোট version)
+ *  - defaultValues: { q: '', category: '' }  (Search page from pre-fill to do)
+ *  - compact: boolean (navbar this small version)
  */
 export default function SearchBar({ defaultValues = {}, compact = false }) {
   const router = useRouter();
@@ -54,7 +54,7 @@ export default function SearchBar({ defaultValues = {}, compact = false }) {
             ${compact ? 'hidden sm:block' : 'block'}
           `}
         >
-          <option value="">সব Category</option>
+          <option value="">All Category</option>
           {categories.map((cat) => (
             <option key={cat._id} value={cat._id}>
               {cat.name}
@@ -71,7 +71,7 @@ export default function SearchBar({ defaultValues = {}, compact = false }) {
       <input
         type="text"
         {...register('q')}
-        placeholder="পণ্য খুঁজুন..."
+        placeholder="Search products..."
         className={`
           ${inputHeight}
           flex-1 px-4 text-gray-800 placeholder:text-gray-400

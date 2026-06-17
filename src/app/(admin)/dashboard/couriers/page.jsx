@@ -66,7 +66,7 @@ export default function CouriersPage() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Couriers</h1>
-          <p className="text-sm text-slate-400 mt-0.5">Delivery partners, API integration, rates ও performance manage করো।</p>
+          <p className="text-sm text-slate-400 mt-0.5">Delivery partners, API integration, rates And performance manage Do।</p>
         </div>
         <button onClick={() => { setEditing(null); setModalOpen(true); }} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 hover:bg-orange-400 text-white text-sm font-semibold transition-colors shadow-lg shadow-orange-900/30">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>

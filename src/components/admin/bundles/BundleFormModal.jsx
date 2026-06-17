@@ -1,5 +1,5 @@
 // 📁 PATH: src/components/admin/bundles/BundleFormModal.jsx
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল
+// ⚠️  This is a completely new file
 
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -158,7 +158,7 @@ function ProductPicker({ products, onChange }) {
                     <p className="text-xs text-slate-600 font-mono">{p.sku}</p>
                   </div>
                   <div className="text-right flex-shrink-0 ml-4">
-                    <p className="text-sm text-slate-300">৳{p.price?.toLocaleString()}</p>
+                    <p className="text-sm text-slate-300">SAR {p.price?.toLocaleString()}</p>
                     <p className={`text-xs ${p.stock === 0 ? 'text-red-400' : 'text-slate-600'}`}>
                       {p.stock === 0 ? 'Out of stock' : `${p.stock} in stock`}
                     </p>
@@ -188,7 +188,7 @@ function ProductPicker({ products, onChange }) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-white font-medium truncate">{p.name}</p>
-                <p className="text-[10px] text-slate-600 font-mono">৳{p.price?.toLocaleString()} each</p>
+                <p className="text-[10px] text-slate-600 font-mono">SAR {p.price?.toLocaleString()} each</p>
               </div>
 
               {/* Quantity stepper */}
@@ -214,7 +214,7 @@ function ProductPicker({ products, onChange }) {
               </div>
 
               <span className="text-xs text-slate-400 font-medium w-20 text-right flex-shrink-0">
-                ৳{((p.price || 0) * (p.quantity || 1)).toLocaleString()}
+                SAR {((p.price || 0) * (p.quantity || 1)).toLocaleString()}
               </span>
 
               <button
@@ -235,7 +235,7 @@ function ProductPicker({ products, onChange }) {
             <span className="text-xs text-slate-500">
               {products.length} product{products.length !== 1 ? 's' : ''} · original total
             </span>
-            <span className="text-sm font-bold text-violet-400">৳{totalOriginal.toLocaleString()}</span>
+            <span className="text-sm font-bold text-violet-400">SAR {totalOriginal.toLocaleString()}</span>
           </div>
         </div>
       )}
@@ -386,12 +386,12 @@ export default function BundleFormModal({ editing, onSave, onClose }) {
                 <p className="text-xs text-slate-500 mb-1">Bundle Preview</p>
                 <div className="flex items-center gap-3 flex-wrap">
                   {form.name && <span className="text-white font-semibold">{form.name}</span>}
-                  <span className="text-violet-400 font-bold">৳{bundlePrice.toLocaleString()}</span>
+                  <span className="text-violet-400 font-bold">SAR {bundlePrice.toLocaleString()}</span>
                   {savings > 0 && (
                     <>
-                      <span className="text-slate-600 text-xs line-through">৳{originalTotal.toLocaleString()}</span>
+                      <span className="text-slate-600 text-xs line-through">SAR {originalTotal.toLocaleString()}</span>
                       <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                        Save {savingsPct}% · ৳{savings.toLocaleString()} off
+                        Save {savingsPct}% · SAR {savings.toLocaleString()} off
                       </span>
                     </>
                   )}
@@ -459,10 +459,10 @@ export default function BundleFormModal({ editing, onSave, onClose }) {
           {/* ── Section 3: Pricing ── */}
           <Section title="Pricing">
             <div className="grid grid-cols-2 gap-4">
-              <Field label="Bundle Price (৳)" required error={errors.bundlePrice}
-                hint={originalTotal > 0 ? `Individual total: ৳${originalTotal.toLocaleString()}` : undefined}>
+              <Field label="Bundle Price (SAR )" required error={errors.bundlePrice}
+                hint={originalTotal > 0 ? `Individual total: SAR ${originalTotal.toLocaleString()}` : undefined}>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs">৳</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs">SAR </span>
                   <input
                     type="number" min="0" step="0.01"
                     className={`${inp} pl-6`}
@@ -473,9 +473,9 @@ export default function BundleFormModal({ editing, onSave, onClose }) {
                 </div>
               </Field>
 
-              <Field label="Compare Price (৳)" hint="Crossed-out 'was' price" error={errors.comparePrice}>
+              <Field label="Compare Price (SAR )" hint="Crossed-out 'was' price" error={errors.comparePrice}>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs">৳</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs">SAR </span>
                   <input
                     type="number" min="0" step="0.01"
                     className={`${inp} pl-6`}

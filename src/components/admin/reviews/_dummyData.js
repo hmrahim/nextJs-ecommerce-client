@@ -1,5 +1,5 @@
 // 📁 PATH: src/components/admin/reviews/_dummyData.js
-// ⚠️  DEV ONLY — API ready হলে এই file আর লাগবে না
+// ⚠️  DEV ONLY — API ready if this file not needed anymore
 
 const now = Date.now();
 const d = (days) => new Date(now - 86_400_000 * days).toISOString();
@@ -181,7 +181,7 @@ export const DUMMY_REVIEWS = [
     orderId: { orderNumber: 'ORD-10405' },
     rating: 5,
     title: 'Changed my morning routine',
-    body: 'I used to spend $8/day at a coffee shop. This dripper pays for itself in a week. The brew clarity is incredible.',
+    body: 'I used to spend SAR 8/day at a coffee shop. This dripper pays for itself in a week. The brew clarity is incredible.',
     images: [],
     isVerified: true,
     isApproved: true,

@@ -3,44 +3,44 @@ import api from '@/lib/api';
 
 export const reviewService = {
   // ── Admin ────────────────────────────────────────────────────────────────
-  // সব review list করো (filter, sort, pagination, search সহ)
+  // All review list Do (filter, sort, pagination, search With)
   adminGetAll: (params) => api.get('/admin/reviews', { params }),
 
-  // একটি review-এর detail
+  // a review-Of detail
   adminGetById: (id) => api.get(`/admin/reviews/${id}`),
 
-  // Review approve করো
+  // Review approve Do
   adminApprove: (id) => api.patch(`/admin/reviews/${id}/approve`),
 
-  // Review reject / unapprove করো
+  // Review reject / unapprove Do
   adminReject: (id) => api.patch(`/admin/reviews/${id}/reject`),
 
-  // Review delete করো
+  // Review delete Do
   adminDelete: (id) => api.delete(`/admin/reviews/${id}`),
 
   // Bulk action — approve / reject / delete
   adminBulkAction: (ids, action) =>
     api.post('/admin/reviews/bulk', { ids, action }),
 
-  // Review-এ admin reply দাও
+  // Review-In admin reply Give
   adminReply: (id, reply) =>
     api.post(`/admin/reviews/${id}/reply`, { reply }),
 
-  // Stats — dashboard cards-এর জন্য
+  // Stats — dashboard cards-for this
   adminGetStats: () => api.get('/admin/reviews/stats'),
 
   // ── Client ──────────────────────────────────────────────────────────────
-  // একটা product-এর approved review list
+  // a product-Of approved review list
   getByProduct: (productId, params) =>
     api.get(`/products/${productId}/reviews`, { params }),
 
-  // Review submit করো
+  // Review submit Do
   create: (productId, data) =>
     api.post(`/products/${productId}/reviews`, data),
 
-  // নিজের review update করো
+  // own review update Do
   update: (reviewId, data) => api.put(`/reviews/${reviewId}`, data),
 
-  // নিজের review delete করো
+  // own review delete Do
   delete: (reviewId) => api.delete(`/reviews/${reviewId}`),
 };

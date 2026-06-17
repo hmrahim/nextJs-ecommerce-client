@@ -1,5 +1,5 @@
 // 📁 PATH: src/components/admin/promotions/PromotionFormModal.jsx
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল
+// ⚠️  This is a completely new file
 
 'use client';
 import { useState, useEffect } from 'react';
@@ -10,7 +10,7 @@ const TYPES = [
   { value: 'bundle_deal',   label: 'Bundle Deal',       icon: '📦' },
   { value: 'tier_discount', label: 'Tier Discount',     icon: '📈' },
   { value: 'cart_percent',  label: '% Cart Discount',   icon: '%'  },
-  { value: 'cart_fixed',    label: '৳ Cart Fixed Off',  icon: '৳'  },
+  { value: 'cart_fixed',    label: 'SAR  Cart Fixed Off',  icon: 'SAR '  },
   { value: 'free_gift',     label: 'Free Gift',         icon: '🎀' },
   { value: 'free_shipping', label: 'Free Shipping',     icon: '🚚' },
 ];
@@ -48,7 +48,7 @@ export default function PromotionFormModal({ promotion, onSave, onClose }) {
       case 'bogo':          return 'Buy 1 Get 1 Free';
       case 'buy_x_get_y':   return `Buy ${form.buyQty} Get ${form.getQty}`;
       case 'cart_percent':  return `${form.discountPercent}% off cart`;
-      case 'cart_fixed':    return `৳${form.discountAmount} off cart`;
+      case 'cart_fixed':    return `SAR ${form.discountAmount} off cart`;
       case 'tier_discount': return 'Spend more, save more';
       case 'bundle_deal':   return `Bundle: ${form.discountPercent}% off`;
       case 'free_gift':     return `Free gift: ${form.freeGiftProduct || '—'}`;
@@ -117,14 +117,14 @@ export default function PromotionFormModal({ promotion, onSave, onClose }) {
           {(form.type === 'cart_percent' || form.type === 'bundle_deal' || form.type === 'tier_discount') && (
             <div className="grid grid-cols-3 gap-4">
               <div><label className={lbl}>Discount %</label><input type="number" min={0} max={100} value={form.discountPercent} onChange={e => set('discountPercent', +e.target.value)} className={ipt} /></div>
-              <div><label className={lbl}>Min Order ৳</label><input type="number" min={0} value={form.minOrderAmount} onChange={e => set('minOrderAmount', +e.target.value)} className={ipt} /></div>
-              <div><label className={lbl}>Max Discount ৳</label><input type="number" min={0} value={form.maxDiscount} onChange={e => set('maxDiscount', +e.target.value)} className={ipt} placeholder="0 = no cap" /></div>
+              <div><label className={lbl}>Min Order SAR </label><input type="number" min={0} value={form.minOrderAmount} onChange={e => set('minOrderAmount', +e.target.value)} className={ipt} /></div>
+              <div><label className={lbl}>Max Discount SAR </label><input type="number" min={0} value={form.maxDiscount} onChange={e => set('maxDiscount', +e.target.value)} className={ipt} placeholder="0 = no cap" /></div>
             </div>
           )}
           {form.type === 'cart_fixed' && (
             <div className="grid grid-cols-2 gap-4">
-              <div><label className={lbl}>Discount Amount ৳</label><input type="number" min={0} value={form.discountAmount} onChange={e => set('discountAmount', +e.target.value)} className={ipt} /></div>
-              <div><label className={lbl}>Min Order ৳</label><input type="number" min={0} value={form.minOrderAmount} onChange={e => set('minOrderAmount', +e.target.value)} className={ipt} /></div>
+              <div><label className={lbl}>Discount Amount SAR </label><input type="number" min={0} value={form.discountAmount} onChange={e => set('discountAmount', +e.target.value)} className={ipt} /></div>
+              <div><label className={lbl}>Min Order SAR </label><input type="number" min={0} value={form.minOrderAmount} onChange={e => set('minOrderAmount', +e.target.value)} className={ipt} /></div>
             </div>
           )}
           {(form.type === 'buy_x_get_y' || form.type === 'bogo') && (

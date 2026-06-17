@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { uploadService, UPLOAD_FOLDERS } from '@/services/uploadService';
 
-// ─── Constants (export করা হয়েছে — page.jsx import করবে) ────────────────────
+// ─── Constants (export has been done — page.jsx import will do) ────────────────────
 export const PLACEMENTS = [
   { id: 'home_hero',      name: 'Home Hero Slider',     size: '1920×720', desc: 'Top of homepage carousel' },
   { id: 'home_strip',     name: 'Home Promo Strip',     size: '1920×80',  desc: 'Thin promo bar above header' },
@@ -63,7 +63,7 @@ function BannerImageUploader({ value, publicId, onChange, placementSize }) {
   const [uploadErr, setUploadErr] = useState('');
   const [imgErr, setImgErr]       = useState(false);
 
-  // value বদলালে broken-image state reset করো
+  // value if changed broken-image state reset Do
   useEffect(() => { setImgErr(false); }, [value]);
 
   const handleFile = async (file) => {
@@ -71,11 +71,11 @@ function BannerImageUploader({ value, publicId, onChange, placementSize }) {
 
     // ── Validation ─────────────────────────────────────────────────────────
     if (!file.type.startsWith('image/')) {
-      setUploadErr('শুধু image file দাও (JPG, PNG, WEBP, SVG)');
+      setUploadErr('only image file Give (JPG, PNG, WEBP, SVG)');
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      setUploadErr('File size ১০MB এর বেশি হবে না');
+      setUploadErr('File size 10MB Will not be more than this');
       return;
     }
 
@@ -95,9 +95,9 @@ function BannerImageUploader({ value, publicId, onChange, placementSize }) {
       URL.revokeObjectURL(localUrl);
       onChange({ url: res.url, publicId: res.publicId });
     } catch (err) {
-      // upload fail হলে preview সরাও, error দেখাও
+      // upload fail If preview remove, error show
       onChange({ url: '', publicId: null });
-      setUploadErr(err?.message || 'Upload failed — আবার চেষ্টা করো');
+      setUploadErr(err?.message || 'Upload failed — Try again');
     } finally {
       setUploading(false);
       setProgress(0);
@@ -145,7 +145,7 @@ function BannerImageUploader({ value, publicId, onChange, placementSize }) {
             {publicId ? (
               <>
                 <span className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" />
-                <span className="text-xs text-slate-400 truncate">Cloudinary-তে uploaded</span>
+                <span className="text-xs text-slate-400 truncate">Cloudinary-In uploaded</span>
               </>
             ) : (
               <>
@@ -266,7 +266,7 @@ const DEFAULT_VALUES = {
   status:      'draft',
   priority:    5,
   imageUrl:    '',       // Cloudinary secure_url
-  imagePublicId: '',     // Cloudinary public_id (delete করতে লাগবে)
+  imagePublicId: '',     // Cloudinary public_id (delete will take to do)
   linkType:    'url',
   linkValue:   '',
   startsAt:    '',
@@ -320,7 +320,7 @@ export default function BannerFormModal({ open, editing, isSaving, onClose, onSa
     mode: 'onChange',
   });
 
-  // editing বদলালে / modal open হলে form reset করো
+  // editing if changed / modal open If form reset Do
   useEffect(() => {
     reset(normalizeBanner(editing));
   }, [editing, open, reset]);
@@ -338,7 +338,7 @@ export default function BannerFormModal({ open, editing, isSaving, onClose, onSa
       placement:     data.placement,
       status:        data.status,
       priority:      Number(data.priority),
-      // backend model field name হলো "image" — তাই এখানে map করো
+      // backend model field name was "image" — So here map Do
       image:         data.imageUrl      || '',
       imagePublicId: data.imagePublicId || '',
       linkType:      data.linkType,
@@ -366,7 +366,7 @@ export default function BannerFormModal({ open, editing, isSaving, onClose, onSa
               {isEdit ? 'Edit Banner' : 'New Banner / Slide'}
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              {isEdit ? `Editing "${editing.title}"` : 'Image Cloudinary-তে upload হবে'}
+              {isEdit ? `Editing "${editing.title}"` : 'Image Cloudinary-In upload will be'}
             </p>
           </div>
           <button
@@ -390,7 +390,7 @@ export default function BannerFormModal({ open, editing, isSaving, onClose, onSa
               {/* ── Image Upload ── */}
               <Field
                 label="Banner Image"
-                hint={`Cloudinary-তে upload হবে · Recommended: ${currentPlacement?.size ?? '—'}`}
+                hint={`Cloudinary-In upload will be · Recommended: ${currentPlacement?.size ?? '—'}`}
               >
                 <Controller
                   name="imageUrl"

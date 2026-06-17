@@ -1,5 +1,5 @@
 // 📁 PATH: src/components/admin/shipping-zones/_dummyData.js
-// Bangladesh-centric shipping zones with realistic rates (BDT)
+// Bangladesh-centric shipping zones with realistic rates (SAR)
 
 const past = (d) => new Date(Date.now() - d * 86400000).toISOString();
 

@@ -57,8 +57,8 @@ export default function AbandonedCartTable({ carts, loading, selected, onSelectC
                     <p className="text-sm text-slate-300 font-medium">{c.itemsCount} items</p>
                     <p className="text-xs text-slate-500 truncate max-w-[200px]">{(c.items || []).slice(0, 2).map(i => i.name).join(', ')}{c.items?.length > 2 && '…'}</p>
                   </td>
-                  <td className="px-4 py-3"><p className="text-sm font-bold text-orange-400">৳{new Intl.NumberFormat().format(c.cartValue)}</p></td>
-                  <td className="px-4 py-3"><p className="text-xs text-slate-300">{timeAgo(c.abandonedAt)}</p><p className="text-[11px] text-slate-600">{new Date(c.abandonedAt).toLocaleDateString('en-BD', { day: '2-digit', month: 'short' })}</p></td>
+                  <td className="px-4 py-3"><p className="text-sm font-bold text-orange-400">SAR {new Intl.NumberFormat().format(c.cartValue)}</p></td>
+                  <td className="px-4 py-3"><p className="text-xs text-slate-300">{timeAgo(c.abandonedAt)}</p><p className="text-[11px] text-slate-600">{new Date(c.abandonedAt).toLocaleDateString('en-SA', { day: '2-digit', month: 'short' })}</p></td>
                   <td className="px-4 py-3">
                     {c.recoveryAttempts > 0 ? (
                       <>

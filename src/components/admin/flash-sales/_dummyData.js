@@ -1,5 +1,5 @@
 // 📁 PATH: src/components/admin/flash-sales/_dummyData.js
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল
+// ⚠️  This is a completely new file
 
 const now  = new Date();
 const f    = (h) => new Date(now.getTime() + h * 3600000).toISOString();

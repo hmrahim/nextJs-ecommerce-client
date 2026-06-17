@@ -28,14 +28,14 @@ function validateFile(file) {
   const limit = SIZE_LIMITS[resourceType];
   if (file.size > limit) {
     const limitMB = limit / (1024 * 1024);
-    throw new Error(`File size limit ${limitMB}MB এর বেশি (${resourceType})`);
+    throw new Error(`File size limit ${limitMB}MB more than this (${resourceType})`);
   }
   return resourceType;
 }
 
 // ── Core single upload ───────────────────────────────────────
 /**
- * একটা file Cloudinary-তে upload করে
+ * a file Cloudinary-In upload Do
  * @param {File} file
  * @param {Object} options
  * @param {string}   options.folder      - Cloudinary folder (default: 'moom24')
@@ -60,7 +60,7 @@ async function uploadOne(file, options = {}) {
 
   const url = `${BASE_URL}/${resourceType}/upload`;
 
-  // XHR দিয়ে progress track করা যায়, fetch দিয়ে হয় না
+  // XHR by progress track can be done, fetch It's not done with
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
 
@@ -77,7 +77,7 @@ async function uploadOne(file, options = {}) {
         const data = JSON.parse(xhr.responseText);
         resolve({
           url:          data.secure_url,        // https CDN url
-          publicId:     data.public_id,          // delete করতে লাগবে
+          publicId:     data.public_id,          // delete will take to do
           resourceType: data.resource_type,      // image / video / raw
           format:       data.format,             // jpg, png, mp4...
           width:        data.width  || null,
@@ -184,8 +184,8 @@ export const uploadService = {
 
   // ── 6. Delete ────────────────────────────────────────────────
   async deleteFile(publicId) {
-    // Server-side API route দিয়ে delete করতে হবে
-    // কারণ Cloudinary destroy API-তে api_secret লাগে (client-এ রাখা যাবে না)
+    // Server-side API route by delete have to do
+    // Reason Cloudinary destroy API-In api_secret takes (client-Cannot be kept here)
     const res = await fetch('/api/upload/delete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -211,10 +211,10 @@ export const uploadService = {
       .catch((err) => {
         if (cancelled) return;
         if (onError) onError(err);
-        // blob preview রেখে দাও — user দেখতে পাবে
+        // blob preview Keep it — user will see
       });
 
-    // cancel function return করি যাতে component unmount হলে cleanup করা যায়
+    // cancel function return so that we do component unmount If cleanup can be done
     return function cancel() {
       cancelled = true;
       URL.revokeObjectURL(localUrl);
@@ -222,7 +222,7 @@ export const uploadService = {
   },
 };
 
-// ── Folder constants — সব জায়গায় একই ব্যবহার করো ─────────────
+// ── Folder constants — Use the same everywhere ─────────────
 export const UPLOAD_FOLDERS = {
   CATEGORY_IMAGES:  'moom24/categories',
   PRODUCT_IMAGES:   'moom24/products',

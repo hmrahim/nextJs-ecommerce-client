@@ -11,7 +11,7 @@ export const productKeys = {
   detail: (id)      => ['admin-products', 'detail', id],
 };
 
-// ─── Helper: cache থেকে ids বাদ দাও ─────────────────────────────────────────
+// ─── Helper: cache from ids omit ─────────────────────────────────────────
 function removeFromCache(queryClient, idsToRemove) {
   queryClient.setQueriesData({ queryKey: productKeys.all() }, (old) => {
     if (!old?.results) return old;
@@ -66,7 +66,7 @@ export function useArchiveProduct() {
     onMutate: async (id) => {
       await qc.cancelQueries({ queryKey: productKeys.all() });
       const snapshot = qc.getQueriesData({ queryKey: productKeys.all() });
-      // cache এ status 'archived' করে দাও
+      // cache In status 'archived' do it
       qc.setQueriesData({ queryKey: productKeys.all() }, (old) => {
         if (!old?.results) return old;
         return {

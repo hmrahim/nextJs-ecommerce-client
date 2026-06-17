@@ -152,14 +152,14 @@ export const DUMMY_CUSTOMER_ORDERS = [
 
 // Dummy activity feed
 export const makeDummyActivity = (customer) => [
-  { type: 'order',   icon: '🛍️', text: `Placed order #ORD-10421 — $258.36`,              time: new Date(Date.now() - 86400000 * 5).toISOString() },
+  { type: 'order',   icon: '🛍️', text: `Placed order #ORD-10421 — SAR 258.36`,              time: new Date(Date.now() - 86400000 * 5).toISOString() },
   { type: 'review',  icon: '⭐', text: `Left 5-star review on "Merino Wool Blanket"`,     time: new Date(Date.now() - 86400000 * 8).toISOString() },
   { type: 'wishlist',icon: '❤️', text: `Added "Mechanical Keyboard TKL" to wishlist`,     time: new Date(Date.now() - 86400000 * 10).toISOString() },
-  { type: 'order',   icon: '🛍️', text: `Placed order #ORD-10389 — $189.99`,              time: new Date(Date.now() - 86400000 * 30).toISOString() },
-  { type: 'coupon',  icon: '🎟️', text: `Applied coupon SAVE20 (saved $38.00)`,           time: new Date(Date.now() - 86400000 * 32).toISOString() },
+  { type: 'order',   icon: '🛍️', text: `Placed order #ORD-10389 — SAR 189.99`,              time: new Date(Date.now() - 86400000 * 30).toISOString() },
+  { type: 'coupon',  icon: '🎟️', text: `Applied coupon SAVE20 (saved SAR 38.00)`,           time: new Date(Date.now() - 86400000 * 32).toISOString() },
   { type: 'login',   icon: '🔐', text: `Logged in from Chrome / macOS (New York, US)`,   time: new Date(Date.now() - 86400000 * 35).toISOString() },
   { type: 'review',  icon: '⭐', text: `Left 4-star review on "Ceramic Coffee Dripper"`, time: new Date(Date.now() - 86400000 * 50).toISOString() },
-  { type: 'order',   icon: '🛍️', text: `Placed order #ORD-10312 — $64.50 (refunded)`,   time: new Date(Date.now() - 86400000 * 60).toISOString() },
+  { type: 'order',   icon: '🛍️', text: `Placed order #ORD-10312 — SAR 64.50 (refunded)`,   time: new Date(Date.now() - 86400000 * 60).toISOString() },
   { type: 'email',   icon: '📧', text: `Email address verified`,                          time: new Date(Date.now() - 86400000 * 100).toISOString() },
   { type: 'signup',  icon: '👤', text: `Account created`,                                 time: new Date(customer.createdAt).toISOString() },
 ];

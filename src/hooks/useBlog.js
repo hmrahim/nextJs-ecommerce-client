@@ -13,7 +13,7 @@ export const blogKeys = {
   stats:  ()        => ['admin-blogs', 'stats'],
 };
 
-// ─── Stats recalculator (optimistic update এর জন্য) ──────────────────────────
+// ─── Stats recalculator (optimistic update for this) ──────────────────────────
 function recalcStats(list) {
   return {
     total:     list.length,
@@ -27,7 +27,7 @@ function recalcStats(list) {
   };
 }
 
-// ─── Helper: একটা blog সব cached list এ patch করো ────────────────────────────
+// ─── Helper: a blog All cached list In patch Do ────────────────────────────
 function patchInCache(queryClient, id, updater) {
   queryClient.setQueriesData({ queryKey: blogKeys.all() }, (old) => {
     if (!old?.posts) return old;
@@ -36,7 +36,7 @@ function patchInCache(queryClient, id, updater) {
   });
 }
 
-// ─── Helper: cache থেকে blogs সরাও ──────────────────────────────────────────
+// ─── Helper: cache from blogs remove ──────────────────────────────────────────
 function removeFromCache(queryClient, ids) {
   queryClient.setQueriesData({ queryKey: blogKeys.all() }, (old) => {
     if (!old?.posts) return old;

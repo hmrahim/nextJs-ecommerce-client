@@ -4,11 +4,11 @@ import { Ticket, Copy, Clock, Check, Tag } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const VOUCHERS = [
-  { id: 1, code: 'WELCOME20', title: '20% off your next order', desc: 'Min order ৳1,500 · One per user', expires: 'Jul 15, 2026', type: 'active', value: '20%', color: 'from-emerald-500 to-emerald-700' },
+  { id: 1, code: 'WELCOME20', title: '20% off your next order', desc: 'Min order SAR 1,500 · One per user', expires: 'Jul 15, 2026', type: 'active', value: '20%', color: 'from-emerald-500 to-emerald-700' },
   { id: 2, code: 'FREESHIP', title: 'Free shipping nationwide', desc: 'No minimum order', expires: 'Jun 30, 2026', type: 'active', value: 'FREE', color: 'from-sky-500 to-blue-700' },
-  { id: 3, code: 'GOLD500', title: '৳500 off for Gold members', desc: 'Min order ৳5,000', expires: 'Aug 01, 2026', type: 'active', value: '৳500', color: 'from-amber-500 to-orange-600' },
+  { id: 3, code: 'GOLD500', title: 'SAR 500 off for Gold members', desc: 'Min order SAR 5,000', expires: 'Aug 01, 2026', type: 'active', value: 'SAR 500', color: 'from-amber-500 to-orange-600' },
   { id: 4, code: 'SUMMER10', title: '10% summer sale', desc: 'On selected categories', expires: 'May 31, 2026', type: 'expired', value: '10%', color: 'from-slate-400 to-slate-600' },
-  { id: 5, code: 'NEWYEAR', title: '৳200 new year bonus', desc: 'Used on ORD-09823', expires: 'Jan 31, 2026', type: 'used', value: '৳200', color: 'from-slate-400 to-slate-600' },
+  { id: 5, code: 'NEWYEAR', title: 'SAR 200 new year bonus', desc: 'Used on ORD-09823', expires: 'Jan 31, 2026', type: 'used', value: 'SAR 200', color: 'from-slate-400 to-slate-600' },
 ];
 
 const TABS = [

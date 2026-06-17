@@ -1,11 +1,11 @@
 // 📁 PATH: app/(client)/search/page.jsx
-// ✅ FIX: import path ছিল '@/components/search/...' → আসল file '@/components/client/search/...'
+// ✅ FIX: import path Was '@/components/search/...' → Original file '@/components/client/search/...'
 import { Suspense } from 'react';
 import SearchPageClient from '@/components/client/search/SearchPageClient';
 
 export const metadata = {
-  title: 'পণ্য খুঁজুন | Moom24',
-  description: 'Moom24 এ আপনার পছন্দের পণ্য খুঁজুন',
+  title: 'Search products | Moom24',
+  description: 'Moom24 Find your desired product in this',
 };
 
 export default function SearchPage() {

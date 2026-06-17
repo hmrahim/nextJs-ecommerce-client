@@ -30,8 +30,8 @@ function BalanceBar({ balance, initial }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <span className="text-xs font-medium text-slate-300">৳{safeBalance.toLocaleString()}</span>
-        <span className="text-xs text-slate-600">/ ৳{initial.toLocaleString()}</span>
+        <span className="text-xs font-medium text-slate-300">SAR {safeBalance.toLocaleString()}</span>
+        <span className="text-xs text-slate-600">/ SAR {initial.toLocaleString()}</span>
       </div>
       <div className="w-28 h-1.5 bg-[#1e1e2e] rounded-full overflow-hidden">
         <div className={`h-full ${color} rounded-full transition-all`} style={{ width: `${pct}%` }} />
@@ -52,7 +52,7 @@ function ExpiryCell({ expiresAt }) {
   return (
     <div>
       <p className={`text-xs font-medium ${expired ? 'text-slate-600 line-through' : urgent ? 'text-red-400' : soon ? 'text-amber-400' : 'text-slate-300'}`}>
-        {d.toLocaleDateString('en-BD', { day: '2-digit', month: 'short', year: 'numeric' })}
+        {d.toLocaleDateString('en-SA', { day: '2-digit', month: 'short', year: 'numeric' })}
       </p>
       {!expired && <p className={`text-xs ${urgent ? 'text-red-500' : soon ? 'text-amber-500' : 'text-slate-600'}`}>{diff === 0 ? 'Expires today!' : `${diff}d left`}</p>}
       {expired  && <p className="text-xs text-slate-700">Expired</p>}
@@ -72,7 +72,7 @@ function ConfirmDeleteModal({ card, onConfirm, onCancel }) {
         </div>
         <h3 className="text-white font-semibold text-center mb-1">Delete Gift Card?</h3>
         <p className="text-slate-400 text-sm text-center mb-5">
-          "<span className="text-orange-400 font-mono font-bold">{card?.code}</span>" permanently delete হবে। যেকোনো remaining balance হারিয়ে যাবে।
+          "<span className="text-orange-400 font-mono font-bold">{card?.code}</span>" permanently delete will be। any remaining balance Will be lost।
         </p>
         <div className="flex gap-3">
           <button onClick={onCancel} className="flex-1 px-4 py-2 rounded-lg border border-[#1e1e2e] text-slate-400 text-sm hover:bg-white/5 transition-colors">Cancel</button>

@@ -76,7 +76,7 @@ const SEED_CHATS = [
     cart: 2300, lastSeen: "30m ago", agentId: "AG-02", rating: 5,
     messages: [
       { from: "customer", t: mins(45), text: "Does NEW500 coupon work on accessories?" },
-      { from: "agent",    t: mins(44), text: "Yes! It works on all items above 2000 BDT 👍" },
+      { from: "agent",    t: mins(44), text: "Yes! It works on all items above 2000 SAR 👍" },
       { from: "customer", t: mins(43), text: "Awesome, thanks!" },
       { from: "system",   t: mins(40), text: "Conversation marked as resolved · Customer rated ⭐ 5/5" },
     ],
@@ -90,7 +90,7 @@ const CANNED = [
   { title: "Hold",            text: "Could you give me a moment while I check that for you?" },
   { title: "Refund policy",   text: "Refunds are processed within 5-7 business days to your original payment method." },
   { title: "Delivery time",   text: "Standard delivery is 2-3 days inside Dhaka and 3-5 days outside Dhaka." },
-  { title: "EMI info",        text: "We offer 0% EMI on EBL, City Bank, BRAC and DBBL cards for orders above 10,000 BDT." },
+  { title: "EMI info",        text: "We offer 0% EMI on EBL, City Bank, BRAC and DBBL cards for orders above 10,000 SAR." },
   { title: "Apology",         text: "I sincerely apologize for the inconvenience. Let me make this right for you." },
   { title: "Close",           text: "Glad I could help! Have a great day. Please rate this conversation ⭐" },
 ];
@@ -421,22 +421,22 @@ export default function LiveChatPage() {
               <Item k="Location" v={active.country} />
               <Item k="Device" v={active.device} />
               <Item k="Current page" v={active.page} />
-              {active.cart > 0 && <Item k="Cart value" v={"৳" + active.cart.toLocaleString()} highlight />}
+              {active.cart > 0 && <Item k="Cart value" v={"SAR " + active.cart.toLocaleString()} highlight />}
             </Block>
 
             <Block title="Customer history">
               <Item k="Total orders" v="24" />
-              <Item k="Lifetime value" v="৳184,750" />
-              <Item k="Avg order" v="৳7,698" />
+              <Item k="Lifetime value" v="SAR 184,750" />
+              <Item k="Avg order" v="SAR 7,698" />
               <Item k="Tier" v="Gold · 1,420 points" />
               <Item k="Previous chats" v="5 · Avg CSAT 4.6" />
             </Block>
 
             <Block title="Recent orders">
               {[
-                ["ORD-552087", "iPhone 15 Pro 256GB", "৳142,000", "Delivered"],
-                ["ORD-549812", "Samsung 65\" QLED",   "৳78,500",  "Delivered"],
-                ["ORD-548112", "Sony WH-1000XM5",    "৳32,800",  "Delivered"],
+                ["ORD-552087", "iPhone 15 Pro 256GB", "SAR 142,000", "Delivered"],
+                ["ORD-549812", "Samsung 65\" QLED",   "SAR 78,500",  "Delivered"],
+                ["ORD-548112", "Sony WH-1000XM5",    "SAR 32,800",  "Delivered"],
               ].map(([id, name, amt, st]) => (
                 <div key={id} style={{
                   padding: 8, marginBottom: 6, background: "#0b1220",

@@ -4,7 +4,7 @@ import { useState, useCallback, useMemo } from 'react';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-// সব attribute এর value combination তৈরি করো (Cartesian product)
+// All attribute Of value combination Create (Cartesian product)
 function cartesian(arrays) {
   if (!arrays.length) return [];
   return arrays.reduce(
@@ -13,12 +13,12 @@ function cartesian(arrays) {
   );
 }
 
-// variant এর unique key বানাও (e.g. "color:red|size:m")
+// variant Of unique key make (e.g. "color:red|size:m")
 function variantKey(combo) {
   return combo.map(c => `${c.attrId}:${c.valueId}`).sort().join('|');
 }
 
-// variant এর display label (e.g. "Red / M")
+// variant Of display label (e.g. "Red / M")
 function variantLabel(combo) {
   return combo.map(c => c.valueLabel).join(' / ');
 }
@@ -39,7 +39,7 @@ function ColorDot({ hex }) {
 
 // ─── Step 1 — Attribute selector ──────────────────────────────────────────────
 function AttributeSelector({ allAttributes, selectedAttrs, onChange }) {
-  // শুধু isVariant:true attributes দেখাবো
+  // only isVariant:true attributes will show
   const variantAttrs = allAttributes.filter(a => a.isVariant && a.isActive);
 
   const toggle = (attr) => {
@@ -47,7 +47,7 @@ function AttributeSelector({ allAttributes, selectedAttrs, onChange }) {
     if (exists) {
       onChange(selectedAttrs.filter(a => a._id !== attr._id));
     } else {
-      // সব active values নিয়ে add করো, সবগুলো initially selected
+      // All active values taking add do, all initially selected
       onChange([...selectedAttrs, {
         ...attr,
         selectedValues: attr.values.filter(v => v.isActive).map(v => v._id),
@@ -71,9 +71,9 @@ function AttributeSelector({ allAttributes, selectedAttrs, onChange }) {
   if (!variantAttrs.length) {
     return (
       <div className="px-4 py-8 text-center text-slate-500 text-sm">
-        কোনো variant attribute নেই। Attributes page থেকে{' '}
+        any variant attribute isn't। Attributes page from{' '}
         <span className="text-amber-400 font-medium">"Used for Variants"</span>{' '}
-        চালু করো।
+        Turn on।
       </div>
     );
   }
@@ -151,7 +151,7 @@ function AttributeSelector({ allAttributes, selectedAttrs, onChange }) {
 
 // ─── Step 2 — Variant table (generated combinations) ─────────────────────────
 function VariantTable({ variants, onChange, basePrice }) {
-  // সব row এ একসাথে price/stock set করার জন্য
+  // All row all together price/stock set to do
   const [bulkPrice, setBulkPrice] = useState('');
   const [bulkStock, setBulkStock] = useState('');
 
@@ -181,7 +181,7 @@ function VariantTable({ variants, onChange, basePrice }) {
   if (!variants.length) {
     return (
       <div className="py-12 text-center text-slate-500 text-sm">
-        উপরে attribute ও value select করলে এখানে variants তৈরি হবে।
+        up attribute And value select if done here variants will be created।
       </div>
     );
   }
@@ -199,7 +199,7 @@ function VariantTable({ variants, onChange, basePrice }) {
             type="number"
             min="0"
             step="0.01"
-            placeholder={`Price (base: ৳${basePrice || 0})`}
+            placeholder={`Price (base: SAR ${basePrice || 0})`}
             value={bulkPrice}
             onChange={e => setBulkPrice(e.target.value)}
             className="h-7 w-36 px-2 rounded-lg border border-[#1e1e2e] bg-[#0a0a0f] text-xs text-white placeholder-slate-700 focus:outline-none focus:border-violet-500/50"
@@ -240,7 +240,7 @@ function VariantTable({ variants, onChange, basePrice }) {
       <div className="rounded-xl border border-[#1e1e2e] overflow-hidden">
         {/* Header */}
         <div className="grid grid-cols-[1fr_auto_110px_110px_120px_40px] gap-2 px-3 py-2 bg-[#0d0d14] border-b border-[#1e1e2e]">
-          {['Variant', 'Attributes', 'SKU', 'Price (৳)', 'Stock', ''].map(h => (
+          {['Variant', 'Attributes', 'SKU', 'Price (SAR )', 'Stock', ''].map(h => (
             <span key={h} className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{h}</span>
           ))}
         </div>
@@ -334,15 +334,15 @@ function VariantTable({ variants, onChange, basePrice }) {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function ProductVariantBuilder({
-  allAttributes = [],    // API থেকে আনা সব attributes (isVariant:true গুলো ব্যবহার হবে)
-  value = [],            // বাইরে থেকে controlled value (variants array)
+  allAttributes = [],    // API All brought from attributes (isVariant:true will be used)
+  value = [],            // from outside controlled value (variants array)
   onChange,              // (variants) => void
   basePrice = 0,
-  existingVariants = [], // edit mode এ আগের variants (DB থেকে)
+  existingVariants = [], // edit mode previously variants (DB from)
 }) {
   // ── Selected attributes state (Step 1) ────────────────────────────────────
   const [selectedAttrs, setSelectedAttrs] = useState(() => {
-    // edit mode এ: existing variants থেকে কোন attributes ছিল সেটা reconstruct করো
+    // edit mode In: existing variants from any attributes it was reconstruct Do
     if (!existingVariants.length) return [];
     const attrMap = {};
     existingVariants.forEach(v => {
@@ -365,7 +365,7 @@ export default function ProductVariantBuilder({
     const activeAttrs = selectedAttrs.filter(a => a.selectedValues.length > 0);
     if (!activeAttrs.length) return [];
 
-    // প্রতিটা attribute এর selected values থেকে combo items বানাও
+    // each attribute Of selected values from combo items make
     const comboParts = activeAttrs.map(attr =>
       attr.selectedValues.map(valueId => {
         const valObj = attr.values.find(v => v._id === valueId);
@@ -380,12 +380,12 @@ export default function ProductVariantBuilder({
       })
     );
 
-    // Cartesian product → সব combinations
+    // Cartesian product → All combinations
     return cartesian(comboParts).map(combo => {
       const key   = variantKey(combo);
       const label = variantLabel(combo);
 
-      // existing variant match করো (edit mode এ price/stock preserve করতে)
+      // existing variant match Do (edit mode In price/stock preserve to do)
       const existing = existingVariants.find(ev => {
         if (!ev.attributes?.length) return false;
         const evKey = variantKey(
@@ -394,7 +394,7 @@ export default function ProductVariantBuilder({
         return evKey === key;
       });
 
-      // controlled value থেকেও match করো
+      // controlled value even from match Do
       const controlled = value.find(v => v._key === key);
 
       return {
@@ -417,19 +417,19 @@ export default function ProductVariantBuilder({
     });
   }, [selectedAttrs, existingVariants, value]);
 
-  // parent কে update করো যখন variants generate হয়
+  // parent Whom update do when variants generate is
   const handleVariantsChange = useCallback((updated) => {
     onChange?.(updated);
   }, [onChange]);
 
-  // selectedAttrs বদলালে নতুন variants generate করো
+  // selectedAttrs If changed, new variants generate Do
   const handleAttrsChange = useCallback((attrs) => {
     setSelectedAttrs(attrs);
-    // নতুন generation হবে useMemo এ, parent কে জানাবো
-    // (effect এর বদলে এটা সরাসরি এরপরই re-render এ হবে)
+    // new generation will be useMemo In, parent who will tell
+    // (effect Instead of this, it will directly follow re-render it will be)
   }, []);
 
-  // generated variants যখন বদলায়, controlled onChange এ পাঠাও
+  // generated variants when changes, controlled onChange send to this
   useMemo(() => {
     onChange?.(generatedVariants);
   // eslint-disable-next-line react-hooks/exhaustive-deps

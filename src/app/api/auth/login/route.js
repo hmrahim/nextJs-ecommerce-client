@@ -7,10 +7,10 @@ export async function POST(req) {
   try {
     const { email, password } = await req.json();
 
-    // তোমার backend-এ login call
+    // your backend-In login call
     const data = await authService.login({ email, password });
 
-    // JWT বানাও এবং httpOnly cookie-তে রাখো
+    // JWT Make and httpOnly cookie-keep in
     const token = await createToken({
       id: data.user._id,
       email: data.user.email,
@@ -21,7 +21,7 @@ export async function POST(req) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 দিন
+      maxAge: 60 * 60 * 24 * 7, // 7 Day
       path: '/',
     });
 

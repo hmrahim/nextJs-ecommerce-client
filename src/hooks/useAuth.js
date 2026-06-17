@@ -12,7 +12,7 @@ export function useAuth() {
   const loading = status === 'loading';
   const isLoggedIn = status === 'authenticated';
 
-  // session.user থেকে সব field বের করা — session না বদলালে recalculate হবে না
+  // session.user all from field to extract — session if not changed recalculate will not be
   const user = useMemo(() => {
     if (!session?.user) return null;
 
@@ -36,7 +36,7 @@ export function useAuth() {
   const isBuyer = user?.role === 'buyer';
 
   /**
-   * একাধিক role একসাথে চেক করো
+   * multiple role Check together
    * Example: hasRole('admin', 'seller')
    */
   const hasRole = (...roles) => {
@@ -45,7 +45,7 @@ export function useAuth() {
   };
 
   /**
-   * Email/password দিয়ে login
+   * Email/password by login
    */
   const loginWithCredentials = async ({ email, password }) => {
     const result = await signIn('credentials', {
@@ -62,7 +62,7 @@ export function useAuth() {
   };
 
   /**
-   * Logout করে login page এ redirect করে
+   * Logout Do login page In redirect Do
    */
   const logout = async () => {
     await signOut({ redirect: false });
@@ -71,8 +71,8 @@ export function useAuth() {
   };
 
   /**
-   * Protected page এ use করো।
-   * Login না থাকলে redirect করবে।
+   * Protected page In use Do।
+   * Login If not available redirect will do।
    * Example: useEffect(() => { requireAuth() }, [])
    */
   const requireAuth = (redirectTo = '/auth/login') => {

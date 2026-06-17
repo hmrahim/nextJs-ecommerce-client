@@ -18,7 +18,7 @@ const ACTION_CONFIG = {
 
 const DUMMY_ACTIVITY = [
   { _id: '1', action: 'login',          description: 'Chrome on Windows · Riyadh, SA',      createdAt: new Date(Date.now() - 60*60*1000) },
-  { _id: '2', action: 'order_placed',   description: 'Order #ORD-00874 · 3 items · ৳2,450', createdAt: new Date(Date.now() - 26*60*60*1000) },
+  { _id: '2', action: 'order_placed',   description: 'Order #ORD-00874 · 3 items · SAR 2,450', createdAt: new Date(Date.now() - 26*60*60*1000) },
   { _id: '3', action: 'profile_update', description: 'Phone number changed',                 createdAt: new Date(Date.now() - 2*24*60*60*1000) },
   { _id: '4', action: 'wishlist_add',   description: 'Samsung Galaxy S25 Ultra',             createdAt: new Date(Date.now() - 3*24*60*60*1000) },
   { _id: '5', action: 'review_posted',  description: '5★ review on Anker USB-C Cable',       createdAt: new Date(Date.now() - 4*24*60*60*1000) },
@@ -26,7 +26,7 @@ const DUMMY_ACTIVITY = [
   { _id: '7', action: 'address_add',    description: 'Office address — Panthapath, Dhaka',   createdAt: new Date(Date.now() - 15*24*60*60*1000) },
   { _id: '8', action: 'card_add',       description: 'Visa card ending in 4242',             createdAt: new Date(Date.now() - 20*24*60*60*1000) },
   { _id: '9', action: 'login',          description: 'Android App · Dhaka, BD',              createdAt: new Date(Date.now() - 22*24*60*60*1000) },
-  { _id: '10',action: 'order_placed',   description: 'Order #ORD-00821 · 1 item · ৳980',    createdAt: new Date(Date.now() - 30*24*60*60*1000) },
+  { _id: '10',action: 'order_placed',   description: 'Order #ORD-00821 · 1 item · SAR 980',    createdAt: new Date(Date.now() - 30*24*60*60*1000) },
 ];
 
 function timeAgo(date) {

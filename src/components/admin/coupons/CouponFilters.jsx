@@ -1,5 +1,5 @@
 // 📁 PATH: src/components/admin/coupons/CouponFilters.jsx
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল
+// ⚠️  This is a completely new file
 
 'use client';
 import { useState, useEffect } from 'react';
@@ -16,7 +16,7 @@ const STATUS_OPTIONS = [
 const TYPE_OPTIONS = [
   { value: '',         label: 'All Types' },
   { value: 'percent',  label: '% Percentage' },
-  { value: 'fixed',    label: '৳ Fixed Amount' },
+  { value: 'fixed',    label: 'SAR  Fixed Amount' },
   { value: 'shipping', label: '🚚 Free Shipping' },
 ];
 

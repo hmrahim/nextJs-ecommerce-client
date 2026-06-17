@@ -16,8 +16,8 @@ export const useCategories = () => {
 
 /**
  * Search products hook
- * ✅ FIX: React Query v5 এ keepPreviousData: true deprecated →
- *         placeholderData: keepPreviousData ব্যবহার করতে হবে।
+ * ✅ FIX: React Query v5 In keepPreviousData: true deprecated →
+ *         placeholderData: keepPreviousData must be used।
  */
 export const useSearchProducts = (searchParams, enabled = false) => {
   return useQuery({

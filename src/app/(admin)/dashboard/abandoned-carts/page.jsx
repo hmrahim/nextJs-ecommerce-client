@@ -107,9 +107,9 @@ export default function AbandonedCartsPage() {
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         {[
           { l: 'Abandoned Carts',  v: stats.total,                                       c: 'text-white' },
-          { l: 'Cart Value at Risk',v: '৳' + new Intl.NumberFormat().format(stats.value),c: 'text-amber-400' },
+          { l: 'Cart Value at Risk',v: 'SAR ' + new Intl.NumberFormat().format(stats.value),c: 'text-amber-400' },
           { l: 'Recovered',        v: stats.recovered,                                   c: 'text-emerald-400' },
-          { l: 'Recovered Value',  v: '৳' + new Intl.NumberFormat().format(stats.recoveredValue), c: 'text-emerald-400' },
+          { l: 'Recovered Value',  v: 'SAR ' + new Intl.NumberFormat().format(stats.recoveredValue), c: 'text-emerald-400' },
           { l: 'Recovery Rate',    v: stats.recoveryRate,                                c: 'text-orange-400' },
         ].map(s => (
           <div key={s.l} className="rounded-xl border border-[#1e1e2e] bg-[#16161f] p-4">

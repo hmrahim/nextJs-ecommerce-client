@@ -98,7 +98,7 @@ export default function TrackingPage() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Shipment Tracking</h1>
-          <p className="text-sm text-slate-400 mt-0.5">Real-time tracking, status timeline ও courier performance monitoring।</p>
+          <p className="text-sm text-slate-400 mt-0.5">Real-time tracking, status timeline And courier performance monitoring।</p>
         </div>
         <div className="flex items-center gap-2 text-xs text-slate-400">
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
@@ -117,7 +117,7 @@ export default function TrackingPage() {
           { label: 'Delivered',   value: stats.delivered,    color: 'text-emerald-400' },
           { label: 'Failed/Ret.', value: stats.failed,       color: 'text-red-400' },
           { label: 'Overdue',     value: stats.overdue,      color: 'text-amber-400' },
-          { label: 'COD Pending', value: `৳${(stats.codValue / 1000).toFixed(1)}k`, color: 'text-orange-400' },
+          { label: 'COD Pending', value: `SAR ${(stats.codValue / 1000).toFixed(1)}k`, color: 'text-orange-400' },
         ].map(s => (
           <div key={s.label} className="p-4 rounded-xl border border-[#1e1e2e] bg-[#111118]">
             <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">{s.label}</p>

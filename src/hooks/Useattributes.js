@@ -110,7 +110,7 @@ export function useCreateAttribute() {
       }),
     onSuccess: (res) => {
       toast.success('Attribute created');
-      // নতুন attribute টা সব list cache-এ ঢুকিয়ে দাও
+      // new attribute all of it list cache-Put it in
       qc.setQueriesData({ queryKey: attributeKeys.all() }, (old) => {
         if (!old?.attributes) return old;
         const updated = [...old.attributes, res.data.data];
@@ -196,7 +196,7 @@ export function useBulkActivateAttributes() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (ids) => {
-      // attributeService-এ bulk endpoint না থাকলে parallel call
+      // attributeService-In bulk endpoint If not available parallel call
       await Promise.all(ids.map((id) => attributeService.adminUpdate(id, { isActive: true })));
     },
     onMutate: async (ids) => {

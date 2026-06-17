@@ -6,7 +6,7 @@ import { TRACKING_STATUSES, PRIORITIES } from './_dummyData';
 function fmtDate(iso) {
   if (!iso) return '—';
   const d = new Date(iso);
-  return d.toLocaleString('en-BD', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleString('en-SA', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
 function relTime(iso) {
@@ -179,12 +179,12 @@ export default function TrackingDetailModal({ shipment, onClose, onAddNote, onAd
               </div>
               <div>
                 <p className="text-[10px] text-slate-500 uppercase">Value</p>
-                <p className="text-sm font-bold text-white">৳{shipment.value.toLocaleString()}</p>
+                <p className="text-sm font-bold text-white">SAR {shipment.value.toLocaleString()}</p>
               </div>
               <div>
                 <p className="text-[10px] text-slate-500 uppercase">{shipment.isCod ? 'COD Amount' : 'Payment'}</p>
                 <p className={`text-sm font-bold ${shipment.isCod ? 'text-amber-400' : 'text-emerald-400'}`}>
-                  {shipment.isCod ? `৳${shipment.codAmount.toLocaleString()}` : 'Prepaid'}
+                  {shipment.isCod ? `SAR ${shipment.codAmount.toLocaleString()}` : 'Prepaid'}
                 </p>
               </div>
             </div>

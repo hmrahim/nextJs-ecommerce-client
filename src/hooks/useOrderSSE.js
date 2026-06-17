@@ -1,6 +1,6 @@
 // 📁 hooks/useOrderSSE.js
-// নতুন order এলে বা order এর status update হলে admin dashboard/orders
-// realtime এ instantly update হওয়ার জন্য SSE hook।
+// new order if comes or order Of status update If admin dashboard/orders
+// realtime In instantly update to be SSE hook।
 
 import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -15,11 +15,11 @@ export const useOrderSSE = (onEvent) => {
     let isUnmounted = false;
 
     const connect = async () => {
-      // EventSource কাস্টম হেডার পাঠাতে পারে না, তাই token কে query param এ পাঠাতে হবে
+      // EventSource Cannot send custom headers, so token Whom query param Must be sent to
       const session = await getSession();
       const token = session?.accessToken || session?.user?.token;
       if (!token) {
-        // লগইন করা না থাকলে কানেক্ট করার দরকার নাই
+        // No need to connect if not logged in
         reconnectTimer.current = setTimeout(connect, 5000);
         return;
       }
@@ -34,7 +34,7 @@ export const useOrderSSE = (onEvent) => {
         queryClient.invalidateQueries({ queryKey: ['admin-order'] });
       };
 
-      // নতুন order placed হলে
+      // new order placed If
       es.addEventListener('order_created', (e) => {
         invalidateAll();
         if (onEvent) {
@@ -46,7 +46,7 @@ export const useOrderSSE = (onEvent) => {
         }
       });
 
-      // order এর status/details update হলে (confirm, status change, cancel, assign rider ইত্যাদি)
+      // order Of status/details update If (confirm, status change, cancel, assign rider etc.)
       es.addEventListener('order_updated', (e) => {
         invalidateAll();
         if (onEvent) {
@@ -61,7 +61,7 @@ export const useOrderSSE = (onEvent) => {
       es.onerror = () => {
         es.close();
         if (isUnmounted) return;
-        // 5s পরে reconnect
+        // 5s Later reconnect
         reconnectTimer.current = setTimeout(connect, 5000);
       };
     };

@@ -121,16 +121,16 @@ export default function CourierTable({ couriers, loading, onEdit, onDelete, onTo
               {/* Rates */}
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="flex justify-between p-2 rounded-md bg-[#0c0c12]">
-                  <span className="text-slate-500">Base</span><span className="text-slate-200 font-semibold">৳{c.baseRate}</span>
+                  <span className="text-slate-500">Base</span><span className="text-slate-200 font-semibold">SAR {c.baseRate}</span>
                 </div>
                 <div className="flex justify-between p-2 rounded-md bg-[#0c0c12]">
-                  <span className="text-slate-500">/Kg</span><span className="text-slate-200 font-semibold">৳{c.perKgRate}</span>
+                  <span className="text-slate-500">/Kg</span><span className="text-slate-200 font-semibold">SAR {c.perKgRate}</span>
                 </div>
                 <div className="flex justify-between p-2 rounded-md bg-[#0c0c12]">
                   <span className="text-slate-500">COD</span><span className="text-slate-200 font-semibold">{c.codChargePercent}%</span>
                 </div>
                 <div className="flex justify-between p-2 rounded-md bg-[#0c0c12]">
-                  <span className="text-slate-500">Pickup</span><span className="text-slate-200 font-semibold">{c.pickupCharge ? `৳${c.pickupCharge}` : 'Free'}</span>
+                  <span className="text-slate-500">Pickup</span><span className="text-slate-200 font-semibold">{c.pickupCharge ? `SAR ${c.pickupCharge}` : 'Free'}</span>
                 </div>
               </div>
 

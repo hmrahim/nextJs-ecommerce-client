@@ -7,7 +7,7 @@ import { useState, useMemo } from 'react';
 const now = Date.now();
 const day = 86400000;
 const iso = (d) => new Date(d).toISOString();
-const fmt = (n) => `৳${Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
+const fmt = (n) => `SAR ${Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
 const dateFmt = (d) => d ? new Date(d).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '—';
 
 const STATUS = {

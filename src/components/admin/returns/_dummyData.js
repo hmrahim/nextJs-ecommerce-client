@@ -87,7 +87,7 @@ export const DUMMY_RETURNS = [
     timeline: [
       { status: 'submitted', note: 'Refund request submitted with damage photos.', createdAt: d(15) },
       { status: 'approved', note: 'Approved as refund-only. No return needed.', createdAt: d(14) },
-      { status: 'refund_processed', note: `Refund of $89.99 processed to original payment. Ref: TXN-RF-9981.`, createdAt: d(12) },
+      { status: 'refund_processed', note: `Refund of SAR 89.99 processed to original payment. Ref: TXN-RF-9981.`, createdAt: d(12) },
     ],
     createdAt: d(15), updatedAt: d(12),
   },

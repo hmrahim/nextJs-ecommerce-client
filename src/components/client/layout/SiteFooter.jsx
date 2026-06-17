@@ -56,7 +56,7 @@ function SiteFooter() {
         <div className="container-x grid gap-6 py-10 md:grid-cols-2 md:items-center">
           <div>
             <h3 className="font-display text-2xl font-bold text-white">Join the Green Club</h3>
-            <p className="mt-1 text-sm text-white/70">Get exclusive deals, early access to flash sales, and ৳200 off your first order.</p>
+            <p className="mt-1 text-sm text-white/70">Get exclusive deals, early access to flash sales, and SAR 200 off your first order.</p>
           </div>
           <form className="flex w-full overflow-hidden rounded-lg bg-white">
             <input className="flex-1 px-4 py-3 text-sm text-foreground outline-none" placeholder="Enter your email address" />

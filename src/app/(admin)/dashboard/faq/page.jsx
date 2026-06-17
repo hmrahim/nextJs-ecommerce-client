@@ -20,7 +20,7 @@ const CATEGORIES = [
 
 const LANGS = [
   { code: "en", name: "English" },
-  { code: "bn", name: "বাংলা" },
+  { code: "bn", name: "Bengali" },
   { code: "hi", name: "हिन्दी" },
   { code: "ar", name: "العربية" },
 ];
@@ -61,7 +61,7 @@ const FAQ_SEED = [
   {
     id: "FAQ-1005", category: "delivery",
     question: "What are the delivery charges?",
-    answer: "Inside Dhaka: ৳60 (free above ৳1,500). Outside Dhaka: ৳120 (free above ৳2,500). Express same-day delivery: ৳200. Heavy items have additional charges shown at checkout.",
+    answer: "Inside Dhaka: SAR 60 (free above SAR 1,500). Outside Dhaka: SAR 120 (free above SAR 2,500). Express same-day delivery: SAR 200. Heavy items have additional charges shown at checkout.",
     status: "published", priority: 1, views: 232100, helpful: 21400, notHelpful: 1820,
     tags: ["delivery-charge", "free-shipping", "express"], updated: "3 days ago", author: "Tanjila A.",
     languages: ["en", "bn"],
@@ -101,7 +101,7 @@ const FAQ_SEED = [
   {
     id: "FAQ-1010", category: "account",
     question: "How do I enable two-factor authentication?",
-    answer: "Go to Settings → Security → Two-Factor Authentication. Choose SMS or Authenticator App. We strongly recommend enabling 2FA for orders above ৳25,000.",
+    answer: "Go to Settings → Security → Two-Factor Authentication. Choose SMS or Authenticator App. We strongly recommend enabling 2FA for orders above SAR 25,000.",
     status: "draft", priority: 5, views: 0, helpful: 0, notHelpful: 0,
     tags: ["2fa", "security"], updated: "Today", author: "Rashed K.",
     languages: ["en"],

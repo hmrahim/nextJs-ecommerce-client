@@ -1,8 +1,8 @@
 // 📁 PATH: src/components/admin/variants/ProductVariantsPanel.jsx
 // ─────────────────────────────────────────────────────────────────────────────
-// Product create/edit page এ এই panel add করো।
-// Product save হওয়ার পর productId থাকলে এটা দেখাবে।
-// Variants inline edit + delete করা যাবে।
+// Product create/edit page in this panel add Do।
+// Product save after being productId If available, it will show this।
+// Variants inline edit + delete can be done।
 // ─────────────────────────────────────────────────────────────────────────────
 'use client';
 import { useState, useEffect, useCallback } from 'react';
@@ -141,7 +141,7 @@ export default function ProductVariantsPanel({ productId }) {
   // ── Render ─────────────────────────────────────────────────────────────────
   if (!productId) return (
     <div className="rounded-2xl border border-[#1e1e2e] bg-[#0f0f17] p-6 text-center">
-      <p className="text-sm text-slate-500">Product save করার পর এখানে variants দেখাবে ও manage করা যাবে।</p>
+      <p className="text-sm text-slate-500">Product save After doing, here variants will show and manage can be done।</p>
     </div>
   );
 
@@ -187,8 +187,8 @@ export default function ProductVariantsPanel({ productId }) {
           <svg className="w-10 h-10 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 10h16M4 14h8m-8 4h8"/>
           </svg>
-          <p className="text-sm">কোনো variant নেই।</p>
-          <p className="text-xs text-slate-700">Attributes page থেকে "Generate Variants" করো।</p>
+          <p className="text-sm">any variant isn't।</p>
+          <p className="text-xs text-slate-700">Attributes page from "Generate Variants" Do।</p>
         </div>
       ) : (
         <div className="overflow-x-auto">
@@ -232,7 +232,7 @@ export default function ProductVariantsPanel({ productId }) {
                   <td className="px-4 py-3">
                     <EditableCell
                       value={v.price}
-                      prefix="৳"
+                      prefix="SAR "
                       onSave={val => updateVariant(v._id, { price: val })}
                     />
                   </td>

@@ -1,5 +1,5 @@
 // 📁 PATH: src/services/couponService.js
-// Production-ready — backend route গুলোর সাথে 1:1 mapped
+// Production-ready — backend route with the 1:1 mapped
 // Backend: src/routes/couponRoutes.js
 
 import api from '@/lib/api';

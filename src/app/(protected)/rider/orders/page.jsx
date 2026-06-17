@@ -115,7 +115,7 @@ function RiderOrderCard({ order, onOpen }) {
           </div>
         </div>
         <div className="text-right">
-          <div className="text-base font-semibold text-amber-400">৳{Number(order.total).toLocaleString('en-IN')}</div>
+          <div className="text-base font-semibold text-amber-400">SAR {Number(order.total).toLocaleString('en-IN')}</div>
           <div className="text-[10px] text-slate-500 uppercase mt-0.5">{order.paymentMethod}</div>
         </div>
       </div>
@@ -166,7 +166,7 @@ function RiderActionSheet({ order, onClose, onDone }) {
             <h2 className="font-mono text-white">{order.orderNumber}</h2>
             <button onClick={onClose} className="text-slate-500 hover:text-white text-2xl">×</button>
           </div>
-          <div className="text-xs text-slate-500 mt-1">Total: <span className="text-amber-400 font-semibold">৳{Number(order.total).toLocaleString('en-IN')}</span></div>
+          <div className="text-xs text-slate-500 mt-1">Total: <span className="text-amber-400 font-semibold">SAR {Number(order.total).toLocaleString('en-IN')}</span></div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-5 space-y-4">
@@ -194,7 +194,7 @@ function RiderActionSheet({ order, onClose, onDone }) {
             {(order.items || []).map((it, i) => (
               <div key={i} className="flex justify-between text-sm py-1">
                 <span className="text-slate-300">{it.productName} × {it.quantity}</span>
-                <span className="text-slate-400">৳{it.lineTotal}</span>
+                <span className="text-slate-400">SAR {it.lineTotal}</span>
               </div>
             ))}
           </div>
@@ -239,7 +239,7 @@ function RiderActionSheet({ order, onClose, onDone }) {
                 <>
                   <div>
                     <label className="block text-[11px] uppercase tracking-widest text-slate-500 mb-1.5">
-                      Amount collected (৳)
+                      Amount collected (SAR )
                     </label>
                     <input
                       type="number"
@@ -247,7 +247,7 @@ function RiderActionSheet({ order, onClose, onDone }) {
                       onChange={(e) => setAmount(e.target.value)}
                       className="w-full bg-[#0a0a12] border border-[#1e1e2e] rounded-lg p-2.5 text-sm text-white"
                     />
-                    <div className="text-[10px] text-slate-500 mt-1">Order total: ৳{order.total}</div>
+                    <div className="text-[10px] text-slate-500 mt-1">Order total: SAR {order.total}</div>
                   </div>
                   {needsTxn && (
                     <div>

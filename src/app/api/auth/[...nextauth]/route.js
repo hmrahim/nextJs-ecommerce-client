@@ -24,7 +24,7 @@ export const authOptions = {
 
       console.log(res);
 
-          const { token, user } = res.data; // ← user আর token আলাদা করো
+          const { token, user } = res.data; // ← user And token Separate
           
 
           if (!user) throw new Error('No user returned');
@@ -34,8 +34,8 @@ export const authOptions = {
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
-            role: user.role,    // ✅ এখন সঠিকভাবে আসবে
-            token: token,        // ✅ API call এর জন্য
+            role: user.role,    // ✅ Now it will come correctly
+            token: token,        // ✅ API call for this
           };
         } catch (err) {
           throw new Error(err?.response?.data?.message || 'Invalid credentials');

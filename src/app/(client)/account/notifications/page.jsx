@@ -18,7 +18,7 @@ const INITIAL = [
   { id: 1, type: 'order', title: 'Your order is out for delivery', body: 'ORD-10002 will arrive by 6 PM today.', time: '10 min ago', unread: true, href: '/account/orders/ORD-10002' },
   { id: 2, type: 'promo', title: '20% off ends tonight', body: 'Use code WELCOME20 before midnight.', time: '2 hours ago', unread: true, href: '/account/vouchers' },
   { id: 3, type: 'reward', title: 'You earned 124 points', body: 'For completing order ORD-10001.', time: '1 day ago', unread: true, href: '/account/rewards' },
-  { id: 4, type: 'wishlist', title: 'Price drop on Smart Watch Series 9', body: 'Now ৳8,750 (was ৳9,990).', time: '2 days ago', unread: false, href: '/account/wishlist' },
+  { id: 4, type: 'wishlist', title: 'Price drop on Smart Watch Series 9', body: 'Now SAR 8,750 (was SAR 9,990).', time: '2 days ago', unread: false, href: '/account/wishlist' },
   { id: 5, type: 'message', title: 'Support replied to your ticket', body: 'Re: Refund for ORD-09823 — please review.', time: '3 days ago', unread: false, href: '#' },
   { id: 6, type: 'order', title: 'Your order was delivered', body: 'ORD-10001 was delivered. Tap to review.', time: '4 days ago', unread: false, href: '/account/orders/ORD-10001' },
   { id: 7, type: 'system', title: 'New device sign-in', body: 'Chrome on Windows · Dhaka, BD', time: '1 week ago', unread: false, href: '/account/settings' },

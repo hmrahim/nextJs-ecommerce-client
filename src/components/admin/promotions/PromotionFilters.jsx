@@ -1,5 +1,5 @@
 // 📁 PATH: src/components/admin/promotions/PromotionFilters.jsx
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল
+// ⚠️  This is a completely new file
 
 'use client';
 import { useState, useEffect } from 'react';
@@ -19,7 +19,7 @@ const TYPE = [
   { value: 'bundle_deal',   label: '📦 Bundle Deal' },
   { value: 'tier_discount', label: '📈 Tier Discount' },
   { value: 'cart_percent',  label: '% Cart Discount' },
-  { value: 'cart_fixed',    label: '৳ Cart Fixed Off' },
+  { value: 'cart_fixed',    label: 'SAR  Cart Fixed Off' },
   { value: 'free_gift',     label: '🎀 Free Gift' },
   { value: 'free_shipping', label: '🚚 Free Shipping' },
 ];

@@ -1,5 +1,5 @@
 // 📁 PATH: src/components/admin/loyalty/LoyaltyRulesTab.jsx
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল
+// ⚠️  This is a completely new file
 
 'use client';
 import { useState } from 'react';
@@ -36,8 +36,8 @@ export default function LoyaltyRulesTab({ rules, onSave, onDelete, onToggle }) {
                 <span className="px-2 py-0.5 rounded-md border border-[#1e1e2e] text-[10px] text-slate-400">{EVENTS.find(e => e.value === r.event)?.label || r.event}</span>
               </div>
               <p className="text-xs text-slate-500 mt-1">
-                {r.pointsType === 'percent' ? `${r.pointsValue} pt per ৳1 spent` : `${r.pointsValue} flat points per event`}
-                {r.minSpend > 0 && ` · min ৳${r.minSpend}`}
+                {r.pointsType === 'percent' ? `${r.pointsValue} pt per SAR 1 spent` : `${r.pointsValue} flat points per event`}
+                {r.minSpend > 0 && ` · min SAR ${r.minSpend}`}
               </p>
             </div>
             <button onClick={() => onToggle(r._id)} className={`relative w-10 h-5 rounded-full transition-colors ${r.isActive ? 'bg-emerald-500' : 'bg-slate-700'}`}>
@@ -54,10 +54,10 @@ export default function LoyaltyRulesTab({ rules, onSave, onDelete, onToggle }) {
             <select value={draft.event} onChange={e => setDraft({ ...draft, event: e.target.value })} className={ipt}>{EVENTS.map(e => <option key={e.value} value={e.value}>{e.label}</option>)}</select>
             <select value={draft.pointsType} onChange={e => setDraft({ ...draft, pointsType: e.target.value })} className={ipt}>
               <option value="flat">Flat points</option>
-              <option value="percent">pt per ৳1</option>
+              <option value="percent">pt per SAR 1</option>
             </select>
             <input type="number" min={0} step={0.1} value={draft.pointsValue} onChange={e => setDraft({ ...draft, pointsValue: +e.target.value })} className={ipt} placeholder="Value" />
-            <input type="number" min={0} value={draft.minSpend} onChange={e => setDraft({ ...draft, minSpend: +e.target.value })} className={ipt} placeholder="Min ৳" />
+            <input type="number" min={0} value={draft.minSpend} onChange={e => setDraft({ ...draft, minSpend: +e.target.value })} className={ipt} placeholder="Min SAR " />
             <div className="md:col-span-6 flex gap-2">
               <button onClick={() => setDraft(null)} className="px-3 py-1.5 rounded-md border border-[#1e1e2e] text-xs text-slate-400 hover:bg-white/5">Cancel</button>
               <button onClick={commit} className="px-3 py-1.5 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium">Save Rule</button>

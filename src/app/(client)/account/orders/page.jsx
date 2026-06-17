@@ -20,7 +20,7 @@ const STATUS_ICONS = { delivered: Check, shipped: Truck, confirmed: Check, pendi
 
 function formatDate(dateStr) {
   if (!dateStr) return '—';
-  return new Date(dateStr).toLocaleDateString('en-BD', { day: 'numeric', month: 'short', year: 'numeric' });
+  return new Date(dateStr).toLocaleDateString('en-SA', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 export default function OrdersPage() {
@@ -61,7 +61,7 @@ export default function OrdersPage() {
       setOrders(data);
       setPagination(res.data?.pagination || { page: 1, pages: 1, total: data.length });
     } catch (err) {
-      setError(err?.response?.data?.message || 'Orders load করা যায়নি। আবার চেষ্টা করুন।');
+      setError(err?.response?.data?.message || 'Orders load could not be done। Try again।');
     } finally {
       setLoading(false);
     }
@@ -80,7 +80,7 @@ export default function OrdersPage() {
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Order ID বা product নাম খুঁজুন"
+              placeholder="Order ID Or product Search name"
               className="w-full rounded-lg border border-border pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/30"
             />
           </div>
@@ -102,7 +102,7 @@ export default function OrdersPage() {
       {loading && (
         <div className="bg-white rounded-2xl border border-border p-12 text-center">
           <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="mt-3 text-sm text-slate-500">Orders loading হচ্ছে...</p>
+          <p className="mt-3 text-sm text-slate-500">Orders loading is happening...</p>
         </div>
       )}
 
@@ -111,7 +111,7 @@ export default function OrdersPage() {
           <AlertCircle className="mx-auto w-10 h-10 text-rose-400" />
           <p className="mt-3 font-semibold text-slate-700">{error}</p>
           <button onClick={fetchOrders} className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-900 text-white text-sm font-semibold">
-            <RefreshCw className="w-4 h-4" /> আবার চেষ্টা করুন
+            <RefreshCw className="w-4 h-4" /> Try again
           </button>
         </div>
       )}
@@ -119,10 +119,10 @@ export default function OrdersPage() {
       {!loading && !error && orders.length === 0 && (
         <div className="bg-white rounded-2xl border border-border p-12 text-center">
           <Package className="mx-auto w-12 h-12 text-slate-300" />
-          <p className="mt-3 font-semibold text-slate-700">কোনো order পাওয়া যায়নি</p>
-          <p className="text-sm text-slate-500">ভিন্ন filter বা search term দিয়ে চেষ্টা করুন।</p>
+          <p className="mt-3 font-semibold text-slate-700">any order Not found</p>
+          <p className="text-sm text-slate-500">different filter Or search term Try with।</p>
           <Link href="/" className="mt-4 inline-block px-4 py-2 rounded-lg bg-slate-900 text-white text-sm font-semibold">
-            Shopping শুরু করুন
+            Shopping Start
           </Link>
         </div>
       )}
@@ -157,7 +157,7 @@ export default function OrdersPage() {
                         </div>
                         <div className="min-w-0">
                           <p className="font-semibold text-sm line-clamp-1">{it.productName}</p>
-                          <p className="text-xs text-slate-500">Qty {it.quantity} · ৳{it.unitPrice?.toLocaleString()}</p>
+                          <p className="text-xs text-slate-500">Qty {it.quantity} · SAR {it.unitPrice?.toLocaleString()}</p>
                           {it.variantAttrs && (
                             <p className="text-xs text-slate-400">
                               {Object.entries(it.variantAttrs).map(([k, v]) => `${k}: ${v}`).join(', ')}
@@ -167,11 +167,11 @@ export default function OrdersPage() {
                       </div>
                     ))}
                     {o.items?.length > 2 && (
-                      <p className="text-xs text-slate-500">+{o.items.length - 2} টি আরো পণ্য</p>
+                      <p className="text-xs text-slate-500">+{o.items.length - 2} more products</p>
                     )}
                     <div className="ml-auto text-right">
                       <p className="text-xs text-slate-500">Total</p>
-                      <p className="font-bold text-emerald-700">৳{o.total?.toLocaleString()}</p>
+                      <p className="font-bold text-emerald-700">SAR {o.total?.toLocaleString()}</p>
                     </div>
                   </div>
 
@@ -202,7 +202,7 @@ export default function OrdersPage() {
           {pagination.pages > 1 && (
             <div className="bg-white rounded-2xl border border-border p-4 flex items-center justify-between">
               <p className="text-sm text-slate-500">
-                {pagination.total} টি order এর মধ্যে page {pagination.page}/{pagination.pages}
+                {pagination.total} The order within it page {pagination.page}/{pagination.pages}
               </p>
               <div className="flex gap-2">
                 <button

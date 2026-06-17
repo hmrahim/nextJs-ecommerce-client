@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import ConfirmOrderDialog from './ConfirmOrderDialog';
 
+
 export const ORDER_STATUS = {
   pending:    { label: 'Pending',    cls: 'bg-amber-500/10 text-amber-400 border-amber-500/20',   dot: 'bg-amber-400' },
   confirmed:  { label: 'Confirmed',  cls: 'bg-sky-500/10 text-sky-400 border-sky-500/20',         dot: 'bg-sky-400' },
@@ -97,14 +98,14 @@ export default function OrdersTable({
   onPageChange,
 }) {
   const [actionMenu, setActionMenu] = useState(null);
+  const [confirmTarget, setConfirmTarget] = useState(null);
+
+
 
   // Cancel modal
   const [cancelTarget, setCancelTarget] = useState(null);
   const [cancelNote, setCancelNote] = useState('');
   const [cancelling, setCancelling] = useState(false);
-
-  // Confirm modal
-  const [confirmTarget, setConfirmTarget] = useState(null);
 
   // View modal (built-in premium)
   const [viewTarget, setViewTarget] = useState(null);
@@ -125,13 +126,6 @@ export default function OrdersTable({
     } finally {
       setCancelling(false);
     }
-  };
-
-  const openConfirmModal = (order) => setConfirmTarget(order);
-  const closeConfirmModal = () => setConfirmTarget(null);
-  const handleConfirmYes = async () => {
-    if (!confirmTarget) return;
-    await onUpdateStatus(confirmTarget._id, 'confirmed');
   };
 
   const openView = (order) => {
@@ -320,12 +314,12 @@ export default function OrdersTable({
                         <span>View</span>
                       </ActionBtn>
 
-                      {/* Confirm — opens premium confirmation modal */}
+                      {/* Confirm — disabled when cancelled / confirmed / processing / shipped / terminal */}
                       <ActionBtn
                         variant="confirm"
                         title={confirmDisabled ? 'Not available for this status' : 'Confirm this order'}
                         disabled={confirmDisabled}
-                        onClick={() => openConfirmModal(order)}
+                        onClick={() => setConfirmTarget(order)}
                       >
                         <IconCheck />
                         <span>Confirm</span>
@@ -434,16 +428,7 @@ export default function OrdersTable({
       )}
     </div>
 
-    {/* ── Premium Confirm Order Modal ──────────────────────────────── */}
-    {confirmTarget && (
-      <ConfirmOrderDialog
-        order={confirmTarget}
-        onClose={closeConfirmModal}
-        onConfirm={handleConfirmYes}
-      />
-    )}
-
-   {/* ── Premium Cancel Confirmation Modal ─────────────────────────── */}
+    {/* ── Premium Cancel Confirmation Modal ─────────────────────────── */}
     {cancelTarget && (
       <div
         className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-[fadeIn_.15s_ease-out]"
@@ -730,6 +715,15 @@ export default function OrdersTable({
         </div>
       </div>
     )}
+
+    {confirmTarget && (
+      <ConfirmOrderDialog
+        order={confirmTarget}
+        onClose={() => setConfirmTarget(null)}
+        onConfirmed={() => setConfirmTarget(null)}
+      />
+    )}
     </>
   );
 }
+

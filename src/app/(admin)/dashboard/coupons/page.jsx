@@ -1,6 +1,6 @@
 // 📁 PATH: src/app/(admin)/dashboard/coupons/page.jsx
-// ⚠️ পুরোনো page.jsx এর জায়গায় REPLACE করো
-// react-query hooks দিয়ে fully wired — কোনো dummy fallback নেই
+// ⚠️ old page.jsx instead of REPLACE Do
+// react-query hooks by fully wired — any dummy fallback isn't
 
 'use client';
 
@@ -136,7 +136,7 @@ export default function CouponsPage() {
           { label: 'Expired',       value: stats.expired,                                icon: '⏰', from: 'from-slate-500/20',   border: 'border-slate-500/20',   text: 'text-slate-400' },
           { label: 'Exhausted',     value: stats.exhausted,                              icon: '🔴', from: 'from-red-500/20',     border: 'border-red-500/20',     text: 'text-red-400' },
           { label: 'Total Uses',    value: (stats.totalUses || 0).toLocaleString(),      icon: '📊', from: 'from-violet-500/20',  border: 'border-violet-500/20',  text: 'text-violet-400' },
-          { label: 'Total Savings', value: `৳${(stats.savings || 0).toLocaleString()}`,  icon: '💰', from: 'from-sky-500/20',     border: 'border-sky-500/20',     text: 'text-sky-400' },
+          { label: 'Total Savings', value: `SAR ${(stats.savings || 0).toLocaleString()}`,  icon: '💰', from: 'from-sky-500/20',     border: 'border-sky-500/20',     text: 'text-sky-400' },
         ].map((s) => (
           <div key={s.label} className={`rounded-xl border ${s.border} bg-gradient-to-br ${s.from}/5 to-transparent p-4`}>
             <div className="text-lg mb-1">{s.icon}</div>

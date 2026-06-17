@@ -116,7 +116,7 @@ function DiscountSection({ discounts = [], onChange }) {
             <label className="block text-xs text-slate-500 mb-1">Type</label>
             <select className={selectCls} value={d.type} onChange={e => update(i, 'type', e.target.value)}>
               <option value="percent">%</option>
-              <option value="fixed">BDT</option>
+              <option value="fixed">SAR</option>
             </select>
           </div>
           <div className="pt-5">
@@ -181,7 +181,7 @@ function SavingOverlay({ mode, uploadingImages }) {
       <p className="text-white text-sm font-medium">
         {uploadingImages ? 'Uploading images…' : mode === 'create' ? 'Creating product…' : 'Updating product…'}
       </p>
-      <p className="text-slate-500 text-xs">একটু অপেক্ষা করো</p>
+      <p className="text-slate-500 text-xs">Wait a moment</p>
     </div>
   );
 }
@@ -308,13 +308,13 @@ export default function ProductFormPage({ mode = 'create', productId }) {
   } = useQuery({
     queryKey: ['admin-product', productId],
     queryFn: () => productService.adminGetById(productId),
-    enabled: mode === 'edit' && !!productId,   // শুধু edit mode এ fetch করবে
-    staleTime: 0,                                // সবসময় fresh data
+    enabled: mode === 'edit' && !!productId,   // only edit mode In fetch will do
+    staleTime: 0,                                // always fresh data
   });
 
  
 
-  // product load হলে form এ set করো
+  // product load If form In set Do
   useEffect(() => {
     if (!productData) return;
     const p = productData.data?.data || productData.data?.product || productData.data;
@@ -536,7 +536,7 @@ export default function ProductFormPage({ mode = 'create', productId }) {
 
             <FormSection title="Pricing">
               <div className="grid grid-cols-3 gap-4">
-                <Field label="Price (BDT)" required>
+                <Field label="Price (SAR)" required>
                   <input type="number" min="0" step="0.01" className={inputCls} value={form.price}
                     onChange={e => set('price', e.target.value)} />
                   {errors.price && <p className="mt-1 text-xs text-red-400">{errors.price}</p>}

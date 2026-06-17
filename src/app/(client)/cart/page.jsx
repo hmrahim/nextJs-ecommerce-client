@@ -47,7 +47,7 @@ function CouponBox({ subtotal, items }) {
           {coupon.code} — {coupon.label}
           {coupon.discount > 0 && (
             <span className="text-xs font-bold text-emerald-600">
-              (-৳{coupon.discount.toLocaleString()})
+              (-SAR {coupon.discount.toLocaleString()})
             </span>
           )}
         </span>
@@ -70,7 +70,7 @@ function CouponBox({ subtotal, items }) {
           type="text"
           value={code}
           onChange={(e) => { setCode(e.target.value.toUpperCase()); clearError(); }}
-          placeholder="Coupon code লিখুন"
+          placeholder="Coupon code write"
           className="flex-1 rounded-md border border-border px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
         />
         <button
@@ -140,7 +140,7 @@ export default function CartPage() {
     return (
       <div className="container-x py-20 flex flex-col items-center gap-3 text-muted-foreground">
         <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-        Cart লোড হচ্ছে…
+        Cart Loading…
       </div>
     );
   }
@@ -149,13 +149,13 @@ export default function CartPage() {
     return (
       <div className="container-x py-16 text-center">
         <p className="text-rose-600 font-medium">
-          {error?.response?.data?.message || 'Cart লোড করা যায়নি।'}
+          {error?.response?.data?.message || 'Cart Could not be loaded।'}
         </p>
         <button
           onClick={() => refetch()}
           className="mt-4 rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
         >
-          আবার চেষ্টা করুন
+          Try again
         </button>
       </div>
     );
@@ -168,15 +168,15 @@ export default function CartPage() {
           <div className="mx-auto mb-6 grid h-20 w-20 place-items-center rounded-full bg-emerald-50">
             <ShoppingBag className="h-10 w-10 text-emerald-600" />
           </div>
-          <h1 className="font-display text-2xl font-bold">Cart খালি আছে</h1>
+          <h1 className="font-display text-2xl font-bold">Cart is empty</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            কিছু product add করুন।
+            some product add do।
           </p>
           <Link
             href="/shop"
             className="mt-6 inline-block rounded-lg bg-amber-400 px-6 py-3 font-bold text-emerald-950 hover:bg-amber-300"
           >
-            Shopping শুরু করুন →
+            Shopping Start →
           </Link>
         </div>
       </div>
@@ -198,7 +198,7 @@ export default function CartPage() {
           </span>
         </h1>
         <button
-          onClick={() => { if (window.confirm('Cart clear করবেন?')) clearCart.mutate(); }}
+          onClick={() => { if (window.confirm('Cart clear will do?')) clearCart.mutate(); }}
           disabled={clearCart.isPending}
           className="text-xs font-semibold text-rose-600 hover:underline disabled:opacity-50"
         >
@@ -218,14 +218,14 @@ export default function CartPage() {
                 onChange={toggleAll}
                 className="accent-emerald-600"
               />
-              সব select করুন ({items.length} items)
+              All select do ({items.length} items)
               <button
                 onClick={removeSelected}
                 disabled={!selected.size || removeItem.isPending}
                 className="ml-auto text-xs text-rose-600 hover:underline disabled:opacity-40"
               >
                 {removeItem.isPending
-                  ? 'মুছছে…'
+                  ? 'is deleting…'
                   : `Remove Selected${selected.size ? ` (${selected.size})` : ''}`}
               </button>
             </div>
@@ -295,18 +295,18 @@ export default function CartPage() {
 
                     <div className="mt-2 flex items-center gap-2">
                       <span className="text-lg font-bold text-emerald-700">
-                        ৳{it.price.toLocaleString()}
+                        SAR {it.price.toLocaleString()}
                       </span>
                       {it.originalPrice && it.originalPrice !== it.price && (
                         <span className="text-xs text-muted-foreground line-through">
-                          ৳{it.originalPrice.toLocaleString()}
+                          SAR {it.originalPrice.toLocaleString()}
                         </span>
                       )}
                     </div>
 
                     {!it.inStock && (
                       <div className="mt-1 text-xs font-semibold text-rose-600">
-                        মাত্র {it.stock}টি বাকি — পরিমাণ adjust করা হয়েছে
+                        only {it.stock}remaining — quantity adjust has been done
                       </div>
                     )}
                   </div>
@@ -328,7 +328,7 @@ export default function CartPage() {
                         onClick={dec}
                         disabled={isUpdating || it.quantity <= 1}
                         className="grid h-8 w-8 place-items-center hover:bg-emerald-50 disabled:opacity-40"
-                        aria-label="কমান"
+                        aria-label="decrease"
                       >
                         <Minus className="h-3 w-3" />
                       </button>
@@ -339,14 +339,14 @@ export default function CartPage() {
                         onClick={inc}
                         disabled={isUpdating || (it.stock !== undefined && it.quantity >= it.stock)}
                         className="grid h-8 w-8 place-items-center hover:bg-emerald-50 disabled:opacity-40"
-                        aria-label="বাড়ান"
+                        aria-label="increase"
                       >
                         <Plus className="h-3 w-3" />
                       </button>
                     </div>
 
                     <div className="text-xs text-muted-foreground">
-                      মোট: <b className="text-foreground">৳{it.lineTotal.toLocaleString()}</b>
+                      Total: <b className="text-foreground">SAR {it.lineTotal.toLocaleString()}</b>
                     </div>
                   </div>
                 </div>
@@ -360,12 +360,12 @@ export default function CartPage() {
               <Truck className="h-5 w-5 text-emerald-700" />
               {remainingForFreeShip > 0 ? (
                 <span>
-                  আরও <b>৳{remainingForFreeShip.toLocaleString()}</b> কিনলে{' '}
-                  <b>FREE ডেলিভারি</b> পাবেন! 🎉
+                  More <b>SAR {remainingForFreeShip.toLocaleString()}</b> if bought{' '}
+                  <b>FREE Delivery</b> will get! 🎉
                 </span>
               ) : (
                 <span className="font-semibold text-emerald-800">
-                  আপনি FREE ডেলিভারি পেয়েছেন! 🎉
+                  You FREE Delivery received! 🎉
                 </span>
               )}
             </div>
@@ -394,12 +394,12 @@ export default function CartPage() {
                 <span className="text-muted-foreground">
                   Subtotal {selectedItems.length ? `(${selectedItems.length} selected)` : ''}
                 </span>
-                <span>৳{selectedSubtotal.toLocaleString()}</span>
+                <span>SAR {selectedSubtotal.toLocaleString()}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Shipping</span>
                 <span className={shipping === 0 ? 'text-emerald-700 font-semibold' : ''}>
-                  {shipping === 0 ? 'FREE' : `৳${shipping}`}
+                  {shipping === 0 ? 'FREE' : `SAR ${shipping}`}
                 </span>
               </div>
               {discount > 0 && (
@@ -408,19 +408,19 @@ export default function CartPage() {
                     Coupon ({coupon?.code})
                   </span>
                   <span className="text-emerald-700 font-semibold">
-                    -৳{discount.toLocaleString()}
+                    -SAR {discount.toLocaleString()}
                   </span>
                 </div>
               )}
               <div className="flex justify-between border-t border-border pt-3 text-lg font-bold">
                 <span>Total</span>
-                <span className="text-emerald-700">৳{total.toLocaleString()}</span>
+                <span className="text-emerald-700">SAR {total.toLocaleString()}</span>
               </div>
             </div>
 
             {discount > 0 && (
               <div className="mt-2 rounded-lg bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700">
-                🎉 আপনি ৳{discount.toLocaleString()} সাশ্রয় করছেন!
+                🎉 You SAR {discount.toLocaleString()} You are saving!
               </div>
             )}
 
@@ -428,13 +428,13 @@ export default function CartPage() {
               href="/checkout"
               className="mt-4 block w-full rounded-lg bg-amber-400 py-3 text-center font-bold text-emerald-950 hover:bg-amber-300 transition-colors"
             >
-              Checkout করুন →
+              Checkout do →
             </Link>
             <Link
               href="/shop"
               className="mt-2 block w-full rounded-lg border border-border py-3 text-center text-sm font-semibold hover:bg-emerald-50 transition-colors"
             >
-              Shopping চালিয়ে যান
+              Shopping Continue
             </Link>
 
             <div className="mt-3 flex items-center justify-center gap-1 text-xs text-muted-foreground">

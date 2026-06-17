@@ -57,11 +57,11 @@ export default function TransactionTable({ rows, onView, onRefund, page, setPage
                     <span className={`text-xs font-medium ${ty.color}`}>{ty.label}</span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <div className="text-white font-medium">৳{t.amount.toLocaleString()}</div>
-                    <div className="text-xs text-gray-500">Fee ৳{t.fee}</div>
+                    <div className="text-white font-medium">SAR {t.amount.toLocaleString()}</div>
+                    <div className="text-xs text-gray-500">Fee SAR {t.fee}</div>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <span className="text-green-400 font-medium">৳{t.net.toLocaleString()}</span>
+                    <span className="text-green-400 font-medium">SAR {t.net.toLocaleString()}</span>
                   </td>
                   <td className="px-4 py-3">
                     <span className={`inline-block px-2 py-1 rounded-md border text-xs ${s.color}`}>{s.label}</span>

@@ -65,12 +65,12 @@ function OrderSummary({ items, subtotal, totalItems }) {
         <div className="space-y-2.5 text-sm">
           <div className="flex justify-between text-muted-foreground">
             <span>Price ({totalItems} items)</span>
-            <span>৳{subtotal.toLocaleString()}</span>
+            <span>SAR {subtotal.toLocaleString()}</span>
           </div>
           {savings > 0 && (
             <div className="flex justify-between text-success">
               <span>Discount</span>
-              <span>-৳{savings.toLocaleString()}</span>
+              <span>-SAR {savings.toLocaleString()}</span>
             </div>
           )}
           <div className="flex justify-between text-muted-foreground">
@@ -80,13 +80,13 @@ function OrderSummary({ items, subtotal, totalItems }) {
           <div className="h-px bg-border" />
           <div className="flex justify-between text-base font-bold text-foreground">
             <span>Total Amount</span>
-            <span className="text-primary">৳{subtotal.toLocaleString()}</span>
+            <span className="text-primary">SAR {subtotal.toLocaleString()}</span>
           </div>
         </div>
 
         {savings > 0 && (
           <div className="rounded-lg bg-success/10 px-3 py-2 text-xs font-semibold text-success">
-            🎉 You save ৳{savings.toLocaleString()} on this order!
+            🎉 You save SAR {savings.toLocaleString()} on this order!
           </div>
         )}
 
@@ -111,7 +111,7 @@ function OrderSummary({ items, subtotal, totalItems }) {
         </h3>
         <div className="space-y-3">
           {[
-            { icon: Truck,       title: 'Free Delivery',     sub: 'On orders above ৳500'     },
+            { icon: Truck,       title: 'Free Delivery',     sub: 'On orders above SAR 500'     },
             { icon: ShieldCheck, title: 'Secure Payment',    sub: '100% safe & encrypted'    },
             { icon: Package,     title: 'Easy Returns',      sub: '7-day hassle-free return'  },
           ].map(({ icon: Icon, title, sub }) => (

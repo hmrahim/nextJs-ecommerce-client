@@ -1,5 +1,5 @@
 // 📁 PATH: src/components/admin/bundles/BundleTable.jsx
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল
+// ⚠️  This is a completely new file
 
 'use client';
 import { useState } from 'react';
@@ -85,7 +85,7 @@ function ConfirmDeleteModal({ bundle, onConfirm, onCancel }) {
         </div>
         <h3 className="text-white font-semibold text-center mb-1">Delete Bundle?</h3>
         <p className="text-slate-400 text-sm text-center mb-5">
-          "<span className="text-violet-400 font-semibold">{bundle?.name}</span>" permanently delete হবে। এটা undo করা যাবে না।
+          "<span className="text-violet-400 font-semibold">{bundle?.name}</span>" permanently delete will be। This undo cannot be done।
         </p>
         <div className="flex gap-3">
           <button
@@ -246,7 +246,7 @@ export default function BundleTable({
                       <div className="flex flex-col gap-0.5">
                         <div className="flex items-center gap-1.5">
                           <span className="text-sm font-bold text-white">
-                            ৳{(bundle.bundlePrice || bundle.price || 0).toLocaleString()}
+                            SAR {(bundle.bundlePrice || bundle.price || 0).toLocaleString()}
                           </span>
                           <SavingsBadge
                             original={bundle.originalPrice || bundle.comparePrice}
@@ -255,7 +255,7 @@ export default function BundleTable({
                         </div>
                         {(bundle.originalPrice || bundle.comparePrice) > 0 && (
                           <span className="text-xs text-slate-600 line-through">
-                            ৳{(bundle.originalPrice || bundle.comparePrice).toLocaleString()}
+                            SAR {(bundle.originalPrice || bundle.comparePrice).toLocaleString()}
                           </span>
                         )}
                       </div>

@@ -35,15 +35,15 @@ export default function TransactionDetailModal({ txn, onClose, onRefund }) {
           <div className="lg:col-span-1 space-y-4">
             <div className="bg-[#111118] border border-white/5 rounded-xl p-4">
               <div className="text-xs text-gray-400 mb-1">Total Amount</div>
-              <div className="text-3xl font-bold text-white">৳{txn.amount.toLocaleString()}</div>
+              <div className="text-3xl font-bold text-white">SAR {txn.amount.toLocaleString()}</div>
               <div className={`text-xs mt-1 font-medium ${ty.color}`}>{ty.label}</div>
             </div>
             <div className="bg-[#111118] border border-white/5 rounded-xl p-4 space-y-2 text-sm">
-              <Row label="Subtotal"     value={`৳${(txn.amount - txn.tax).toLocaleString()}`} />
-              <Row label="Tax (5%)"     value={`৳${txn.tax.toLocaleString()}`} />
-              <Row label="Gateway Fee"  value={`-৳${txn.fee.toLocaleString()}`} cls="text-red-400" />
+              <Row label="Subtotal"     value={`SAR ${(txn.amount - txn.tax).toLocaleString()}`} />
+              <Row label="Tax (5%)"     value={`SAR ${txn.tax.toLocaleString()}`} />
+              <Row label="Gateway Fee"  value={`-SAR ${txn.fee.toLocaleString()}`} cls="text-red-400" />
               <div className="border-t border-white/5 pt-2 mt-2">
-                <Row label="Net to Merchant" value={`৳${txn.net.toLocaleString()}`} cls="text-green-400 font-semibold" />
+                <Row label="Net to Merchant" value={`SAR ${txn.net.toLocaleString()}`} cls="text-green-400 font-semibold" />
               </div>
             </div>
             <div className="bg-[#111118] border border-white/5 rounded-xl p-4">

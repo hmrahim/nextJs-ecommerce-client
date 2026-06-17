@@ -31,7 +31,7 @@ function recalcStats(list) {
   };
 }
 
-// ─── Helper: একটা brand সব cached list এ patch করো ──────────────────────────
+// ─── Helper: a brand All cached list In patch Do ──────────────────────────
 function patchInCache(queryClient, id, updater) {
   queryClient.setQueriesData({ queryKey: brandKeys.all() }, (old) => {
     if (!old?.brands) return old;
@@ -40,7 +40,7 @@ function patchInCache(queryClient, id, updater) {
   });
 }
 
-// ─── Helper: cache থেকে brands সরাও ─────────────────────────────────────────
+// ─── Helper: cache from brands remove ─────────────────────────────────────────
 function removeFromCache(queryClient, ids) {
   queryClient.setQueriesData({ queryKey: brandKeys.all() }, (old) => {
     if (!old?.brands) return old;

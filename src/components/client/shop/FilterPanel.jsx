@@ -26,11 +26,11 @@ function FilterGroup({ title, defaultOpen = true, children }) {
 }
 
 const PRICE_PRESETS = [
-  { label: "Under ৳500",       min: "",     max: "500" },
-  { label: "৳500 – ৳2,000",    min: "500",  max: "2000" },
-  { label: "৳2,000 – ৳5,000",  min: "2000", max: "5000" },
-  { label: "৳5,000 – ৳20,000", min: "5000", max: "20000" },
-  { label: "Above ৳20,000",    min: "20000", max: "" },
+  { label: "Under SAR 500",       min: "",     max: "500" },
+  { label: "SAR 500 – SAR 2,000",    min: "500",  max: "2000" },
+  { label: "SAR 2,000 – SAR 5,000",  min: "2000", max: "5000" },
+  { label: "SAR 5,000 – SAR 20,000", min: "5000", max: "20000" },
+  { label: "Above SAR 20,000",    min: "20000", max: "" },
 ];
 
 function SkeletonList({ count = 6 }) {

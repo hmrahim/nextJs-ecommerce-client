@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL; // তোমার backend URL
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL; // your backend URL
 
 export const authService = {
 

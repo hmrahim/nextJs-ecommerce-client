@@ -10,11 +10,11 @@ export default function Providers({ children, session }) {
     () => new QueryClient({
       defaultOptions: {
         queries: {
-          staleTime:            60 * 1000,       // 1 মিনিট — refetch বন্ধ থাকবে
-          gcTime:               5 * 60 * 1000,   // 5 মিনিট memory তে cache থাকবে
+          staleTime:            60 * 1000,       // 1 minute — refetch will be closed
+          gcTime:               5 * 60 * 1000,   // 5 minute memory In cache will be
           retry:                1,
-          refetchOnWindowFocus: false,            // ✅ Tab switch এ refetch বন্ধ
-          refetchOnReconnect:   false,            // ✅ Network reconnect এ refetch বন্ধ
+          refetchOnWindowFocus: false,            // ✅ Tab switch In refetch closed
+          refetchOnReconnect:   false,            // ✅ Network reconnect In refetch closed
         },
       },
     })

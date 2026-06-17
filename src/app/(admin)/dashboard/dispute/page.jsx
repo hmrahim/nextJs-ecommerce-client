@@ -80,7 +80,7 @@ const DUMMY_DISPUTES = [
     customerName: 'David Kim', customerEmail: 'dkim@example.com', customerOrderCount: 8,
     type: 'refund_not_received', priority: 'medium', status: 'open',
     claimedAmount: 186.37, orderTotal: 186.37, paymentMethod: 'Apple Pay',
-    description: 'My return was approved 2 weeks ago but I still have not received my refund of $186.37. The return tracking shows it was delivered to your warehouse 10 days ago.',
+    description: 'My return was approved 2 weeks ago but I still have not received my refund of SAR 186.37. The return tracking shows it was delivered to your warehouse 10 days ago.',
     assignedTo: null, team: null,
     openedAt: d(2), slaDeadline: new Date(now + 86400000 * 3).toISOString(),
     timeline: [
@@ -121,7 +121,7 @@ const DUMMY_DISPUTES = [
     timeline: [
       { type: 'open', label: 'Dispute opened', at: d(15), by: 'Robert Nguyen' },
       { type: 'under_review', label: 'Under Review', at: d(14), by: 'Lisa T.' },
-      { type: 'refund_issued', label: 'Partial refund issued — $27.50', note: 'Customer accepted partial refund', at: d(10), by: 'Lisa T.' },
+      { type: 'refund_issued', label: 'Partial refund issued — SAR 27.50', note: 'Customer accepted partial refund', at: d(10), by: 'Lisa T.' },
       { type: 'resolved', label: 'Dispute resolved', at: d(10), by: 'Lisa T.' },
     ],
     messages: [],

@@ -206,8 +206,8 @@ function LocalisationSettings() {
         <div className="px-6 py-2">
           <Field label="Currency" hint="ISO 4217 code — changing this does NOT convert existing prices.">
             <Select value={form.currency} onChange={set('currency')} options={[
-              { value: 'BDT', label: 'BDT — Bangladeshi Taka (৳)' },
-              { value: 'USD', label: 'USD — US Dollar ($)' },
+              { value: 'SAR', label: 'SAR — Bangladeshi Riyal (SAR )' },
+              { value: 'SAR', label: 'SAR — US Riyal ($)' },
               { value: 'EUR', label: 'EUR — Euro (€)' },
               { value: 'GBP', label: 'GBP — British Pound (£)' },
               { value: 'SAR', label: 'SAR — Saudi Riyal (﷼)' },
@@ -215,7 +215,7 @@ function LocalisationSettings() {
             ]} />
           </Field>
           <Field label="Currency Symbol">
-            <Input value={form.currencySymbol} onChange={set('currencySymbol')} placeholder="৳" />
+            <Input value={form.currencySymbol} onChange={set('currencySymbol')} placeholder="SAR " />
           </Field>
           <Field label="Timezone">
             <Select value={form.timezone} onChange={set('timezone')} options={[
@@ -237,7 +237,7 @@ function LocalisationSettings() {
           <Field label="Language">
             <Select value={form.language} onChange={set('language')} options={[
               { value: 'en', label: 'English' },
-              { value: 'bn', label: 'বাংলা (Bangla)' },
+              { value: 'bn', label: 'Bengali (Bangla)' },
               { value: 'ar', label: 'العربية (Arabic)' },
             ]} />
           </Field>
@@ -352,10 +352,10 @@ function PaymentSettings() {
               <span className="text-sm font-semibold text-white">Cash on Delivery</span>
               <Toggle checked={form.cod?.enabled ?? false} onChange={setNested('cod', 'enabled')} />
             </div>
-            <Field label="COD Surcharge (৳)" hint="Extra fee charged for cash payments (0 for none).">
+            <Field label="COD Surcharge (SAR )" hint="Extra fee charged for cash payments (0 for none).">
               <Input value={form.cod?.surcharge} onChange={setNested('cod', 'surcharge')} type="number" placeholder="0" />
             </Field>
-            <Field label="Max Order Value for COD (৳)" hint="Orders above this amount will not allow COD. Leave blank for no limit.">
+            <Field label="Max Order Value for COD (SAR )" hint="Orders above this amount will not allow COD. Leave blank for no limit.">
               <Input value={form.cod?.maxOrderValue} onChange={setNested('cod', 'maxOrderValue')} type="number" placeholder="5000" />
             </Field>
           </div>
@@ -379,8 +379,8 @@ function ShippingSettings() {
       <SectionHeader title="Shipping" subtitle="Default shipping rules, free-shipping thresholds, and courier integrations." />
       {isLoading ? <SkeletonBlock /> : (
         <div className="px-6 py-2">
-          <Field label="Default Shipping Fee (৳)"><Input value={form.defaultFee} onChange={set('defaultFee')} type="number" placeholder="60" /></Field>
-          <Field label="Free Shipping Threshold (৳)" hint="Orders above this amount qualify for free shipping. Set to 0 to disable.">
+          <Field label="Default Shipping Fee (SAR )"><Input value={form.defaultFee} onChange={set('defaultFee')} type="number" placeholder="60" /></Field>
+          <Field label="Free Shipping Threshold (SAR )" hint="Orders above this amount qualify for free shipping. Set to 0 to disable.">
             <Input value={form.freeThreshold} onChange={set('freeThreshold')} type="number" placeholder="999" />
           </Field>
           <Field label="Processing Time" hint="Displayed to customers at checkout.">

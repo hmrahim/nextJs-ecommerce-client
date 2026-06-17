@@ -1,5 +1,5 @@
 // 📁 PATH: src/services/promotionService.js
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল
+// ⚠️  This is a completely new file
 
 import api from '@/lib/api';
 

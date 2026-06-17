@@ -1,5 +1,5 @@
 // 📁 PATH: src/app/(admin)/dashboard/loyalty/page.jsx
-// ⚠️  পুরোনো page.jsx এর জায়গায় REPLACE করো (অথবা নতুন)
+// ⚠️  old page.jsx instead of REPLACE Do (or new)
 
 'use client';
 import { useState, useEffect, useCallback } from 'react';
@@ -15,14 +15,14 @@ const DUMMY_SETTINGS = {
 };
 
 const DUMMY_TIERS = [
-  { _id: 't1', name: 'Bronze',   threshold: 0,     multiplier: 1,   color: '#a16207', perks: ['Earn 1 pt / ৳1', 'Birthday bonus'] },
-  { _id: 't2', name: 'Silver',   threshold: 10000, multiplier: 1.25,color: '#94a3b8', perks: ['Earn 1.25× points', 'Free shipping over ৳1000', 'Early sale access'] },
+  { _id: 't1', name: 'Bronze',   threshold: 0,     multiplier: 1,   color: '#a16207', perks: ['Earn 1 pt / SAR 1', 'Birthday bonus'] },
+  { _id: 't2', name: 'Silver',   threshold: 10000, multiplier: 1.25,color: '#94a3b8', perks: ['Earn 1.25× points', 'Free shipping over SAR 1000', 'Early sale access'] },
   { _id: 't3', name: 'Gold',     threshold: 50000, multiplier: 1.5, color: '#f59e0b', perks: ['Earn 1.5× points', 'Free shipping always', 'Priority support', '5% extra discount'] },
   { _id: 't4', name: 'Platinum', threshold: 150000,multiplier: 2,   color: '#22d3ee', perks: ['Earn 2× points', 'Dedicated manager', 'Exclusive drops', 'Free returns'] },
 ];
 
 const DUMMY_RULES = [
-  { _id: 'r1', name: 'Earn per ৳1 spent', event: 'order_delivered', pointsType: 'percent', pointsValue: 1, minSpend: 0, isActive: true },
+  { _id: 'r1', name: 'Earn per SAR 1 spent', event: 'order_delivered', pointsType: 'percent', pointsValue: 1, minSpend: 0, isActive: true },
   { _id: 'r2', name: 'Signup Bonus', event: 'signup', pointsType: 'flat', pointsValue: 500, minSpend: 0, isActive: true },
   { _id: 'r3', name: 'Verified Review', event: 'review_posted', pointsType: 'flat', pointsValue: 50, minSpend: 0, isActive: true },
   { _id: 'r4', name: 'Birthday Gift', event: 'birthday', pointsType: 'flat', pointsValue: 250, minSpend: 0, isActive: true },

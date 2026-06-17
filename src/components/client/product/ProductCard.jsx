@@ -4,6 +4,7 @@ import { Star, Heart, ShoppingCart, BadgeCheck, Check, Loader2 } from "lucide-re
 import { useAddToCart } from "@/hooks/useCart";
 import { useState } from "react";
 
+
 function ProductCard({ p, compact = false }) {
   const price        = p.price        ?? 0;
   const comparePrice = p.comparePrice ?? null;
@@ -48,6 +49,7 @@ function ProductCard({ p, compact = false }) {
       /* toast already shown by the mutation */
     }
   };
+
 
   return (
     <Link
@@ -95,11 +97,11 @@ function ProductCard({ p, compact = false }) {
         {/* price */}
         <div className="flex items-baseline gap-2">
           <span className="text-lg font-bold text-primary">
-            ৳{price.toLocaleString()}
+            SAR {price.toLocaleString()}
           </span>
           {comparePrice && comparePrice > price && (
             <span className="text-xs text-muted-foreground line-through">
-              ৳{comparePrice.toLocaleString()}
+              SAR {comparePrice.toLocaleString()}
             </span>
           )}
         </div>
@@ -136,6 +138,7 @@ function ProductCard({ p, compact = false }) {
               <ShoppingCart className="h-3.5 w-3.5" /> Add to Cart
             </>
           )}
+
         </button>
       </div>
     </Link>

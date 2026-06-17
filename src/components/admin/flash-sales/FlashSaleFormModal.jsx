@@ -168,12 +168,12 @@ export default function FlashSaleFormModal({ editing, onSave, onClose }) {
                 className="w-full h-9 px-3 rounded-lg border border-[#1e1e2e] bg-[#0a0a0f] text-sm text-white focus:outline-none focus:border-orange-500/60"
               >
                 <option value="percent">% Percentage</option>
-                <option value="fixed">৳ Fixed Amount</option>
+                <option value="fixed">SAR  Fixed Amount</option>
               </select>
             </div>
             <div>
               <label className="block text-xs font-medium text-slate-400 mb-1.5">
-                {form.discountType === 'percent' ? 'Percentage (%)' : 'Amount (৳)'} *
+                {form.discountType === 'percent' ? 'Percentage (%)' : 'Amount (SAR )'} *
               </label>
               <input
                 type="number"

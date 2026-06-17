@@ -32,8 +32,8 @@ export const useCouponStore = create(
        */
       applyCoupon: async (code, orderAmount, items = []) => {
         if (!code?.trim()) {
-          set({ error: 'কোড টা লিখুন' });
-          return { ok: false, message: 'কোড টা লিখুন' };
+          set({ error: 'Write the code' });
+          return { ok: false, message: 'Write the code' };
         }
 
         set({ loading: true, error: null });

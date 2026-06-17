@@ -1,124 +1,185 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useRiders, useConfirmOrder } from '@/hooks/useOrder';
+import toast from 'react-hot-toast';
 
 /**
- * Premium Yes/No "Confirm Order" dialog.
- * No rider assignment — simple confirmation only.
+ * Amazon/Noon-style "Confirm Order" dialog.
+ * Forces admin to pick an active rider before confirming the order.
  *
  * Props:
- *  - order: order object (must include _id, orderNumber, totalAmount/total, customerName)
+ *  - order: full order object (must include _id, orderNumber, shippingAddress)
  *  - onClose()
- *  - onConfirm(): async — caller updates status to 'confirmed'
+ *  - onConfirmed?(updatedOrder)
  */
-export default function ConfirmOrderDialog({ order, onClose, onConfirm }) {
-  const [submitting, setSubmitting] = useState(false);
+export default function ConfirmOrderDialog({ order, onClose, onConfirmed }) {
+  const [riderId, setRiderId] = useState('');
+  const [note, setNote]       = useState('');
+  const [search, setSearch]   = useState('');
+
+  const { data: riders = [], isLoading } = useRiders({ availableOnly: true });
+  const confirmMut = useConfirmOrder();
+
+  const filtered = useMemo(() => {
+    const s = search.trim().toLowerCase();
+    if (!s) return riders;
+    return riders.filter((r) =>
+      r.name.toLowerCase().includes(s) ||
+      r.phone?.toLowerCase().includes(s) ||
+      r.serviceAreas?.some((a) => a.toLowerCase().includes(s)),
+    );
+  }, [riders, search]);
+
+  const selected = riders.find((r) => r._id === riderId);
+
+  const handleSubmit = async () => {
+    try {
+      const res = await confirmMut.mutateAsync({ id: order._id, riderId, note });
+      onConfirmed?.(res?.data?.data);
+      onClose();
+    } catch { /* toast handled in hook */ }
+  };
 
   if (!order) return null;
 
-  const handleClose = () => {
-    if (!submitting) onClose?.();
-  };
-
-  const handleYes = async () => {
-    if (submitting) return;
-    setSubmitting(true);
-    try {
-      await onConfirm?.();
-      onClose?.();
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   return (
-    <div
-      className="fixed inset-0 z-[70] flex items-center justify-center p-4"
-      style={{ animation: 'fadeIn .15s ease-out' }}
-    >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/75 backdrop-blur-md" onClick={handleClose} />
-
-      {/* Dialog */}
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-md" />
       <div
-        className="relative w-full max-w-md rounded-2xl border border-white/10 bg-gradient-to-b from-[#1a1a24] to-[#111118] shadow-[0_30px_80px_-20px_rgba(16,185,129,0.35),0_0_0_1px_rgba(255,255,255,0.04)] overflow-hidden"
-        style={{ animation: 'popIn .25s cubic-bezier(.2,.9,.3,1.2)' }}
+        className="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-2xl border border-[#1e1e2e] bg-gradient-to-b from-[#13131a] to-[#0e0e17] shadow-2xl flex flex-col"
+        onClick={(e) => e.stopPropagation()}
       >
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/60 to-transparent" />
-        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full bg-emerald-500/20 blur-3xl pointer-events-none" />
+        {/* Header */}
+        <div className="flex items-start justify-between p-5 border-b border-[#1e1e2e]">
+          <div>
+            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+              <span className="text-amber-400">⚡</span> Confirm Order &amp; Assign Rider
+            </h2>
+            <p className="text-xs text-slate-500 mt-1">
+              Order <span className="text-slate-300 font-mono">{order.orderNumber}</span> ·
+              {' '}<span className="text-slate-300">{order.shippingAddress?.city || order.shippingAddress?.area || '—'}</span>
+            </p>
+          </div>
+          <button onClick={onClose} className="text-slate-500 hover:text-white text-2xl leading-none">×</button>
+        </div>
 
-        <div className="relative p-6">
-          {/* Icon */}
-          <div className="mx-auto mb-4 w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/30 to-emerald-600/10 border border-emerald-400/30 flex items-center justify-center shadow-[0_0_30px_-5px_rgba(16,185,129,0.5)]">
-            <svg className="w-7 h-7 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-            </svg>
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto p-5 space-y-4">
+          {/* Search */}
+          <div className="relative">
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search rider by name, phone, or area..."
+              className="w-full bg-[#0a0a12] border border-[#1e1e2e] rounded-lg pl-10 pr-3 py-2.5 text-sm text-white placeholder-slate-600 focus:border-amber-500/50 focus:outline-none"
+            />
+            <span className="absolute left-3 top-2.5 text-slate-500">🔍</span>
           </div>
 
-          <h3 className="text-center text-lg font-bold text-white">Confirm this order?</h3>
-          <p className="mt-1.5 text-center text-sm text-slate-400">
-            Order{' '}
-            <span className="font-mono font-semibold text-emerald-300">
-              #{order.orderNumber || order._id?.slice(-6).toUpperCase()}
-            </span>{' '}
-            will be marked as <span className="text-white font-medium">Confirmed</span>.
-          </p>
+          {/* Rider list */}
+          <div>
+            <div className="text-[11px] uppercase tracking-widest text-slate-500 mb-2">
+              Available riders ({filtered.length})
+            </div>
 
-          {/* Summary */}
-          <div className="mt-5 rounded-xl border border-white/5 bg-black/30 p-3 flex items-center justify-between">
-            <div className="min-w-0">
-              <p className="text-xs text-slate-500">Customer</p>
-              <p className="text-sm text-white font-medium truncate">
-                {order.customerName || `${order.shippingAddress?.firstName || ''} ${order.shippingAddress?.lastName || ''}`.trim() || 'Unknown'}
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-slate-500">Total</p>
-              <p className="text-sm font-bold text-white">
-                ${Number(order.totalAmount ?? order.total ?? 0).toFixed(2)}
-              </p>
-            </div>
+            {isLoading ? (
+              <div className="text-slate-500 text-sm py-8 text-center">Loading riders…</div>
+            ) : filtered.length === 0 ? (
+              <div className="rounded-lg border border-dashed border-[#1e1e2e] py-8 text-center text-slate-500 text-sm">
+                No available riders found
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[280px] overflow-y-auto pr-1">
+                {filtered.map((r) => {
+                  const active = r._id === riderId;
+                  return (
+                    <button
+                      key={r._id}
+                      type="button"
+                      onClick={() => setRiderId(r._id)}
+                      className={[
+                        'text-left rounded-xl border p-3 transition-all',
+                        active
+                          ? 'border-amber-500 bg-amber-500/10 ring-1 ring-amber-500/40'
+                          : 'border-[#1e1e2e] bg-[#0a0a12] hover:border-[#2a2a3e]',
+                      ].join(' ')}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white font-semibold">
+                          {r.name?.charAt(0) || 'R'}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium text-white truncate">{r.name}</div>
+                          <div className="text-[11px] text-slate-500 truncate">{r.phone || '—'}</div>
+                        </div>
+                        {active && <span className="text-amber-400 text-lg">✓</span>}
+                      </div>
+                      <div className="mt-2 flex flex-wrap gap-1.5 text-[10px]">
+                        <span className="px-2 py-0.5 rounded-full bg-[#1e1e2e] text-slate-300">
+                          🛵 {r.vehicleType}
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400">
+                          {r.activeOrders} active
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400">
+                          ⭐ {Number(r.rating).toFixed(1)}
+                        </span>
+                      </div>
+                      {r.serviceAreas?.length > 0 && (
+                        <div className="mt-1.5 text-[10px] text-slate-500 truncate">
+                          📍 {r.serviceAreas.join(' · ')}
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
-          {/* Buttons */}
-          <div className="mt-6 flex items-center gap-2">
+          {/* Note */}
+          <div>
+            <label className="block text-[11px] uppercase tracking-widest text-slate-500 mb-1.5">
+              Note for rider (optional)
+            </label>
+            <textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              rows={2}
+              placeholder="e.g. Call customer before reaching, fragile items..."
+              className="w-full bg-[#0a0a12] border border-[#1e1e2e] rounded-lg p-2.5 text-sm text-white placeholder-slate-600 focus:border-amber-500/50 focus:outline-none resize-none"
+            />
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="border-t border-[#1e1e2e] p-4 flex items-center justify-between gap-3 bg-[#0a0a12]">
+          <div className="text-xs text-slate-500">
+            {selected ? (
+              <>Confirming with <span className="text-amber-400">{selected.name}</span></>
+            ) : (
+              <>No rider selected — confirming without assigning</>
+            )}
+          </div>
+          <div className="flex gap-2">
             <button
-              onClick={handleClose}
-              disabled={submitting}
-              className="flex-1 h-10 rounded-xl border border-white/10 bg-white/[0.03] text-slate-300 text-sm font-semibold hover:bg-white/[0.07] transition-all disabled:opacity-40"
+              onClick={onClose}
+              className="px-4 py-2 rounded-lg border border-[#1e1e2e] text-slate-300 hover:bg-[#1e1e2e] text-sm"
             >
-              No
+              Cancel
             </button>
             <button
-              onClick={handleYes}
-              disabled={submitting}
-              className="flex-1 h-10 rounded-xl bg-gradient-to-b from-emerald-500 to-emerald-600 text-white text-sm font-semibold border border-emerald-400/50 shadow-[0_8px_24px_-8px_rgba(16,185,129,0.7)] hover:from-emerald-400 hover:to-emerald-500 active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+              onClick={handleSubmit}
+              disabled={confirmMut.isPending}
+              className="px-5 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-600 text-white text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90"
             >
-              {submitting ? (
-                <>
-                  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  Confirming…
-                </>
-              ) : (
-                <>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                  </svg>
-                  Yes, confirm
-                </>
-              )}
+              {confirmMut.isPending ? 'Confirming…' : '✓ Confirm Order'}
             </button>
           </div>
         </div>
       </div>
-
-      <style>{`
-        @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
-        @keyframes popIn  { 0% { opacity: 0; transform: scale(.92) translateY(8px) } 100% { opacity: 1; transform: scale(1) translateY(0) } }
-      `}</style>
     </div>
   );
 }

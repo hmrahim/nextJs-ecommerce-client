@@ -12,7 +12,7 @@ export const bannerKeys = {
   stats:  ()        => ['admin-banners', 'stats'],
 };
 
-// ─── Stats recalculator (optimistic update এর জন্য) ──────────────────────────
+// ─── Stats recalculator (optimistic update for this) ──────────────────────────
 function recalcStats(list) {
   return {
     total:       list.length,
@@ -26,7 +26,7 @@ function recalcStats(list) {
   };
 }
 
-// ─── Helper: একটা banner সব cached list এ patch করো ──────────────────────────
+// ─── Helper: a banner All cached list In patch Do ──────────────────────────
 function patchInCache(queryClient, id, updater) {
   queryClient.setQueriesData({ queryKey: bannerKeys.all() }, (old) => {
     if (!old?.banners) return old;
@@ -35,7 +35,7 @@ function patchInCache(queryClient, id, updater) {
   });
 }
 
-// ─── Helper: cache থেকে banners সরাও ─────────────────────────────────────────
+// ─── Helper: cache from banners remove ─────────────────────────────────────────
 function removeFromCache(queryClient, ids) {
   queryClient.setQueriesData({ queryKey: bannerKeys.all() }, (old) => {
     if (!old?.banners) return old;
@@ -176,7 +176,7 @@ export function useToggleBannerStatus() {
       return { snapshot };
     },
     onSuccess: (_res, id) => {
-      // server থেকে updated banner নিয়ে cache patch করো
+      // server from updated banner taking cache patch Do
       const updated = _res?.data?.data;
       if (updated) patchInCache(qc, id, () => updated);
     },

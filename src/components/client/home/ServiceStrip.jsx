@@ -4,7 +4,7 @@ const ServiceStrip = () => {
     return (
         <section className="grid grid-cols-2 gap-2 rounded-2xl bg-emerald-50 p-3 md:grid-cols-4">
             {[
-                { i: "🚚", t: "Free Shipping", s: "Orders over ৳999" },
+                { i: "🚚", t: "Free Shipping", s: "Orders over SAR 999" },
                 { i: "↩️", t: "7-Day Returns", s: "Easy refund policy" },
                 { i: "🔒", t: "Secure Checkout", s: "100% protected" },
                 { i: "🎁", t: "Rewards Program", s: "Earn on every order" }

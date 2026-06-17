@@ -50,7 +50,7 @@ export function SiteHeader() {
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5"><Phone className="h-3 w-3" /> +880 1700-000000</span>
             <span className="hidden md:flex items-center gap-1.5"><Mail className="h-3 w-3" /> support@greenmart.com</span>
-            <span className="hidden lg:flex items-center gap-1.5"><Truck className="h-3 w-3" /> Free delivery on orders over ৳999</span>
+            <span className="hidden lg:flex items-center gap-1.5"><Truck className="h-3 w-3" /> Free delivery on orders over SAR 999</span>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/become-seller" className="hover:text-white">Sell on GreenMart</Link>
@@ -149,7 +149,7 @@ export function SiteHeader() {
               <ShoppingCart className="h-5 w-5" />
               <div className="hidden lg:block text-xs leading-tight">
                 <div className="text-emerald-200/70">My Cart</div>
-                <div className="font-semibold">৳ {cartSubtotal.toLocaleString("en-BD")}</div>
+                <div className="font-semibold">SAR  {cartSubtotal.toLocaleString("en-SA")}</div>
               </div>
               {cartItemCount > 0 && (
                 <span className="absolute -top-1 -right-1 grid h-5 min-w-5 place-items-center rounded-full bg-amber-400 px-1 text-[10px] font-bold text-emerald-950">

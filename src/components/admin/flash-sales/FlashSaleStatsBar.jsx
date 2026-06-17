@@ -1,5 +1,5 @@
 // 📁 PATH: src/components/admin/flash-sales/FlashSaleStatsBar.jsx
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল
+// ⚠️  This is a completely new file
 
 'use client';
 
@@ -47,7 +47,7 @@ export default function FlashSaleStatsBar({ sales }) {
       />
       <StatCard
         label="Total Revenue"
-        value={`৳${(totalRevenue / 1000).toFixed(0)}K`}
+        value={`SAR ${(totalRevenue / 1000).toFixed(0)}K`}
         sub={`${totalSold} orders`}
         color="green"
         icon="💰"

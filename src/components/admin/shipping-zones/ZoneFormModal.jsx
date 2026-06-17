@@ -141,15 +141,15 @@ export default function ZoneFormModal({ open, editing, onSave, onClose }) {
 
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className={lbl}>Base Rate (৳)</label>
+              <label className={lbl}>Base Rate (SAR )</label>
               <input type="number" min="0" className={inp} value={form.baseRate} onChange={e => upd('baseRate', e.target.value)} />
             </div>
             <div>
-              <label className={lbl}>Per Kg Rate (৳)</label>
+              <label className={lbl}>Per Kg Rate (SAR )</label>
               <input type="number" min="0" className={inp} value={form.perKgRate} onChange={e => upd('perKgRate', e.target.value)} />
             </div>
             <div>
-              <label className={lbl}>Free Shipping Above (৳)</label>
+              <label className={lbl}>Free Shipping Above (SAR )</label>
               <input type="number" min="0" className={inp} value={form.freeShippingThreshold} onChange={e => upd('freeShippingThreshold', e.target.value)} placeholder="0 = disabled" />
             </div>
           </div>
@@ -165,7 +165,7 @@ export default function ZoneFormModal({ open, editing, onSave, onClose }) {
               {errors.eta && <p className="text-xs text-red-400 mt-1">{errors.eta}</p>}
             </div>
             <div>
-              <label className={lbl}>COD Charge (৳)</label>
+              <label className={lbl}>COD Charge (SAR )</label>
               <div className="flex items-center gap-2">
                 <label className="flex items-center gap-2 text-sm text-slate-300 whitespace-nowrap">
                   <input type="checkbox" checked={form.codAvailable} onChange={e => upd('codAvailable', e.target.checked)} className="w-4 h-4 rounded accent-orange-500" />

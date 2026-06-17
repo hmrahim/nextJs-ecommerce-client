@@ -1,5 +1,5 @@
 // 📁 PATH: src/app/(admin)/dashboard/bundles/page.jsx
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল
+// ⚠️  This is a completely new file
 
 'use client';
 import { useState, useEffect, useCallback } from 'react';
@@ -310,7 +310,7 @@ export default function BundlesPage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          Demo mode — backend connected হলে real bundles দেখাবে। Changes reload-এ persist করবে না।
+          Demo mode — backend connected If real bundles will show। Changes reload-In persist will not do।
         </div>
       )}
 

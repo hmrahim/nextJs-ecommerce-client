@@ -8,7 +8,7 @@ const NOTIFICATIONS = [
     id: 1,
     type: 'order',
     title: 'New Order Received',
-    message: 'Order #ORD-2841 placed by Rahim Uddin — ৳1,250',
+    message: 'Order #ORD-2841 placed by Rahim Uddin — SAR 1,250',
     time: '2 min ago',
     unread: true,
   },

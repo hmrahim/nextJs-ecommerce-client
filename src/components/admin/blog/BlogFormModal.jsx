@@ -73,13 +73,13 @@ function TagInput({ value = [], onChange }) {
   };
 
   const handleKeyDown = (e) => {
-    // Space অথবা Enter অথবা Comma — নতুন tag
+    // Space or Enter or Comma — new tag
     if (e.key === ' ' || e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
       addTag(inputVal);
       setInputVal('');
     }
-    // Backspace — শেষ tag delete
+    // Backspace — End tag delete
     if (e.key === 'Backspace' && inputVal === '' && value.length > 0) {
       onChange(value.slice(0, -1));
     }
@@ -87,7 +87,7 @@ function TagInput({ value = [], onChange }) {
 
   const handleChange = (e) => {
     const val = e.target.value;
-    // comma দিয়ে লিখলে সাথে সাথে add করো
+    // comma If you write with, it will instantly add Do
     if (val.endsWith(',')) {
       addTag(val.slice(0, -1));
       setInputVal('');
@@ -155,11 +155,11 @@ function CoverImageUploader({ value, onChange }) {
   const handleFile = async (file) => {
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      setUploadErr('শুধু image file দাও (JPG, PNG, WEBP)');
+      setUploadErr('only image file Give (JPG, PNG, WEBP)');
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      setUploadErr('File size ১০MB এর বেশি হবে না');
+      setUploadErr('File size 10MB Will not be more than this');
       return;
     }
     setUploadErr('');
@@ -176,7 +176,7 @@ function CoverImageUploader({ value, onChange }) {
       onChange({ url: res.url, publicId: res.publicId });
     } catch (err) {
       onChange({ url: '', publicId: null });
-      setUploadErr(err?.message || 'Upload failed — আবার চেষ্টা করো');
+      setUploadErr(err?.message || 'Upload failed — Try again');
     } finally {
       setUploading(false);
       setProgress(0);
@@ -286,7 +286,7 @@ export default function BlogFormModal({ open, post, authors = [], onClose, onSav
     status:      'draft',
     isFeatured:  false,
     readTime:    5,
-    tags:        [],   // ← array হিসেবে রাখো
+    tags:        [],   // ← array Keep as
     excerpt:     '',
     content:     '',
     coverImage:  { url: '', publicId: null },
@@ -317,7 +317,7 @@ export default function BlogFormModal({ open, post, authors = [], onClose, onSav
         status:      post.status      || 'draft',
         isFeatured:  post.isFeatured  || false,
         readTime:    post.readTime    || 5,
-        tags:        post.tags || [],   // ← array হিসেবে
+        tags:        post.tags || [],   // ← array as
         excerpt:     post.excerpt     || '',
         content:     post.content     || '',
         coverImage:  post.coverImage  || { url: '', publicId: null },
@@ -345,7 +345,7 @@ export default function BlogFormModal({ open, post, authors = [], onClose, onSav
   const onSubmit = (data) => {
     const payload = {
       ...data,
-      // tags ইতিমধ্যে array — আলাদা করে split করতে হবে না
+      // tags Already array — separately split Will not have to do
       publishedAt: data.publishedAt ? new Date(data.publishedAt).toISOString() : null,
     };
     onSave(payload);
@@ -542,8 +542,8 @@ export default function BlogFormModal({ open, post, authors = [], onClose, onSav
               />
             </Field>
 
-            {/* Tags — Controller দিয়ে TagInput এ connect করো */}
-            <Field label="Tags" hint="Space বা Enter বা Comma দিলে tag আলাদা হবে। Backspace দিলে শেষ tag মুছে যাবে।">
+            {/* Tags — Controller by TagInput In connect Do */}
+            <Field label="Tags" hint="Space Or Enter Or Comma if given tag will be different। Backspace if given, finished tag will be deleted।">
               <Controller
                 name="tags"
                 control={control}

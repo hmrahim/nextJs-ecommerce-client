@@ -39,8 +39,8 @@ function ImagePicker({ imageUrl, onFileSelect, onRemoveExisting, disabled }) {
 
   const handleFile = (file) => {
     if (!file) return;
-    if (!file.type.startsWith('image/')) { setErr('শুধু image file দাও (jpg, png, webp, gif)'); return; }
-    if (file.size > 10 * 1024 * 1024) { setErr('File size ১০MB এর বেশি হবে না'); return; }
+    if (!file.type.startsWith('image/')) { setErr('only image file Give (jpg, png, webp, gif)'); return; }
+    if (file.size > 10 * 1024 * 1024) { setErr('File size 10MB Will not be more than this'); return; }
     setErr('');
     setPreview(URL.createObjectURL(file));
     onFileSelect(file);
@@ -97,7 +97,7 @@ function ImagePicker({ imageUrl, onFileSelect, onRemoveExisting, disabled }) {
         <div className="text-center">
           <p className="text-sm text-slate-300"><span className="text-amber-400 font-medium">Click to select</span> or drag & drop</p>
           <p className="text-xs text-slate-600 mt-0.5">PNG, JPG, WEBP, GIF — max 10MB</p>
-          <p className="text-xs text-slate-700 mt-0.5">Upload হবে Submit করার পরে</p>
+          <p className="text-xs text-slate-700 mt-0.5">Upload will be Submit after doing</p>
         </div>
       </button>
       <input ref={inputRef} type="file" accept="image/png,image/jpeg,image/webp,image/gif" className="hidden" onChange={e => handleFile(e.target.files?.[0])} />
@@ -106,7 +106,7 @@ function ImagePicker({ imageUrl, onFileSelect, onRemoveExisting, disabled }) {
   );
 }
 
-// ── Saving Overlay — mutation.isPending এ দেখাবে ────────────
+// ── Saving Overlay — mutation.isPending will show in ────────────
 function SavingOverlay({ isEdit }) {
   return (
     <div className="absolute inset-0 bg-[#13131c]/90 backdrop-blur-sm rounded-2xl z-10 flex flex-col items-center justify-center gap-4 px-10">
@@ -117,7 +117,7 @@ function SavingOverlay({ isEdit }) {
       <p className="text-white text-sm font-medium">
         {isEdit ? 'Updating category...' : 'Creating category...'}
       </p>
-      <p className="text-slate-500 text-xs">একটু অপেক্ষা করো</p>
+      <p className="text-slate-500 text-xs">Wait a moment</p>
     </div>
   );
 }
@@ -133,7 +133,7 @@ export default function CategoryFormModal({ editing, parentFor, allCategories, o
   const [pendingFile, setPendingFile] = useState(null);
   const [removeExisting, setRemoveExisting] = useState(false);
 
-  // image upload চলছে কিনা (cloudinary) — এটা mutation এর বাইরে তাই আলাদা রাখতে হবে
+  // image upload if running (cloudinary) — This mutation Therefore, it must be kept separate from this
   const [uploading, setUploading] = useState(false);
 
   const { watch, setValue, handleSubmit: rhfSubmit } = useForm({
@@ -173,7 +173,7 @@ const createMutation = useMutation({
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['admin-categories'] });
     toast.success('Category created successfully!');
-    onClose(); // ← onSave এর বদলে onClose
+    onClose(); // ← onSave instead of this onClose
   },
   onError: (err) => {
     toast.error(err?.response?.data?.message || 'Something went wrong');
@@ -186,14 +186,14 @@ const updateMutation = useMutation({
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['admin-categories'] });
     toast.success('Category updated successfully!');
-    onClose(); // ← onSave এর বদলে onClose
+    onClose(); // ← onSave instead of this onClose
   },
   onError: (err) => {
     toast.error(err?.response?.data?.message || 'Something went wrong');
   },
 });
 
-  // image upload + mutation মিলিয়ে সব pending হলে true
+  // image upload + mutation all combined pending If true
   const isPending = uploading || createMutation.isPending || updateMutation.isPending;
 
   // ── Submit ───────────────────────────────────────────────
@@ -215,7 +215,7 @@ const updateMutation = useMutation({
         finalImageUrl = result.url;
         finalImagePublicId = result.publicId;
 
-        // পুরোনো image delete
+        // old image delete
         if (existingPublicId && existingPublicId !== finalImagePublicId) {
           try { await uploadService.deleteFile(existingPublicId); } catch {
             console.warn('Old image delete failed:', existingPublicId);
@@ -223,7 +223,7 @@ const updateMutation = useMutation({
         }
       }
 
-      // ── Edit: image remove করলে delete ──────────────────
+      // ── Edit: image remove if done delete ──────────────────
       if (isEdit && removeExisting && existingPublicId && !pendingFile) {
         try { await uploadService.deleteFile(existingPublicId); } catch {
           console.warn('Old image delete failed:', existingPublicId);
@@ -264,7 +264,7 @@ const updateMutation = useMutation({
         className="relative bg-[#13131c] border border-[#1e1e2e] rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] flex flex-col"
         onClick={e => e.stopPropagation()}
       >
-        {/* Overlay — mutation চলার সময় */}
+        {/* Overlay — mutation While running */}
         {isPending && <SavingOverlay isEdit={isEdit} />}
 
         {/* Header */}
@@ -295,7 +295,7 @@ const updateMutation = useMutation({
             {pendingFile && !isPending && (
               <p className="mt-1.5 text-xs text-amber-400/80 flex items-center gap-1">
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                Submit করার পরে upload হবে
+                Submit after doing upload will be
               </p>
             )}
           </Field>

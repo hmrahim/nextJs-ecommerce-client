@@ -1,5 +1,5 @@
 // 📁 PATH: src/components/admin/affiliates/PayoutModal.jsx
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল
+// ⚠️  This is a completely new file
 
 'use client';
 import { useState } from 'react';
@@ -29,12 +29,12 @@ export default function PayoutModal({ affiliate, onSave, onClose }) {
             <p className="text-xs text-slate-500">Affiliate</p>
             <p className="text-sm font-semibold text-white">{affiliate.name}</p>
             <p className="text-xs text-slate-500 mt-2">Pending Balance</p>
-            <p className="text-xl font-bold text-amber-400">৳{new Intl.NumberFormat().format(affiliate.pendingPayout)}</p>
+            <p className="text-xl font-bold text-amber-400">SAR {new Intl.NumberFormat().format(affiliate.pendingPayout)}</p>
             <p className="text-xs text-slate-500 mt-2">Payout via</p>
             <p className="text-sm text-slate-300">{affiliate.payoutMethod} — <span className="font-mono">{affiliate.payoutAccount}</span></p>
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Payout Amount ৳</label>
+            <label className="block text-xs font-medium text-slate-400 mb-1.5">Payout Amount SAR </label>
             <input type="number" min={0} max={affiliate.pendingPayout} value={amount} onChange={e => setAmount(+e.target.value)} className="w-full h-10 px-3 rounded-lg border border-[#1e1e2e] bg-[#111118] text-sm text-white focus:outline-none focus:border-orange-500/50" />
           </div>
           <div>

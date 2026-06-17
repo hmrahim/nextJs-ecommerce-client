@@ -13,16 +13,16 @@ const future = (d) => new Date(now.getTime() + d * 86400000).toISOString();
 const past   = (d) => new Date(now.getTime() - d * 86400000).toISOString();
 
 const DUMMY = [
-  { _id: 'g01', code: 'GIFT-WX2A-7K9P-MN3Q', type: 'digital',  initialValue: 1000, balance: 1000, currency: 'BDT', recipientName: 'Rahim Uddin',    recipientEmail: 'rahim@example.com', senderName: 'Karim Ahmed',  message: 'Happy Birthday!',         isActive: true,  expiresAt: future(180), issuedAt: past(2),  createdAt: past(2)   },
-  { _id: 'g02', code: 'GIFT-ABCD-1234-EFGH', type: 'digital',  initialValue: 2000, balance:  450, currency: 'BDT', recipientName: 'Fatima Begum',   recipientEmail: 'fatima@example.com',senderName: 'Sister',       message: 'Enjoy shopping!',          isActive: true,  expiresAt: future(60),  issuedAt: past(40), createdAt: past(40)  },
-  { _id: 'g03', code: 'GIFT-EID2-5000-VIP1', type: 'physical', initialValue: 5000, balance: 5000, currency: 'BDT', recipientName: 'Hasan Mahmud',   recipientEmail: '',                  senderName: 'Acme Corp',    message: 'Eid Mubarak from Acme',   isActive: true,  expiresAt: future(365), issuedAt: past(5),  createdAt: past(5)   },
-  { _id: 'g04', code: 'GIFT-XPRD-9999-ZZZZ', type: 'digital',  initialValue: 500,  balance:    0, currency: 'BDT', recipientName: 'Sadia Khan',     recipientEmail: 'sadia@example.com', senderName: 'Brother',      message: 'Get something nice',       isActive: true,  expiresAt: past(10),    issuedAt: past(120),createdAt: past(120) },
-  { _id: 'g05', code: 'GIFT-FRSH-3K2L-PQ7M', type: 'digital',  initialValue: 3000, balance: 3000, currency: 'BDT', recipientName: '',               recipientEmail: '',                  senderName: '',             message: '',                          isActive: false, expiresAt: future(90),  issuedAt: past(1),  createdAt: past(1)   },
-  { _id: 'g06', code: 'GIFT-CORP-BULK-001A', type: 'physical', initialValue: 10000,balance: 7250, currency: 'BDT', recipientName: 'Ahsan Habib',    recipientEmail: 'ahsan@corp.com',    senderName: 'HR Dept',      message: 'Annual reward',            isActive: true,  expiresAt: future(200), issuedAt: past(30), createdAt: past(30)  },
-  { _id: 'g07', code: 'GIFT-FLSH-8765-4321', type: 'digital',  initialValue: 1500, balance:    0, currency: 'BDT', recipientName: 'Nadia Akter',    recipientEmail: 'nadia@example.com', senderName: 'Friend',       message: 'For your wedding!',         isActive: true,  expiresAt: future(20),  issuedAt: past(60), createdAt: past(60)  },
-  { _id: 'g08', code: 'GIFT-WLCM-NEW1-2025', type: 'digital',  initialValue: 200,  balance:  200, currency: 'BDT', recipientName: 'New Customer',   recipientEmail: 'new@example.com',   senderName: 'ShopName',     message: 'Welcome to our store!',    isActive: true,  expiresAt: future(45),  issuedAt: past(0),  createdAt: past(0)   },
-  { _id: 'g09', code: 'GIFT-VIPP-LRGE-2500', type: 'physical', initialValue: 2500, balance: 1200, currency: 'BDT', recipientName: 'Tareq Hassan',   recipientEmail: 'tareq@vip.com',     senderName: 'VIP Program',  message: 'Thanks for your loyalty',  isActive: true,  expiresAt: future(150), issuedAt: past(20), createdAt: past(20)  },
-  { _id: 'g10', code: 'GIFT-OLDX-XPRD-2024', type: 'digital',  initialValue: 800,  balance:  800, currency: 'BDT', recipientName: 'Mizanur Rahman', recipientEmail: 'mizan@example.com', senderName: 'Old Friend',   message: 'Better late than never',   isActive: true,  expiresAt: past(60),    issuedAt: past(200),createdAt: past(200) },
+  { _id: 'g01', code: 'GIFT-WX2A-7K9P-MN3Q', type: 'digital',  initialValue: 1000, balance: 1000, currency: 'SAR', recipientName: 'Rahim Uddin',    recipientEmail: 'rahim@example.com', senderName: 'Karim Ahmed',  message: 'Happy Birthday!',         isActive: true,  expiresAt: future(180), issuedAt: past(2),  createdAt: past(2)   },
+  { _id: 'g02', code: 'GIFT-ABCD-1234-EFGH', type: 'digital',  initialValue: 2000, balance:  450, currency: 'SAR', recipientName: 'Fatima Begum',   recipientEmail: 'fatima@example.com',senderName: 'Sister',       message: 'Enjoy shopping!',          isActive: true,  expiresAt: future(60),  issuedAt: past(40), createdAt: past(40)  },
+  { _id: 'g03', code: 'GIFT-EID2-5000-VIP1', type: 'physical', initialValue: 5000, balance: 5000, currency: 'SAR', recipientName: 'Hasan Mahmud',   recipientEmail: '',                  senderName: 'Acme Corp',    message: 'Eid Mubarak from Acme',   isActive: true,  expiresAt: future(365), issuedAt: past(5),  createdAt: past(5)   },
+  { _id: 'g04', code: 'GIFT-XPRD-9999-ZZZZ', type: 'digital',  initialValue: 500,  balance:    0, currency: 'SAR', recipientName: 'Sadia Khan',     recipientEmail: 'sadia@example.com', senderName: 'Brother',      message: 'Get something nice',       isActive: true,  expiresAt: past(10),    issuedAt: past(120),createdAt: past(120) },
+  { _id: 'g05', code: 'GIFT-FRSH-3K2L-PQ7M', type: 'digital',  initialValue: 3000, balance: 3000, currency: 'SAR', recipientName: '',               recipientEmail: '',                  senderName: '',             message: '',                          isActive: false, expiresAt: future(90),  issuedAt: past(1),  createdAt: past(1)   },
+  { _id: 'g06', code: 'GIFT-CORP-BULK-001A', type: 'physical', initialValue: 10000,balance: 7250, currency: 'SAR', recipientName: 'Ahsan Habib',    recipientEmail: 'ahsan@corp.com',    senderName: 'HR Dept',      message: 'Annual reward',            isActive: true,  expiresAt: future(200), issuedAt: past(30), createdAt: past(30)  },
+  { _id: 'g07', code: 'GIFT-FLSH-8765-4321', type: 'digital',  initialValue: 1500, balance:    0, currency: 'SAR', recipientName: 'Nadia Akter',    recipientEmail: 'nadia@example.com', senderName: 'Friend',       message: 'For your wedding!',         isActive: true,  expiresAt: future(20),  issuedAt: past(60), createdAt: past(60)  },
+  { _id: 'g08', code: 'GIFT-WLCM-NEW1-2025', type: 'digital',  initialValue: 200,  balance:  200, currency: 'SAR', recipientName: 'New Customer',   recipientEmail: 'new@example.com',   senderName: 'ShopName',     message: 'Welcome to our store!',    isActive: true,  expiresAt: future(45),  issuedAt: past(0),  createdAt: past(0)   },
+  { _id: 'g09', code: 'GIFT-VIPP-LRGE-2500', type: 'physical', initialValue: 2500, balance: 1200, currency: 'SAR', recipientName: 'Tareq Hassan',   recipientEmail: 'tareq@vip.com',     senderName: 'VIP Program',  message: 'Thanks for your loyalty',  isActive: true,  expiresAt: future(150), issuedAt: past(20), createdAt: past(20)  },
+  { _id: 'g10', code: 'GIFT-OLDX-XPRD-2024', type: 'digital',  initialValue: 800,  balance:  800, currency: 'SAR', recipientName: 'Mizanur Rahman', recipientEmail: 'mizan@example.com', senderName: 'Old Friend',   message: 'Better late than never',   isActive: true,  expiresAt: past(60),    issuedAt: past(200),createdAt: past(200) },
 ];
 
 function getStatus(g) {
@@ -224,7 +224,7 @@ export default function GiftCardsPage() {
       {usingDummy && (
         <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 text-sm">
           <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-          Demo mode — backend connect হলে real gift cards দেখাবে।
+          Demo mode — backend connect If real gift cards will show।
         </div>
       )}
 
@@ -235,8 +235,8 @@ export default function GiftCardsPage() {
           { label: 'Active',          value: stats.active,                                      icon: '✅', from: 'from-emerald-500/20',border: 'border-emerald-500/20',text: 'text-emerald-400' },
           { label: 'Fully Redeemed',  value: stats.redeemed,                                    icon: '💸', from: 'from-red-500/20',    border: 'border-red-500/20',    text: 'text-red-400' },
           { label: 'Expired',         value: stats.expired,                                     icon: '⏰', from: 'from-slate-500/20',  border: 'border-slate-500/20',  text: 'text-slate-400' },
-          { label: 'Outstanding',     value: `৳${stats.outstanding.toLocaleString()}`,         icon: '💰', from: 'from-sky-500/20',    border: 'border-sky-500/20',    text: 'text-sky-400' },
-          { label: 'Total Issued',    value: `৳${stats.issuedValue.toLocaleString()}`,         icon: '📊', from: 'from-violet-500/20', border: 'border-violet-500/20', text: 'text-violet-400' },
+          { label: 'Outstanding',     value: `SAR ${stats.outstanding.toLocaleString()}`,         icon: '💰', from: 'from-sky-500/20',    border: 'border-sky-500/20',    text: 'text-sky-400' },
+          { label: 'Total Issued',    value: `SAR ${stats.issuedValue.toLocaleString()}`,         icon: '📊', from: 'from-violet-500/20', border: 'border-violet-500/20', text: 'text-violet-400' },
         ].map(s => (
           <div key={s.label} className={`rounded-xl border ${s.border} bg-gradient-to-br ${s.from}/5 to-transparent p-4`}>
             <div className="text-lg mb-1">{s.icon}</div>

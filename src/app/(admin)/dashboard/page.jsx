@@ -10,7 +10,7 @@ const STATS = [
   {
     key: 'revenue',
     label: 'Total Revenue',
-    value: '৳4,82,350',
+    value: 'SAR 4,82,350',
     change: '+18.4%',
     up: true,
     sub: 'vs last month',
@@ -77,20 +77,20 @@ const CHART_DATA = [
 ];
 
 const RECENT_ORDERS = [
-  { id: 'ORD-2841', customer: 'Rahim Uddin', amount: '৳1,250', status: 'pending', time: '2 min ago', items: 3 },
-  { id: 'ORD-2840', customer: 'Nusrat Jahan', amount: '৳3,800', status: 'confirmed', time: '14 min ago', items: 1 },
-  { id: 'ORD-2839', customer: 'Karim Hossain', amount: '৳720', status: 'processing', time: '1 hr ago', items: 2 },
-  { id: 'ORD-2838', customer: 'Farida Begum', amount: '৳5,400', status: 'shipped', time: '3 hr ago', items: 4 },
-  { id: 'ORD-2837', customer: 'Sohel Rana', amount: '৳980', status: 'delivered', time: '5 hr ago', items: 1 },
-  { id: 'ORD-2836', customer: 'Mitu Akter', amount: '৳2,150', status: 'delivered', time: 'Yesterday', items: 2 },
+  { id: 'ORD-2841', customer: 'Rahim Uddin', amount: 'SAR 1,250', status: 'pending', time: '2 min ago', items: 3 },
+  { id: 'ORD-2840', customer: 'Nusrat Jahan', amount: 'SAR 3,800', status: 'confirmed', time: '14 min ago', items: 1 },
+  { id: 'ORD-2839', customer: 'Karim Hossain', amount: 'SAR 720', status: 'processing', time: '1 hr ago', items: 2 },
+  { id: 'ORD-2838', customer: 'Farida Begum', amount: 'SAR 5,400', status: 'shipped', time: '3 hr ago', items: 4 },
+  { id: 'ORD-2837', customer: 'Sohel Rana', amount: 'SAR 980', status: 'delivered', time: '5 hr ago', items: 1 },
+  { id: 'ORD-2836', customer: 'Mitu Akter', amount: 'SAR 2,150', status: 'delivered', time: 'Yesterday', items: 2 },
 ];
 
 const TOP_PRODUCTS = [
-  { name: 'Jamdani Saree', category: 'Clothing', sold: 284, revenue: '৳2,84,000', stock: 42, trend: '+12%' },
-  { name: 'Muslin Panjabi', category: 'Clothing', sold: 196, revenue: '৳98,000', stock: 18, trend: '+8%' },
-  { name: 'Kantha Quilt', category: 'Home', sold: 143, revenue: '৳71,500', stock: 3, trend: '-2%' },
-  { name: 'Nakshi Kantha Bag', category: 'Accessories', sold: 118, revenue: '৳35,400', stock: 27, trend: '+5%' },
-  { name: 'Brass Ornament Set', category: 'Decor', sold: 97, revenue: '৳48,500', stock: 61, trend: '+15%' },
+  { name: 'Jamdani Saree', category: 'Clothing', sold: 284, revenue: 'SAR 2,84,000', stock: 42, trend: '+12%' },
+  { name: 'Muslin Panjabi', category: 'Clothing', sold: 196, revenue: 'SAR 98,000', stock: 18, trend: '+8%' },
+  { name: 'Kantha Quilt', category: 'Home', sold: 143, revenue: 'SAR 71,500', stock: 3, trend: '-2%' },
+  { name: 'Nakshi Kantha Bag', category: 'Accessories', sold: 118, revenue: 'SAR 35,400', stock: 27, trend: '+5%' },
+  { name: 'Brass Ornament Set', category: 'Decor', sold: 97, revenue: 'SAR 48,500', stock: 61, trend: '+15%' },
 ];
 
 const ACTIVITY = [
@@ -197,7 +197,7 @@ function RevenueChart() {
                 fill="#16161f" stroke="#1e1e2e" strokeWidth="1" />
               <text x={bx + 55} y={p.y - 28} textAnchor="middle"
                 fontSize="11" fill="#e2e8f0" fontFamily="DM Sans, sans-serif" fontWeight="600">
-                ৳{(p.revenue / 1000).toFixed(0)}k
+                SAR {(p.revenue / 1000).toFixed(0)}k
               </text>
               <text x={bx + 55} y={p.y - 14} textAnchor="middle"
                 fontSize="9" fill="#64748b" fontFamily="DM Sans, sans-serif">
@@ -245,7 +245,7 @@ function OrdersBar() {
 
 /* ── Main Page ─────────────────────────────────────────── */
 export default function DashboardPage() {
-  const today = new Date().toLocaleDateString('en-BD', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const today = new Date().toLocaleDateString('en-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
   const [stats, setStats] = useState(STATS);
   const [recentOrders, setRecentOrders] = useState(RECENT_ORDERS);
@@ -261,8 +261,8 @@ export default function DashboardPage() {
       const s = statsRes?.data?.data || statsRes?.data;
       if (s) {
         setStats(prev => prev.map(stat => {
-          if (stat.key === 'revenue' && s.revenue != null) return { ...stat, value: `৳${Number(s.revenue).toLocaleString('en-BD')}` };
-          if (stat.key === 'orders' && s.total != null) return { ...stat, value: Number(s.total).toLocaleString('en-BD') };
+          if (stat.key === 'revenue' && s.revenue != null) return { ...stat, value: `SAR ${Number(s.revenue).toLocaleString('en-SA')}` };
+          if (stat.key === 'orders' && s.total != null) return { ...stat, value: Number(s.total).toLocaleString('en-SA') };
           if (stat.key === 'pending' && s.pending != null) return { ...stat, value: String(s.pending) };
           return stat;
         }));
@@ -273,22 +273,22 @@ export default function DashboardPage() {
         setRecentOrders(orders.map(o => ({
           id: o.orderNumber || o._id,
           customer: o.customerName || o.customer?.name || 'Customer',
-          amount: `৳${Number(o.totalAmount || 0).toLocaleString('en-BD')}`,
+          amount: `SAR ${Number(o.totalAmount || 0).toLocaleString('en-SA')}`,
           status: o.status || 'pending',
-          time: new Date(o.placedAt || o.createdAt).toLocaleString('en-BD', { hour: '2-digit', minute: '2-digit' }),
+          time: new Date(o.placedAt || o.createdAt).toLocaleString('en-SA', { hour: '2-digit', minute: '2-digit' }),
           items: o.items?.length || 0,
         })));
       }
       setUsingDummy(false);
     } catch {
-      // Backend না থাকলে demo data দিয়ে চলবে
+      // Backend If not available demo data will run with
       setUsingDummy(true);
     }
   }, []);
 
   useEffect(() => { fetchDashboardData(); }, [fetchDashboardData]);
 
-  // ── Realtime: নতুন order এলে বা order update হলে dashboard instantly refresh হবে ──
+  // ── Realtime: new order if comes or order update If dashboard instantly refresh will be ──
   const handleOrderEvent = useCallback((type, payload) => {
     if (type === 'order_created') {
       toast.success(`New order received${payload?.orderNumber ? ` — ${payload.orderNumber}` : ''}`);

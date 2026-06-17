@@ -37,8 +37,8 @@ function LogoUploader({ value, brandName, onChange }) {
 
   const handleFile = async (file) => {
     if (!file) return;
-    if (!file.type.startsWith('image/')) { setUploadErr('শুধু image file (jpg, png, svg, webp)'); return; }
-    if (file.size > 5 * 1024 * 1024)    { setUploadErr('File size ৫MB এর বেশি হবে না'); return; }
+    if (!file.type.startsWith('image/')) { setUploadErr('only image file (jpg, png, svg, webp)'); return; }
+    if (file.size > 5 * 1024 * 1024)    { setUploadErr('File size 5MB Will not be more than this'); return; }
 
     setUploadErr('');
     setUploading(true);
@@ -52,7 +52,7 @@ function LogoUploader({ value, brandName, onChange }) {
       URL.revokeObjectURL(localUrl);
       onChange({ url: res.url, publicId: res.publicId });
     } catch (err) {
-      setUploadErr(err?.message || 'Upload failed. আবার চেষ্টা করো।');
+      setUploadErr(err?.message || 'Upload failed. Try again।');
     } finally {
       setUploading(false);
     }

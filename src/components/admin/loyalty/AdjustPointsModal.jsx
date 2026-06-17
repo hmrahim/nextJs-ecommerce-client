@@ -1,5 +1,5 @@
 // 📁 PATH: src/components/admin/loyalty/AdjustPointsModal.jsx
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল
+// ⚠️  This is a completely new file
 
 'use client';
 import { useState } from 'react';

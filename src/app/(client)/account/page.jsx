@@ -41,7 +41,7 @@ function formatDate(d) {
 }
 
 function formatBdt(n) {
-  return `৳${Number(n || 0).toLocaleString()}`;
+  return `SAR ${Number(n || 0).toLocaleString()}`;
 }
 
 function Row({ l, v }) {

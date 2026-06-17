@@ -245,7 +245,7 @@ export default function ShopPage() {
             </div>
           )}
 
-          {/* ── Sentinel — IntersectionObserver এখানে watch করে ── */}
+          {/* ── Sentinel — IntersectionObserver here watch Do ── */}
           <div ref={sentinelRef} className="h-4" />
 
           {/* Loading more indicator */}

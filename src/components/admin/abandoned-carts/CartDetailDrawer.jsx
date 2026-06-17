@@ -18,7 +18,7 @@ export default function CartDetailDrawer({ cart, onClose }) {
             <p className="text-xs text-slate-400">{cart.phone || '—'}</p>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-lg border border-[#1e1e2e] bg-[#111118] p-3"><p className="text-xs text-slate-500">Cart Value</p><p className="text-lg font-bold text-orange-400">৳{new Intl.NumberFormat().format(cart.cartValue)}</p></div>
+            <div className="rounded-lg border border-[#1e1e2e] bg-[#111118] p-3"><p className="text-xs text-slate-500">Cart Value</p><p className="text-lg font-bold text-orange-400">SAR {new Intl.NumberFormat().format(cart.cartValue)}</p></div>
             <div className="rounded-lg border border-[#1e1e2e] bg-[#111118] p-3"><p className="text-xs text-slate-500">Items</p><p className="text-lg font-bold text-white">{cart.itemsCount}</p></div>
           </div>
           <div>
@@ -26,8 +26,8 @@ export default function CartDetailDrawer({ cart, onClose }) {
             <div className="space-y-2">
               {(cart.items || []).map((it, i) => (
                 <div key={i} className="flex items-center justify-between p-3 rounded-lg border border-[#1e1e2e] bg-[#111118]">
-                  <div><p className="text-sm text-white">{it.name}</p><p className="text-xs text-slate-500">Qty {it.qty} × ৳{it.price}</p></div>
-                  <p className="text-sm font-semibold text-orange-400">৳{new Intl.NumberFormat().format(it.qty * it.price)}</p>
+                  <div><p className="text-sm text-white">{it.name}</p><p className="text-xs text-slate-500">Qty {it.qty} × SAR {it.price}</p></div>
+                  <p className="text-sm font-semibold text-orange-400">SAR {new Intl.NumberFormat().format(it.qty * it.price)}</p>
                 </div>
               ))}
             </div>
@@ -39,7 +39,7 @@ export default function CartDetailDrawer({ cart, onClose }) {
                 {cart.recoveryLog.map((l, i) => (
                   <div key={i} className="flex gap-3 p-3 rounded-lg border border-[#1e1e2e] bg-[#111118]">
                     <div className="w-2 h-2 rounded-full bg-orange-400 mt-1.5" />
-                    <div className="flex-1"><p className="text-sm text-white">{l.type.toUpperCase()} — {l.note}</p><p className="text-xs text-slate-500">{new Date(l.at).toLocaleString('en-BD')}</p></div>
+                    <div className="flex-1"><p className="text-sm text-white">{l.type.toUpperCase()} — {l.note}</p><p className="text-xs text-slate-500">{new Date(l.at).toLocaleString('en-SA')}</p></div>
                   </div>
                 ))}
               </div>

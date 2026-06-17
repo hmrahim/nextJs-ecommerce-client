@@ -45,9 +45,9 @@ function ConfirmArchiveModal({ product, onConfirm, onCancel, isPending }) {
         </div>
         <h3 className="text-white font-semibold text-center mb-1">Archive Product?</h3>
         <p className="text-slate-400 text-sm text-center mb-1">
-          &ldquo;{product?.name}&rdquo; archived হবে।
+          &ldquo;{product?.name}&rdquo; archived will be।
         </p>
-        <p className="text-slate-500 text-xs text-center mb-5">Product টি list থেকে সরে যাবে কিন্তু DB তে থাকবে।</p>
+        <p className="text-slate-500 text-xs text-center mb-5">Product The list will move away from but DB will be in।</p>
         <div className="flex gap-3">
           <button
             onClick={onCancel}
@@ -84,9 +84,9 @@ function ConfirmDeleteModal({ product, onConfirm, onCancel, isPending }) {
         </div>
         <h3 className="text-white font-semibold text-center mb-1">Permanently Delete?</h3>
         <p className="text-slate-400 text-sm text-center mb-1">
-          &ldquo;{product?.name}&rdquo; চিরতরে মুছে যাবে।
+          &ldquo;{product?.name}&rdquo; will be permanently deleted।
         </p>
-        <p className="text-red-400/70 text-xs text-center mb-5">⚠️ এটি undo করা যাবে না।</p>
+        <p className="text-red-400/70 text-xs text-center mb-5">⚠️ This undo cannot be done।</p>
         <div className="flex gap-3">
           <button
             onClick={onCancel}
@@ -230,9 +230,9 @@ export default function ProductTable({
 
                     {/* Price */}
                     <td className="px-4 py-3">
-                      <span className="text-white font-semibold">৳{product.price?.toLocaleString()}</span>
+                      <span className="text-white font-semibold">SAR {product.price?.toLocaleString()}</span>
                       {product.comparePrice && product.comparePrice > product.price && (
-                        <span className="ml-1.5 text-xs text-slate-500 line-through">৳{product.comparePrice?.toLocaleString()}</span>
+                        <span className="ml-1.5 text-xs text-slate-500 line-through">SAR {product.comparePrice?.toLocaleString()}</span>
                       )}
                     </td>
 

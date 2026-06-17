@@ -5,8 +5,8 @@ export function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-export function formatPrice(amount, currency = 'BDT') {
-  return new Intl.NumberFormat('en-BD', { style: 'currency', currency }).format(amount);
+export function formatPrice(amount, currency = 'SAR') {
+  return new Intl.NumberFormat('en-SA', { style: 'currency', currency }).format(amount);
 }
 
 export function slugify(text) {

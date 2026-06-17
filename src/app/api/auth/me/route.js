@@ -11,7 +11,7 @@ export async function GET() {
     const payload = await verifyToken(token);
     if (!payload) return NextResponse.json(null, { status: 401 });
 
-    // backend থেকে fresh user data আনো
+    // backend from fresh user data Bring
     const data = await authService.getMe(token);
     if (!data) return NextResponse.json(null, { status: 401 });
 

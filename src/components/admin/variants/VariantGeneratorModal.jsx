@@ -53,7 +53,7 @@ function AttributeSetRow({ attr, selectedValues, onChange }) {
       <div className="flex flex-wrap gap-2">
         {activeValues.map(val => {
           const selected  = selectedValues.some(v => v.valueId === val._id);
-          // color value এর hex — backend schema অনুযায়ী সব fallback চেষ্টা করো
+          // color value Of hex — backend schema all by fallback try
           const colorHex  = val.valueData ?? val.value ?? val.hex ?? null;
           const isColor   = attr.type === 'color' && colorHex && colorHex.startsWith('#');
           return (
@@ -159,7 +159,7 @@ export default function VariantGeneratorModal({ attributes = [], onClose, onSucc
   }, [step, productSearch]);
 
   // ── Combinations ─────────────────────────────────────────────────────────────
-  // activeSets = attributes যেগুলোতে কমপক্ষে ১টা value select করা হয়েছে
+  // activeSets = attributes in which at least 1 value select has been done
   const activeSets = variantAttrs.filter(a => (selections[a._id]?.length || 0) > 0);
   const combinations = useMemo(
     () => buildCartesian(activeSets, selections),
@@ -211,7 +211,7 @@ export default function VariantGeneratorModal({ attributes = [], onClose, onSucc
     if (!canGenerate) return;
     setGenerating(true);
 
-    // attributeSets: প্রতিটা active attribute এর selected values পাঠাও
+    // attributeSets: each active attribute Of selected values send
     const attributeSets = activeSets.map(attr => ({
       attributeId:   attr._id,
       attributeName: attr.name,
@@ -257,7 +257,7 @@ export default function VariantGeneratorModal({ attributes = [], onClose, onSucc
         <div className="flex flex-wrap gap-1.5">
           {preview.map((combo, i) => {
             const title = buildTitle(combo);
-            // color dot থেকে প্রথম color attribute
+            // color dot from first color attribute
             const colorAttr = combo.find(a => a.attributeSlug === 'color');
             return (
               <span key={i} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#16161f] border border-[#1e1e2e] text-xs text-slate-300">
@@ -291,7 +291,7 @@ export default function VariantGeneratorModal({ attributes = [], onClose, onSucc
           <div>
             <h2 className="text-base font-bold text-white">Generate Product Variants</h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              Color × Size → Red/S, Red/M, Green/S… সব combinations auto-তৈরি
+              Color × Size → Red/S, Red/M, Green/S… All combinations auto-create
             </p>
           </div>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-white/5 text-slate-500 hover:text-slate-300 transition-colors">
@@ -326,7 +326,7 @@ export default function VariantGeneratorModal({ attributes = [], onClose, onSucc
           {/* ── Step 1: Product Selection ── */}
           {step === 1 && (
             <div className="space-y-4">
-              <p className="text-sm text-slate-400">কোন product এ variants add করবে?</p>
+              <p className="text-sm text-slate-400">Which product In variants add will do?</p>
               <input
                 value={productSearch}
                 onChange={e => setProductSearch(e.target.value)}
@@ -363,7 +363,7 @@ export default function VariantGeneratorModal({ attributes = [], onClose, onSucc
                       )}
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{p.name}</p>
-                        <p className="text-xs text-slate-500">SKU: {p.sku || '—'} · ৳{p.price || p.basePrice || 0}</p>
+                        <p className="text-xs text-slate-500">SKU: {p.sku || '—'} · SAR {p.price || p.basePrice || 0}</p>
                       </div>
                       {selectedProduct?._id === p._id && <span className="text-amber-400 text-sm">✓</span>}
                     </button>
@@ -379,7 +379,7 @@ export default function VariantGeneratorModal({ attributes = [], onClose, onSucc
               <div className="flex items-center gap-3 p-3 rounded-xl bg-amber-500/5 border border-amber-500/20">
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-white">{selectedProduct?.name}</p>
-                  <p className="text-xs text-slate-500">প্রতিটি attribute combination এ একটা variant হবে</p>
+                  <p className="text-xs text-slate-500">each attribute combination this is one variant will be</p>
                 </div>
                 <button onClick={() => setStep(1)} className="text-xs text-slate-500 hover:text-amber-400 transition-colors">Change</button>
               </div>
@@ -388,14 +388,14 @@ export default function VariantGeneratorModal({ attributes = [], onClose, onSucc
               <div className="p-3 rounded-xl bg-blue-500/5 border border-blue-500/15 text-xs text-blue-300 flex gap-2">
                 <span className="text-blue-400 flex-shrink-0">ℹ️</span>
                 <span>
-                  সব attribute থেকে values select করো। উদাহরণ: Color (Red, Green) + Size (S, M, L)
-                  {' '}= <strong>6টা</strong> combination (Red/S, Red/M, Red/L, Green/S, Green/M, Green/L)
+                  All attribute from values select Do। example: Color (Red, Green) + Size (S, M, L)
+                  {' '}= <strong>6O'clock</strong> combination (Red/S, Red/M, Red/L, Green/S, Green/M, Green/L)
                 </span>
               </div>
 
               {variantAttrs.length === 0 ? (
                 <div className="text-center py-8 text-slate-500 text-sm">
-                  কোনো isVariant=true attribute নেই। Attribute তৈরি করুন আগে।
+                  any isVariant=true attribute isn't। Attribute Create first।
                 </div>
               ) : (
                 <>
@@ -413,7 +413,7 @@ export default function VariantGeneratorModal({ attributes = [], onClose, onSucc
 
                   {/* ── Stock field ── */}
                   <div>
-                    <label className="block text-xs text-slate-400 mb-1.5">Default Stock (সব variant এর জন্য)</label>
+                    <label className="block text-xs text-slate-400 mb-1.5">Default Stock (All variant for this)</label>
                     <input
                       type="number" min="0" value={defaultStock}
                       onChange={e => setDefaultStock(e.target.value)}
@@ -434,7 +434,7 @@ export default function VariantGeneratorModal({ attributes = [], onClose, onSucc
                             : 'border-[#2a2a3e] bg-[#16161f] text-slate-400 hover:border-slate-500'
                         }`}
                       >
-                        🏷️ সব variant এক দামে
+                        🏷️ All variant at one price
                       </button>
                       <button
                         onClick={() => handlePricingModeChange('individual')}
@@ -444,7 +444,7 @@ export default function VariantGeneratorModal({ attributes = [], onClose, onSucc
                             : 'border-[#2a2a3e] bg-[#16161f] text-slate-400 hover:border-slate-500'
                         }`}
                       >
-                        🔖 প্রতিটা variant আলাদা দাম
+                        🔖 each variant separate price
                       </button>
                     </div>
 
@@ -475,7 +475,7 @@ export default function VariantGeneratorModal({ attributes = [], onClose, onSucc
                             onClick={fillAllPrices}
                             className="px-3 h-8 rounded-lg border border-violet-500/30 bg-violet-500/10 text-violet-400 text-xs font-medium hover:bg-violet-500/20 transition-colors whitespace-nowrap"
                           >
-                            সবগুলোতে দাও
+                            Give in all
                           </button>
                         </div>
 
@@ -493,7 +493,7 @@ export default function VariantGeneratorModal({ attributes = [], onClose, onSucc
                                 )}
                                 <span className="flex-1 text-xs text-slate-300 font-medium">{title}</span>
                                 <div className="flex items-center gap-1">
-                                  <span className="text-xs text-slate-500">৳</span>
+                                  <span className="text-xs text-slate-500">SAR </span>
                                   <input
                                     type="number" min="0"
                                     value={variantPrices[title] ?? ''}
@@ -507,20 +507,20 @@ export default function VariantGeneratorModal({ attributes = [], onClose, onSucc
                           })}
                         </div>
                         {!allPricesFilled && (
-                          <p className="text-[10px] text-amber-500">⚠️ সব variant এর price দাও</p>
+                          <p className="text-[10px] text-amber-500">⚠️ All variant Of price Give</p>
                         )}
                       </div>
                     )}
 
                     {pricingMode === 'individual' && totalCombinations === 0 && (
-                      <p className="text-xs text-slate-600 italic">আগে attribute values select করো।</p>
+                      <p className="text-xs text-slate-600 italic">Before attribute values select Do।</p>
                     )}
                   </div>
 
                   {totalCombinations > 0 && (
                     <div className="p-3 rounded-xl bg-violet-500/5 border border-violet-500/20 text-center">
                       <span className="text-violet-400 font-bold text-lg">{totalCombinations}</span>
-                      <span className="text-slate-400 text-sm ml-2">টি variant তৈরি হবে</span>
+                      <span className="text-slate-400 text-sm ml-2">The variant will be created</span>
                       <p className="text-[10px] text-slate-600 mt-1">
                         {activeSets.map(a => `${a.name}(${selections[a._id].length})`).join(' × ')}
                       </p>
@@ -541,9 +541,9 @@ export default function VariantGeneratorModal({ attributes = [], onClose, onSucc
               </div>
               <div>
                 <p className="text-white font-bold text-lg">{result.created} Variants Created!</p>
-                <p className="text-slate-400 text-sm mt-1">{selectedProduct?.name} এ auto-add হয়ে গেছে</p>
+                <p className="text-slate-400 text-sm mt-1">{selectedProduct?.name} In auto-add is done</p>
                 {result.skipped > 0 && (
-                  <p className="text-amber-400 text-xs mt-1">{result.skipped}টি ইতিমধ্যে ছিল, skip করা হয়েছে</p>
+                  <p className="text-amber-400 text-xs mt-1">{result.skipped}was already available, skip has been done</p>
                 )}
               </div>
               <div className="grid grid-cols-3 gap-3 max-w-xs mx-auto">

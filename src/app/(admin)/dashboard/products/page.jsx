@@ -33,12 +33,12 @@ function BulkActionModal({ count, mode, onConfirm, onCancel, isPending }) {
           )}
         </div>
         <h3 className="text-white font-semibold text-center mb-1">
-          {isDelete ? `${count}টি Product Delete করবে?` : `${count}টি Product Archive করবে?`}
+          {isDelete ? `${count}The Product Delete will do?` : `${count}The Product Archive will do?`}
         </h3>
         <p className="text-slate-400 text-sm text-center mb-5">
           {isDelete
-            ? '⚠️ DB থেকে চিরতরে মুছে যাবে, undo সম্ভব না।'
-            : 'Product গুলো archived হবে, DB তে থাকবে।'}
+            ? '⚠️ DB will be permanently deleted from, undo Not possible।'
+            : 'Product s archived will be, DB will be in।'}
         </p>
         <div className="flex gap-3">
           <button onClick={onCancel} disabled={isPending}
@@ -148,7 +148,7 @@ export default function ProductsPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Bulk actions — selected থাকলে দেখাবে */}
+          {/* Bulk actions — selected If there, it will show */}
           {selected.length > 0 && (
             <>
               {/* Bulk Archive */}

@@ -3,8 +3,8 @@
 
 /**
  * SearchFilters Component
- * Search results page এ sidebar filter panel
- * Parent (SearchPageClient) থেকে register, watch পাবে — একই form এর অংশ
+ * Search results page In sidebar filter panel
+ * Parent (SearchPageClient) from register, watch will get — same form part of it
  *
  * Props:
  *  - register: from react-hook-form
@@ -22,7 +22,7 @@ export default function SearchFilters({ register, categories = [] }) {
           {...register('category')}
           className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-400"
         >
-          <option value="">সব Category</option>
+          <option value="">All Category</option>
           {categories.map((cat) => (
             <option key={cat._id} value={cat._id}>
               {cat.name}
@@ -34,7 +34,7 @@ export default function SearchFilters({ register, categories = [] }) {
       {/* Price Range */}
       <div>
         <h3 className="mb-2 text-sm font-semibold text-gray-700 uppercase tracking-wide">
-          দাম (৳)
+          Price (SAR )
         </h3>
         <div className="flex items-center gap-2">
           <input
@@ -64,7 +64,7 @@ export default function SearchFilters({ register, categories = [] }) {
           {...register('rating')}
           className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-400"
         >
-          <option value="">যেকোনো Rating</option>
+          <option value="">any Rating</option>
           <option value="4">⭐ 4+ Star</option>
           <option value="3">⭐ 3+ Star</option>
           <option value="2">⭐ 2+ Star</option>
@@ -80,7 +80,7 @@ export default function SearchFilters({ register, categories = [] }) {
           className="h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-400"
         />
         <label htmlFor="inStock" className="text-sm text-gray-700 cursor-pointer">
-          Stock আছে এমন পণ্য
+          Stock Products that are in stock
         </label>
       </div>
 
@@ -94,11 +94,11 @@ export default function SearchFilters({ register, categories = [] }) {
           className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-400"
         >
           <option value="">Relevance</option>
-          <option value="price:asc">দাম: কম থেকে বেশি</option>
-          <option value="price:desc">দাম: বেশি থেকে কম</option>
-          <option value="rating:desc">সর্বোচ্চ Rating</option>
-          <option value="newest">নতুন পণ্য আগে</option>
-          <option value="sold:desc">সবচেয়ে বেশি বিক্রি</option>
+          <option value="price:asc">Price: Low to High</option>
+          <option value="price:desc">Price: High to Low</option>
+          <option value="rating:desc">Maximum Rating</option>
+          <option value="newest">New product before</option>
+          <option value="sold:desc">Most sold</option>
         </select>
       </div>
     </aside>

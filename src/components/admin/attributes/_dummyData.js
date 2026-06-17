@@ -1,5 +1,5 @@
 // 📁 PATH: src/components/admin/attributes/_dummyData.js
-// ⚠️  DEV ONLY — backend ready হলে import সরিয়ে দাও
+// ⚠️  DEV ONLY — backend ready If import remove
 
 export const ATTRIBUTE_TYPES = [
   { value: 'select',    label: 'Dropdown (Select)',    icon: '▾',  desc: 'Single value from a list' },

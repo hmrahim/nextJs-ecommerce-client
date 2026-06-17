@@ -9,6 +9,7 @@ import {
   ShoppingBag, Copy, CheckCheck
 } from 'lucide-react';
 import { orderService } from '@/services/orderService';
+import { generateInvoicePDF } from '@/lib/invoiceGenerator';
 
 /* ── Status helpers ─────────────────────────────────────────── */
 const STATUS_STEPS = ['pending', 'confirmed', 'shipped', 'delivered'];
@@ -31,12 +32,12 @@ const PAYMENT_METHOD_LABELS = {
 
 function formatDate(d) {
   if (!d) return '—';
-  return new Date(d).toLocaleDateString('en-BD', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  return new Date(d).toLocaleDateString('en-SA', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
 function formatShortDate(d) {
   if (!d) return '—';
-  return new Date(d).toLocaleDateString('en-BD', { day: 'numeric', month: 'short', year: 'numeric' });
+  return new Date(d).toLocaleDateString('en-SA', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 /* ── Cancel confirmation modal ────────────────────────────── */
@@ -44,16 +45,16 @@ function CancelModal({ onConfirm, onClose, loading }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl">
-        <h3 className="text-lg font-bold text-slate-900">Order Cancel করবেন?</h3>
-        <p className="mt-2 text-sm text-slate-600">একবার cancel করলে আর undo করা যাবে না।</p>
+        <h3 className="text-lg font-bold text-slate-900">Order Cancel will do?</h3>
+        <p className="mt-2 text-sm text-slate-600">once cancel if done, then no more undo cannot be done।</p>
         <div className="mt-5 flex gap-3">
-          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-border text-sm font-semibold hover:bg-slate-50">না, থাক</button>
+          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-border text-sm font-semibold hover:bg-slate-50">no, let it be</button>
           <button
             onClick={onConfirm}
             disabled={loading}
             className="flex-1 py-2.5 rounded-xl bg-rose-600 text-white text-sm font-semibold hover:bg-rose-700 disabled:opacity-60"
           >
-            {loading ? 'Cancelling...' : 'হ্যাঁ, Cancel করুন'}
+            {loading ? 'Cancelling...' : 'Yes, Cancel do'}
           </button>
         </div>
       </div>
@@ -70,6 +71,20 @@ export default function OrderDetailPage() {
   const [canceling, setCanceling] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [copied,   setCopied]   = useState(false);
+  const [downloadingInvoice, setDownloadingInvoice] = useState(false);
+
+  const handleDownloadInvoice = async () => {
+    if (!order || downloadingInvoice) return;
+    try {
+      setDownloadingInvoice(true);
+      generateInvoicePDF(order);
+    } catch (e) {
+      console.error('Invoice generate failed:', e);
+      alert('Invoice download failed. Please try again.');
+    } finally {
+      setDownloadingInvoice(false);
+    }
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -80,7 +95,7 @@ export default function OrderDetailPage() {
         const res = await orderService.getById(id);
         setOrder(res.data?.data);
       } catch (err) {
-        setError(err?.response?.data?.message || 'Order details load করা যায়নি।');
+        setError(err?.response?.data?.message || 'Order details load could not be done।');
       } finally {
         setLoading(false);
       }
@@ -94,7 +109,7 @@ export default function OrderDetailPage() {
       setOrder(res.data?.data);
       setShowModal(false);
     } catch (err) {
-      alert(err?.response?.data?.message || 'Cancel করা যায়নি।');
+      alert(err?.response?.data?.message || 'Cancel could not be done।');
     } finally {
       setCanceling(false);
     }
@@ -111,7 +126,7 @@ export default function OrderDetailPage() {
   if (loading) return (
     <div className="bg-white rounded-2xl border border-border p-16 text-center">
       <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto" />
-      <p className="mt-3 text-sm text-slate-500">Order details loading হচ্ছে...</p>
+      <p className="mt-3 text-sm text-slate-500">Order details loading is happening...</p>
     </div>
   );
 
@@ -157,7 +172,7 @@ export default function OrderDetailPage() {
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <Link href="/account/orders" className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-orange-600">
-                <ChevronLeft className="w-3.5 h-3.5" /> সব Orders
+                <ChevronLeft className="w-3.5 h-3.5" /> All Orders
               </Link>
               <div className="mt-1 flex items-center gap-2">
                 <h1 className="text-2xl font-bold text-slate-900">{order.orderNumber}</h1>
@@ -222,7 +237,7 @@ export default function OrderDetailPage() {
               <X className="w-5 h-5 text-rose-500 flex-shrink-0" />
               <div>
                 <p className="font-semibold text-rose-700 capitalize">{order.status}</p>
-                {order.cancelledAt && <p className="text-xs text-rose-500">{formatDate(order.cancelledAt)} তারিখে cancel হয়েছে।</p>}
+                {order.cancelledAt && <p className="text-xs text-rose-500">{formatDate(order.cancelledAt)} on date cancel has been।</p>}
               </div>
             </div>
           )}
@@ -256,9 +271,9 @@ export default function OrderDetailPage() {
                           {Object.entries(item.variantAttrs).map(([k, v]) => `${k}: ${v}`).join(' · ')}
                         </p>
                       )}
-                      <p className="text-xs text-slate-500 mt-0.5">Qty {item.quantity} × ৳{item.unitPrice?.toLocaleString()}</p>
+                      <p className="text-xs text-slate-500 mt-0.5">Qty {item.quantity} × SAR {item.unitPrice?.toLocaleString()}</p>
                     </div>
-                    <p className="font-bold text-slate-900 flex-shrink-0">৳{item.lineTotal?.toLocaleString()}</p>
+                    <p className="font-bold text-slate-900 flex-shrink-0">SAR {item.lineTotal?.toLocaleString()}</p>
                   </div>
                 ))}
               </div>
@@ -297,21 +312,21 @@ export default function OrderDetailPage() {
               <dl className="text-sm space-y-2">
                 <div className="flex justify-between">
                   <dt className="text-slate-500">Subtotal ({order.items?.length} items)</dt>
-                  <dd>৳{order.subtotal?.toLocaleString()}</dd>
+                  <dd>SAR {order.subtotal?.toLocaleString()}</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-slate-500">Shipping</dt>
-                  <dd>{order.shippingCost === 0 ? <span className="text-emerald-600 font-medium">Free</span> : `৳${order.shippingCost}`}</dd>
+                  <dd>{order.shippingCost === 0 ? <span className="text-emerald-600 font-medium">Free</span> : `SAR ${order.shippingCost}`}</dd>
                 </div>
                 {order.couponDiscount > 0 && (
                   <div className="flex justify-between text-emerald-600">
                     <dt>Coupon {order.couponCode && `(${order.couponCode})`}</dt>
-                    <dd>-৳{order.couponDiscount?.toLocaleString()}</dd>
+                    <dd>-SAR {order.couponDiscount?.toLocaleString()}</dd>
                   </div>
                 )}
                 <div className="flex justify-between border-t border-border pt-2 font-bold text-base">
                   <dt>Total</dt>
-                  <dd className="text-emerald-700">৳{order.total?.toLocaleString()}</dd>
+                  <dd className="text-emerald-700">SAR {order.total?.toLocaleString()}</dd>
                 </div>
               </dl>
             </div>
@@ -365,8 +380,20 @@ export default function OrderDetailPage() {
 
             {/* Actions */}
             <div className="flex flex-col gap-2">
-              <button className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-border text-sm font-semibold hover:bg-slate-50">
-                <Download className="w-4 h-4" /> Invoice Download
+              <button
+                onClick={handleDownloadInvoice}
+                disabled={downloadingInvoice}
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 text-white text-sm font-semibold shadow-sm hover:from-orange-600 hover:to-orange-700 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+              >
+                {downloadingInvoice ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" /> Generating...
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-4 h-4" /> Download Invoice
+                  </>
+                )}
               </button>
               <Link
                 href="/contact"

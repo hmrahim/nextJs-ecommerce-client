@@ -1,5 +1,5 @@
 // 📁 PATH: src/components/admin/coupons/CouponTable.jsx
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল
+// ⚠️  This is a completely new file
 
 'use client';
 import { useState } from 'react';
@@ -13,7 +13,7 @@ const STATUS_CFG = {
 
 const TYPE_CFG = {
   percent:  { label: (v) => `${v}% off`,    cls: 'bg-violet-500/10 text-violet-400 border-violet-500/20' },
-  fixed:    { label: (v) => `৳${v} off`,    cls: 'bg-sky-500/10 text-sky-400 border-sky-500/20' },
+  fixed:    { label: (v) => `SAR ${v} off`,    cls: 'bg-sky-500/10 text-sky-400 border-sky-500/20' },
   shipping: { label: (_) => 'Free Shipping', cls: 'bg-teal-500/10 text-teal-400 border-teal-500/20' },
 };
 
@@ -53,7 +53,7 @@ function ExpiryCell({ expiresAt }) {
   return (
     <div>
       <p className={`text-xs font-medium ${expired ? 'text-slate-600 line-through' : urgent ? 'text-red-400' : soon ? 'text-amber-400' : 'text-slate-300'}`}>
-        {d.toLocaleDateString('en-BD', { day: '2-digit', month: 'short', year: 'numeric' })}
+        {d.toLocaleDateString('en-SA', { day: '2-digit', month: 'short', year: 'numeric' })}
       </p>
       {!expired && <p className={`text-xs ${urgent ? 'text-red-500' : soon ? 'text-amber-500' : 'text-slate-600'}`}>{diff === 0 ? 'Expires today!' : `${diff}d left`}</p>}
       {expired  && <p className="text-xs text-slate-700">Expired</p>}
@@ -73,7 +73,7 @@ function ConfirmDeleteModal({ coupon, onConfirm, onCancel }) {
         </div>
         <h3 className="text-white font-semibold text-center mb-1">Delete Coupon?</h3>
         <p className="text-slate-400 text-sm text-center mb-5">
-          "<span className="text-orange-400 font-mono font-bold">{coupon?.code}</span>" permanently delete হবে।
+          "<span className="text-orange-400 font-mono font-bold">{coupon?.code}</span>" permanently delete will be।
         </p>
         <div className="flex gap-3">
           <button onClick={onCancel} className="flex-1 px-4 py-2 rounded-lg border border-[#1e1e2e] text-slate-400 text-sm hover:bg-white/5 transition-colors">Cancel</button>
@@ -181,7 +181,7 @@ export default function CouponTable({ coupons, loading, selected, onSelectChange
                     {/* Min order */}
                     <td className="px-4 py-3">
                       {coupon.minOrderAmount > 0
-                        ? <span className="text-xs text-slate-300">৳{coupon.minOrderAmount.toLocaleString()}</span>
+                        ? <span className="text-xs text-slate-300">SAR {coupon.minOrderAmount.toLocaleString()}</span>
                         : <span className="text-xs text-slate-600">No minimum</span>
                       }
                     </td>

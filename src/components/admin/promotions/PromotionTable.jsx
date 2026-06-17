@@ -1,5 +1,5 @@
 // 📁 PATH: src/components/admin/promotions/PromotionTable.jsx
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল
+// ⚠️  This is a completely new file
 
 'use client';
 import { useState } from 'react';
@@ -16,7 +16,7 @@ const TYPE_CFG = {
   bundle_deal:   { label: 'Bundle',        icon: '📦' },
   tier_discount: { label: 'Tier Discount', icon: '📈' },
   cart_percent:  { label: '% Cart Off',    icon: '%'  },
-  cart_fixed:    { label: '৳ Cart Off',    icon: '৳'  },
+  cart_fixed:    { label: 'SAR  Cart Off',    icon: 'SAR '  },
   free_gift:     { label: 'Free Gift',     icon: '🎀' },
   free_shipping: { label: 'Free Shipping', icon: '🚚' },
 };
@@ -35,7 +35,7 @@ function ConfirmDelete({ name, onConfirm, onCancel }) {
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       <div className="relative bg-[#16161f] border border-[#1e1e2e] rounded-2xl p-6 w-full max-w-sm" onClick={e => e.stopPropagation()}>
         <h3 className="text-white font-semibold text-center mb-1">Delete Promotion?</h3>
-        <p className="text-slate-400 text-sm text-center mb-5">"<span className="text-orange-400">{name}</span>" permanently delete হবে।</p>
+        <p className="text-slate-400 text-sm text-center mb-5">"<span className="text-orange-400">{name}</span>" permanently delete will be।</p>
         <div className="flex gap-3">
           <button onClick={onCancel} className="flex-1 px-4 py-2 rounded-lg border border-[#1e1e2e] text-slate-400 text-sm hover:bg-white/5">Cancel</button>
           <button onClick={onConfirm} className="flex-1 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-sm font-medium">Delete</button>
@@ -87,12 +87,12 @@ export default function PromotionTable({ promotions, loading, selected, onSelect
                   <td className="px-4 py-3"><span className="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-[#1e1e2e] text-xs text-slate-300"><span>{tc.icon}</span>{tc.label}</span></td>
                   <td className="px-4 py-3 text-sm text-orange-400 font-medium">{p.rewardLabel || '—'}</td>
                   <td className="px-4 py-3">
-                    <p className="text-xs text-slate-400">{p.startsAt ? new Date(p.startsAt).toLocaleDateString('en-BD', { day: '2-digit', month: 'short' }) : '—'}</p>
-                    <p className="text-xs text-slate-600">→ {p.endsAt ? new Date(p.endsAt).toLocaleDateString('en-BD', { day: '2-digit', month: 'short' }) : 'No end'}</p>
+                    <p className="text-xs text-slate-400">{p.startsAt ? new Date(p.startsAt).toLocaleDateString('en-SA', { day: '2-digit', month: 'short' }) : '—'}</p>
+                    <p className="text-xs text-slate-600">→ {p.endsAt ? new Date(p.endsAt).toLocaleDateString('en-SA', { day: '2-digit', month: 'short' }) : 'No end'}</p>
                   </td>
                   <td className="px-4 py-3">
                     <p className="text-sm text-white font-medium">{new Intl.NumberFormat().format(p.redeemCount || 0)} <span className="text-xs text-slate-500 font-normal">uses</span></p>
-                    <p className="text-xs text-emerald-400">৳{new Intl.NumberFormat().format(p.totalDiscount || 0)} given</p>
+                    <p className="text-xs text-emerald-400">SAR {new Intl.NumberFormat().format(p.totalDiscount || 0)} given</p>
                   </td>
                   <td className="px-4 py-3"><span className="text-sm text-slate-300 font-semibold">{p.priority || 0}</span>{p.stackable && <span className="block text-[10px] text-violet-400">stackable</span>}</td>
                   <td className="px-4 py-3"><span className={`px-2 py-1 rounded-md border text-xs font-medium ${st.cls}`}>{st.label}</span></td>

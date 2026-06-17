@@ -106,7 +106,7 @@ export default function CartDrawer() {
             <div className="border-b border-border bg-success/10 px-5 py-2.5">
               <p className="text-xs font-medium text-success flex items-center gap-1.5">
                 <Truck className="h-3.5 w-3.5" />
-                Free delivery on orders above ৳500
+                Free delivery on orders above SAR 500
               </p>
             </div>
 
@@ -129,7 +129,7 @@ export default function CartDrawer() {
               {/* savings callout */}
               {savings > 0 && (
                 <div className="rounded-lg bg-success/10 px-3 py-2 text-xs font-semibold text-success">
-                  🎉 You're saving ৳{savings.toLocaleString()} on this order!
+                  🎉 You're saving SAR {savings.toLocaleString()} on this order!
                 </div>
               )}
 
@@ -137,7 +137,7 @@ export default function CartDrawer() {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between text-muted-foreground">
                   <span>Subtotal ({totalItems} items)</span>
-                  <span>৳{subtotal.toLocaleString()}</span>
+                  <span>SAR {subtotal.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-muted-foreground">
                   <span>Delivery</span>
@@ -145,7 +145,7 @@ export default function CartDrawer() {
                 </div>
                 <div className="flex justify-between border-t border-border pt-2 text-base font-bold text-foreground">
                   <span>Total</span>
-                  <span className="text-primary">৳{subtotal.toLocaleString()}</span>
+                  <span className="text-primary">SAR {subtotal.toLocaleString()}</span>
                 </div>
               </div>
 

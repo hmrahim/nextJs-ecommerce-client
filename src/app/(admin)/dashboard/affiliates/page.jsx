@@ -1,5 +1,5 @@
 // 📁 PATH: src/app/(admin)/dashboard/affiliates/page.jsx
-// ⚠️  পুরোনো page.jsx এর জায়গায় REPLACE করো (অথবা নতুন)
+// ⚠️  old page.jsx instead of REPLACE Do (or new)
 
 'use client';
 import { useState, useEffect, useCallback } from 'react';
@@ -109,8 +109,8 @@ export default function AffiliatesPage() {
           { l: 'Approved',         v: stats.approved, c: 'text-emerald-400' },
           { l: 'Pending Review',   v: stats.pending, c: 'text-amber-400' },
           { l: 'Conversions',      v: new Intl.NumberFormat().format(stats.conversions), c: 'text-violet-400' },
-          { l: 'Affiliate Revenue',v: '৳' + new Intl.NumberFormat().format(stats.revenue), c: 'text-emerald-400' },
-          { l: 'Pending Payout',   v: '৳' + new Intl.NumberFormat().format(stats.payout), c: 'text-amber-400' },
+          { l: 'Affiliate Revenue',v: 'SAR ' + new Intl.NumberFormat().format(stats.revenue), c: 'text-emerald-400' },
+          { l: 'Pending Payout',   v: 'SAR ' + new Intl.NumberFormat().format(stats.payout), c: 'text-amber-400' },
         ].map(s => (
           <div key={s.l} className="rounded-xl border border-[#1e1e2e] bg-[#16161f] p-4">
             <p className="text-[10px] uppercase tracking-wider text-slate-500">{s.l}</p>

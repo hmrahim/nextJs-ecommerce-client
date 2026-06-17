@@ -81,7 +81,7 @@ function makeTxn(i) {
     fee,
     tax,
     net,
-    currency: 'BDT',
+    currency: 'SAR',
     createdAt: date.toISOString(),
     updatedAt: date.toISOString(),
     ipAddress: `103.${rand(1,255)}.${rand(1,255)}.${rand(1,255)}`,

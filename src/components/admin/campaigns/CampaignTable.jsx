@@ -1,5 +1,5 @@
 // 📁 PATH: src/components/admin/campaigns/CampaignTable.jsx
-// ⚠️  এটা সম্পূর্ণ নতুন ফাইল
+// ⚠️  This is a completely new file
 
 'use client';
 import { useState } from 'react';
@@ -42,7 +42,7 @@ function ConfirmDelete({ name, onConfirm, onCancel }) {
           <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
         </div>
         <h3 className="text-white font-semibold text-center mb-1">Delete Campaign?</h3>
-        <p className="text-slate-400 text-sm text-center mb-5">"<span className="text-orange-400 font-semibold">{name}</span>" permanently delete হবে।</p>
+        <p className="text-slate-400 text-sm text-center mb-5">"<span className="text-orange-400 font-semibold">{name}</span>" permanently delete will be।</p>
         <div className="flex gap-3">
           <button onClick={onCancel} className="flex-1 px-4 py-2 rounded-lg border border-[#1e1e2e] text-slate-400 text-sm hover:bg-white/5">Cancel</button>
           <button onClick={onConfirm} className="flex-1 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-sm font-medium">Delete</button>
@@ -135,14 +135,14 @@ export default function CampaignTable({ campaigns, loading, selected, onSelectCh
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <p className="text-sm font-semibold text-emerald-400">৳{fmt(c.revenue)}</p>
+                    <p className="text-sm font-semibold text-emerald-400">SAR {fmt(c.revenue)}</p>
                     <p className="text-xs text-slate-500">{fmt(c.conversions)} orders</p>
                   </td>
                   <td className="px-4 py-3">
                     {c.scheduledAt
                       ? <>
-                          <p className="text-xs text-slate-300">{new Date(c.scheduledAt).toLocaleDateString('en-BD', { day: '2-digit', month: 'short' })}</p>
-                          <p className="text-[11px] text-slate-500">{new Date(c.scheduledAt).toLocaleTimeString('en-BD', { hour: '2-digit', minute: '2-digit' })}</p>
+                          <p className="text-xs text-slate-300">{new Date(c.scheduledAt).toLocaleDateString('en-SA', { day: '2-digit', month: 'short' })}</p>
+                          <p className="text-[11px] text-slate-500">{new Date(c.scheduledAt).toLocaleTimeString('en-SA', { hour: '2-digit', minute: '2-digit' })}</p>
                         </>
                       : <span className="text-xs text-slate-600">Not scheduled</span>}
                   </td>

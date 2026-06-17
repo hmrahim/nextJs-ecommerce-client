@@ -65,12 +65,12 @@ export default function TransactionFilters({ filters, setFilters, onExport, onRe
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mt-3">
         <div>
-          <label className="block text-xs text-gray-400 mb-1">Min Amount (৳)</label>
+          <label className="block text-xs text-gray-400 mb-1">Min Amount (SAR )</label>
           <input type="number" value={filters.minAmount} onChange={e => update('minAmount', e.target.value)}
             className="w-full bg-[#111118] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500/50" />
         </div>
         <div>
-          <label className="block text-xs text-gray-400 mb-1">Max Amount (৳)</label>
+          <label className="block text-xs text-gray-400 mb-1">Max Amount (SAR )</label>
           <input type="number" value={filters.maxAmount} onChange={e => update('maxAmount', e.target.value)}
             className="w-full bg-[#111118] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500/50" />
         </div>

@@ -1,5 +1,5 @@
 // 📁 PATH: services/searchService.js
-import api from '@/lib/api'; // তোমার existing axios instance
+import api from '@/lib/api'; // your existing axios instance
 
 /**
  * GET /api/products/search
@@ -15,7 +15,7 @@ export const searchProducts = async (params) => {
 
 /**
  * GET /api/categories
- * Search bar এ category dropdown এর জন্য
+ * Search bar In category dropdown for this
  */
 export const getCategories = async () => {
     const { data } = await api.get('/categories', { params: { limit: 100 } });

@@ -80,7 +80,7 @@ export function useAddToCart() {
       const status  = err?.response?.status;
       const message = err?.response?.data?.message;
       if (status === 409) {
-        // stock শেষ — backend এর message দেখাও (e.g. "Only 2 item(s) left in stock.")
+        // stock End — backend Of message show (e.g. "Only 2 item(s) left in stock.")
         toast.error(message || 'Not enough stock available');
       } else {
         toast.error(message || 'Could not add to cart');
