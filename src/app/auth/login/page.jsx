@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -22,7 +22,8 @@ const schema = z.object({
     ),
 });
 
-export default function LoginPage() {
+// ── useSearchParams এই আলাদা component এ ──
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { loginWithCredentials } = useAuth();
@@ -70,6 +71,66 @@ export default function LoginPage() {
   };
 
   return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <div>
+        <div className="relative">
+          <Mail className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
+          <input
+            {...register('email')}
+            placeholder="Email Address"
+            className="w-full rounded-xl border border-white/10 bg-white/5 py-4 pl-12 pr-4 text-white outline-none transition focus:border-indigo-500"
+          />
+        </div>
+        {errors.email && (
+          <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
+        )}
+      </div>
+
+      <div>
+        <div className="relative">
+          <Lock className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
+          <input
+            type={showPassword ? 'text' : 'password'}
+            {...register('password')}
+            placeholder="Password"
+            className="w-full rounded-xl border border-white/10 bg-white/5 py-4 pl-12 pr-12 text-white outline-none transition focus:border-indigo-500"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-4 top-4"
+          >
+            {showPassword
+              ? <EyeOff className="h-5 w-5 text-gray-400" />
+              : <Eye className="h-5 w-5 text-gray-400" />}
+          </button>
+        </div>
+        <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
+          <div
+            className={`h-full rounded-full transition-all duration-500 ${strengthColor}`}
+            style={{ width: `${strength * 25}%` }}
+          />
+        </div>
+        {errors.password && (
+          <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>
+        )}
+      </div>
+
+      <motion.button
+        type="submit"
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        disabled={isLoading}
+        className="w-full rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 py-4 font-semibold text-white shadow-lg transition disabled:opacity-60"
+      >
+        {isLoading ? 'Logging in...' : 'Login'}
+      </motion.button>
+    </form>
+  );
+}
+
+export default function LoginPage() {
+  return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black px-4 py-12">
       <div className="absolute inset-0">
         <div className="absolute left-20 top-20 h-72 w-72 rounded-full bg-purple-600 blur-[120px]" />
@@ -90,61 +151,15 @@ export default function LoginPage() {
             Start your shopping journey
           </p>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <div>
-              <div className="relative">
-                <Mail className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
-                <input
-                  {...register('email')}
-                  placeholder="Email Address"
-                  className="w-full rounded-xl border border-white/10 bg-white/5 py-4 pl-12 pr-4 text-white outline-none transition focus:border-indigo-500"
-                />
-              </div>
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
-              )}
+          <Suspense fallback={
+            <div className="space-y-5 animate-pulse">
+              <div className="h-14 rounded-xl bg-white/10" />
+              <div className="h-14 rounded-xl bg-white/10" />
+              <div className="h-14 rounded-xl bg-white/10" />
             </div>
-
-            <div>
-              <div className="relative">
-                <Lock className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  {...register('password')}
-                  placeholder="Password"
-                  className="w-full rounded-xl border border-white/10 bg-white/5 py-4 pl-12 pr-12 text-white outline-none transition focus:border-indigo-500"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-4"
-                >
-                  {showPassword
-                    ? <EyeOff className="h-5 w-5 text-gray-400" />
-                    : <Eye className="h-5 w-5 text-gray-400" />}
-                </button>
-              </div>
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
-                <div
-                  className={`h-full rounded-full transition-all duration-500 ${strengthColor}`}
-                  style={{ width: `${strength * 25}%` }}
-                />
-              </div>
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>
-              )}
-            </div>
-
-            <motion.button
-              type="submit"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              disabled={isLoading}
-              className="w-full rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 py-4 font-semibold text-white shadow-lg transition disabled:opacity-60"
-            >
-              {isLoading ? 'Logging in...' : 'Login'}
-            </motion.button>
-          </form>
+          }>
+            <LoginForm />
+          </Suspense>
 
           <div className="mt-8 text-center text-gray-400">
             You don&apos;t have an account?
