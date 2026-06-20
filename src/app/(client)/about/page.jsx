@@ -3,7 +3,7 @@ function About() {
       <section className="bg-gradient-to-br from-emerald-700 to-emerald-900 py-20 text-white">
         <div className="container-x text-center">
           <h1 className="font-display text-5xl font-extrabold">Building the future of commerce, sustainably</h1>
-          <p className="mx-auto mt-4 max-w-2xl text-emerald-100">GreenMart connects millions of buyers with verified sellers across South Asia. Founded in 2018, we're on a mission to make ecommerce fair, fast, and green.</p>
+          <p className="mx-auto mt-4 max-w-2xl text-emerald-100">Moom24 connects millions of buyers with verified sellers across South Asia. Founded in 2018, we're on a mission to make ecommerce fair, fast, and green.</p>
         </div>
       </section>
 
@@ -13,7 +13,7 @@ function About() {
           <div>
             <span className="chip">Our Story</span>
             <h2 className="mt-3 font-display text-3xl font-bold">From a small idea to a national marketplace</h2>
-            <p className="mt-4 text-muted-foreground">Started in a Dhaka garage with 3 founders and 12 products, GreenMart now serves 8 million customers across 64 districts, partnering with 50,000+ vendors from local artisans to global brands.</p>
+            <p className="mt-4 text-muted-foreground">Started in a Dhaka garage with 3 founders and 12 products, Moom24 now serves 8 million customers across 64 districts, partnering with 50,000+ vendors from local artisans to global brands.</p>
             <p className="mt-3 text-muted-foreground">We believe ecommerce should empower small businesses, delight customers, and respect the planet — and every decision we make is rooted in those three values.</p>
           </div>
         </div>

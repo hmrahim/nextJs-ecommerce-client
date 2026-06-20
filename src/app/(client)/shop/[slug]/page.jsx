@@ -10,7 +10,7 @@ import {
   Tag, AlertCircle, Loader2, Ban,
 } from 'lucide-react';
 import { useAddToCart }     from '@/hooks/useCart';
-import { useWishlistStore } from '@/store/wishlistStore';
+import { useToggleWishlist, useWishlistIds } from '@/hooks/useWishlist';
 import ProductReviews       from '@/components/client/product/ProductReviews';
 import { ProductCard }      from '@/components/client/product/ProductCard';
 import {
@@ -170,9 +170,9 @@ export default function ProductDetailPage() {
   // ✅ useEffect+variantService by removing React Query — cache will be, route If you come back re-fetch will not be
   const { data: variants = [] }               = useProductVariants(product?._id);
 
-  const addToCart    = useAddToCart();
-  const toggleWish   = useWishlistStore((s) => s.toggle);
-  const isWishlisted = useWishlistStore((s) => s.isWishlisted);
+  const addToCart       = useAddToCart();
+  const toggleWishlist  = useToggleWishlist();
+  const wishlistIds     = useWishlistIds();
 
   const [imgIdx,    setImgIdx]    = useState(0);
   const [selection, setSelection] = useState({});
@@ -228,7 +228,7 @@ export default function ProductDetailPage() {
   const brandName    = product.brand?.name    ?? '';
   const categoryName = product.category?.name ?? '';
   const categorySlug = product.category?.slug ?? '';
-  const wishlisted   = isWishlisted(product._id);
+  const wishlisted   = wishlistIds.has(String(product._id));
   const displaySku   = activeVariant?.sku || product.sku;
 
   const handleAddToCart = async () => {
@@ -465,10 +465,29 @@ export default function ProductDetailPage() {
             )}
 
             <button
-              onClick={() => toggleWish({ ...product, id: product._id })}
-              className={`p-3 rounded-lg border transition ${wishlisted ? 'border-rose-300 bg-rose-50 text-rose-500' : 'border-border hover:bg-slate-50'}`}
+              onClick={() => {
+                if (toggleWishlist.isPending) return;
+                toggleWishlist.mutate({
+                  _id: product._id,
+                  id: product._id,
+                  name: product.name,
+                  slug: product.slug,
+                  images: product.images,
+                  price: product.price,
+                  comparePrice: product.comparePrice,
+                  avgRating: product.avgRating,
+                  reviewCount: product.reviewCount,
+                  brand: product.brand,
+                  inStock,
+                });
+              }}
+              disabled={toggleWishlist.isPending}
+              aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+              className={`p-3 rounded-lg border transition disabled:opacity-60 ${wishlisted ? 'border-rose-300 bg-rose-50 text-rose-500' : 'border-border hover:bg-slate-50'}`}
             >
-              <Heart className={`w-5 h-5 ${wishlisted ? 'fill-rose-500' : ''}`} />
+              {toggleWishlist.isPending
+                ? <Loader2 className="w-5 h-5 animate-spin" />
+                : <Heart className={`w-5 h-5 ${wishlisted ? 'fill-rose-500' : ''}`} />}
             </button>
 
             <button onClick={handleShare} className="p-3 rounded-lg border border-border hover:bg-slate-50">

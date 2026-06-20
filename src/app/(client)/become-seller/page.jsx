@@ -5,7 +5,7 @@ function BecomeSeller() {
         <div className="container-x grid gap-8 lg:grid-cols-2 lg:items-center">
           <div>
             <span className="chip">For Businesses</span>
-            <h1 className="mt-3 font-display text-5xl font-extrabold leading-tight">Grow your business with <span className="text-amber-300">GreenMart</span></h1>
+            <h1 className="mt-3 font-display text-5xl font-extrabold leading-tight">Grow your business with <span className="text-amber-300">Moom24</span></h1>
             <p className="mt-4 max-w-xl text-lg text-emerald-100">Reach millions of customers across 64 districts. Open a store in 5 minutes, ship from anywhere, get paid weekly.</p>
             <div className="mt-6 flex flex-wrap gap-3">
               <button className="rounded-full bg-amber-400 px-8 py-3.5 font-bold text-emerald-950 hover:bg-amber-300">Start Selling Today →</button>

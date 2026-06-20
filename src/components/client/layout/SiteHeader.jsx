@@ -10,6 +10,8 @@ import { useCategories } from "@/hooks/client/useCategories";
 import { useCart } from "@/hooks/useCart";
 import { UserAccountMenu } from "@/components/client/layout/UserAccountMenu";
 import { useAuth } from "@/hooks/useAuth";
+import { useWishlist } from "@/hooks/useWishlist";
+import LanguageSwitcher from "@/components/common/LanguageSwitcher";
 
 export function SiteHeader() {
   const [megaOpen, setMegaOpen] = useState(false);
@@ -18,6 +20,8 @@ export function SiteHeader() {
   const cartItemCount = cart?.itemCount ?? 0;
   const cartSubtotal = cart?.subtotal ?? 0;
   const { isLoggedIn } = useAuth();
+  const { data: wishlist } = useWishlist();
+  const wishlistCount = wishlist?.itemCount ?? 0;
 
   // ── Amazon-style global search (header only) ──
   const router = useRouter();
@@ -46,19 +50,18 @@ export function SiteHeader() {
 
       {/* ── Top utility bar ── */}
       <div className="hidden sm:block bg-[var(--color-primary-deep)] text-white/90 text-xs">
-        <div className="container-x flex h-8 items-center justify-between overflow-hidden">
+        <div className="container-x flex h-8 items-center justify-between ">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5"><Phone className="h-3 w-3" /> +880 1700-000000</span>
-            <span className="hidden md:flex items-center gap-1.5"><Mail className="h-3 w-3" /> support@greenmart.com</span>
+            <span className="hidden md:flex items-center gap-1.5"><Mail className="h-3 w-3" /> support@Moom24.com</span>
             <span className="hidden lg:flex items-center gap-1.5"><Truck className="h-3 w-3" /> Free delivery on orders over SAR 999</span>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/become-seller" className="hover:text-white">Sell on GreenMart</Link>
+            <Link href="/become-seller" className="hover:text-white">Sell on Moom24</Link>
             <Link href="/account" className="hidden md:inline hover:text-white">Track Order</Link>
             <Link href="/help" className="hidden md:inline hover:text-white">Help Center</Link>
-            <button className="flex items-center gap-1 hover:text-white">
-              <Globe className="h-3 w-3" /> EN <ChevronDown className="h-3 w-3" />
-            </button>
+            <LanguageSwitcher />
+
           </div>
         </div>
       </div>
@@ -70,10 +73,10 @@ export function SiteHeader() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 font-display font-bold">
-              G
+              M
             </div>
             <div className="hidden sm:block">
-              <div className="font-display text-xl font-bold leading-none">GreenMart</div>
+              <div className="font-display text-xl font-bold leading-none">Moom24</div>
               <div className="text-[10px] text-emerald-200/70">Multivendor Marketplace</div>
             </div>
           </Link>
@@ -131,7 +134,11 @@ export function SiteHeader() {
                 <div className="text-emerald-200/70">Saved</div>
                 <div className="font-semibold">Wishlist</div>
               </div>
-              <span className="absolute -top-1 -right-1 grid h-5 min-w-5 place-items-center rounded-full bg-amber-400 px-1 text-[10px] font-bold text-emerald-950">12</span>
+              {wishlistCount > 0 && (
+                <span className="absolute -top-1 -right-1 grid h-5 min-w-5 place-items-center rounded-full bg-amber-400 px-1 text-[10px] font-bold text-emerald-950">
+                  {wishlistCount > 99 ? "99+" : wishlistCount}
+                </span>
+              )}
             </Link>
             {/* Account menu — dropdown if logged in, sign-in CTA if not */}
             <UserAccountMenu />

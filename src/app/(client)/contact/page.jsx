@@ -22,7 +22,7 @@ function Contact() {
         <aside className="space-y-4">
           {[
     { i: Phone, t: "Call us", v: "+880 1700-000000", s: "Mon-Sun, 24/7" },
-    { i: Mail, t: "Email", v: "support@greenmart.com", s: "We reply in under 2h" },
+    { i: Mail, t: "Email", v: "support@Moom24.com", s: "We reply in under 2h" },
     { i: MessageSquare, t: "Live Chat", v: "Start a chat", s: "Always available" },
     { i: MapPin, t: "Visit", v: "Banani, Dhaka 1213", s: "Bangladesh" },
     { i: Clock, t: "Office hours", v: "9 AM \u2013 7 PM BST", s: "Sat \u2013 Thu" }

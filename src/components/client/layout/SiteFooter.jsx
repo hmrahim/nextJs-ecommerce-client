@@ -72,10 +72,10 @@ function SiteFooter() {
         <div className="col-span-2">
           <div className="flex items-center gap-2">
             <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 font-display font-bold text-white">G</div>
-            <div className="font-display text-xl font-bold text-white">GreenMart</div>
+            <div className="font-display text-xl font-bold text-white">Moom24</div>
           </div>
           <p className="mt-4 max-w-sm text-sm text-white/70">
-            GreenMart is South Asia's fastest-growing multivendor marketplace. Connecting 50,000+ verified sellers with millions of happy customers across 64 districts.
+            Moom24 is South Asia's fastest-growing multivendor marketplace. Connecting 50,000+ verified sellers with millions of happy customers across 64 districts.
           </p>
           <div className="mt-5 flex gap-3">
             {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => <a key={i} className="grid h-9 w-9 place-items-center rounded-full bg-white/10 hover:bg-emerald-500" href="#"><Icon className="h-4 w-4" /></a>)}
@@ -100,7 +100,7 @@ function SiteFooter() {
 
       <div className="border-t border-border border-white/10">
         <div className="container-x flex flex-col items-center justify-between gap-3 py-5 text-xs text-white/60 md:flex-row">
-          <div>© {(/* @__PURE__ */ new Date()).getFullYear()} GreenMart Marketplace. All rights reserved.</div>
+          <div>© {(/* @__PURE__ */ new Date()).getFullYear()} Moom24 Marketplace. All rights reserved.</div>
           <div className="flex flex-wrap items-center gap-4">
             <span>Secured Payments:</span>
             {["VISA", "Mastercard", "bKash", "Nagad", "Rocket", "COD"].map((p) => <span key={p} className="rounded bg-white/10 px-2 py-1 font-semibold text-white/80">{p}</span>)}

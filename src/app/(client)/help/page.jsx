@@ -20,7 +20,7 @@ function Help() {
     { i: "\u{1F4B3}", t: "Payments & Refunds", d: "Methods, refund status" },
     { i: "\u{1F69A}", t: "Shipping & Delivery", d: "Charges, delays" },
     { i: "\u{1F510}", t: "Account & Security", d: "Login, profile, password" },
-    { i: "\u{1F6D2}", t: "Buying on GreenMart", d: "Vouchers, deals, search" },
+    { i: "\u{1F6D2}", t: "Buying on Moom24", d: "Vouchers, deals, search" },
     { i: "\u{1F3EA}", t: "For Sellers", d: "Open store, payouts" },
     { i: "\u2B50", t: "Reviews & Ratings", d: "Leave or edit a review" },
     { i: "\u{1F4F1}", t: "App Help", d: "Install, notifications" }
@@ -63,7 +63,7 @@ function Help() {
           <div className="mt-5 flex flex-wrap justify-center gap-3">
             <button className="flex items-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white"><MessageSquare className="h-4 w-4" /> Live Chat</button>
             <button className="flex items-center gap-2 rounded-full border border-border border-emerald-600 px-6 py-3 text-sm font-semibold text-emerald-700"><Phone className="h-4 w-4" /> +880 1700-000000</button>
-            <button className="flex items-center gap-2 rounded-full border border-border border-emerald-600 px-6 py-3 text-sm font-semibold text-emerald-700"><Mail className="h-4 w-4" /> support@greenmart.com</button>
+            <button className="flex items-center gap-2 rounded-full border border-border border-emerald-600 px-6 py-3 text-sm font-semibold text-emerald-700"><Mail className="h-4 w-4" /> support@Moom24.com</button>
           </div>
         </div>
       </section>
