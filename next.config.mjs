@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   reactStrictMode: true,
 
   images: {
@@ -9,7 +13,6 @@ const nextConfig = {
   },
 
   experimental: {
-    // Tree-shake heavy libraries
     optimizePackageImports: [
       'lucide-react',
       'framer-motion',

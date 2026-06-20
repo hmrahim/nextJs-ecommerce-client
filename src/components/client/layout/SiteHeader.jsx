@@ -5,7 +5,7 @@ import {
   Search, ShoppingCart, Heart, User, MapPin, Menu,
   Bell, Globe, ChevronDown, Phone, Mail, Truck,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useCategories } from "@/hooks/client/useCategories";
 import { useCart } from "@/hooks/useCart";
 import { UserAccountMenu } from "@/components/client/layout/UserAccountMenu";
@@ -13,23 +13,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { useWishlist } from "@/hooks/useWishlist";
 import LanguageSwitcher from "@/components/common/LanguageSwitcher";
 
-export function SiteHeader() {
-  const [megaOpen, setMegaOpen] = useState(false);
-  const { data: categories = [] } = useCategories();
-  const { data: cart } = useCart();
-  const cartItemCount = cart?.itemCount ?? 0;
-  const cartSubtotal = cart?.subtotal ?? 0;
-  const { isLoggedIn } = useAuth();
-  const { data: wishlist } = useWishlist();
-  const wishlistCount = wishlist?.itemCount ?? 0;
-
-  // ── Amazon-style global search (header only) ──
+// ── Search আলাদা component এ — useSearchParams এখানে ──
+function HeaderSearch({ categories }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [q, setQ] = useState("");
   const [category, setCategory] = useState("");
 
-  // Pre-fill from URL when on /search page (so input reflects current query)
   useEffect(() => {
     setQ(searchParams?.get("q") ?? "");
     setCategory(searchParams?.get("category") ?? "");
@@ -44,6 +34,50 @@ export function SiteHeader() {
     params.set("page", "1");
     router.push(`/search?${params.toString()}`);
   };
+
+  return (
+    <form onSubmit={handleSearch} className="flex-1 min-w-0" role="search">
+      <div className="flex h-11 overflow-hidden rounded-lg bg-white shadow-sm focus-within:ring-2 focus-within:ring-amber-400">
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="hidden md:block border-r border-border bg-emerald-50 px-3 text-xs text-emerald-900 outline-none shrink-0 max-w-[140px]"
+        >
+          <option value="">All Categories</option>
+          {categories.map((c) => (
+            <option key={c._id} value={c.slug}>{c.name}</option>
+          ))}
+        </select>
+        <input
+          type="search"
+          name="q"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Search for products, brands, vendors..."
+          className="flex-1 min-w-0 px-4 text-sm text-foreground outline-none"
+          autoComplete="off"
+        />
+        <button
+          type="submit"
+          aria-label="Search"
+          className="shrink-0 bg-gradient-to-r from-emerald-500 to-emerald-600 px-5 text-white hover:from-emerald-600 hover:to-emerald-700"
+        >
+          <Search className="h-5 w-5" />
+        </button>
+      </div>
+    </form>
+  );
+}
+
+export function SiteHeader() {
+  const [megaOpen, setMegaOpen] = useState(false);
+  const { data: categories = [] } = useCategories();
+  const { data: cart } = useCart();
+  const cartItemCount = cart?.itemCount ?? 0;
+  const cartSubtotal = cart?.subtotal ?? 0;
+  const { isLoggedIn } = useAuth();
+  const { data: wishlist } = useWishlist();
+  const wishlistCount = wishlist?.itemCount ?? 0;
 
   return (
     <header className="sticky top-0 z-50">
@@ -61,7 +95,6 @@ export function SiteHeader() {
             <Link href="/account" className="hidden md:inline hover:text-white">Track Order</Link>
             <Link href="/help" className="hidden md:inline hover:text-white">Help Center</Link>
             <LanguageSwitcher />
-
           </div>
         </div>
       </div>
@@ -90,37 +123,12 @@ export function SiteHeader() {
             </div>
           </div>
 
-          {/* ── Search (Amazon-style, global) ── */}
-          <form onSubmit={handleSearch} className="flex-1 min-w-0" role="search">
-            <div className="flex h-11 overflow-hidden rounded-lg bg-white shadow-sm focus-within:ring-2 focus-within:ring-amber-400">
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="hidden md:block border-r border-border bg-emerald-50 px-3 text-xs text-emerald-900 outline-none shrink-0 max-w-[140px]"
-              >
-                <option value="">All Categories</option>
-                {categories.map((c) => (
-                  <option key={c._id} value={c.slug}>{c.name}</option>
-                ))}
-              </select>
-              <input
-                type="search"
-                name="q"
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                placeholder="Search for products, brands, vendors..."
-                className="flex-1 min-w-0 px-4 text-sm text-foreground outline-none"
-                autoComplete="off"
-              />
-              <button
-                type="submit"
-                aria-label="Search"
-                className="shrink-0 bg-gradient-to-r from-emerald-500 to-emerald-600 px-5 text-white hover:from-emerald-600 hover:to-emerald-700"
-              >
-                <Search className="h-5 w-5" />
-              </button>
-            </div>
-          </form>
+          {/* ── Search — Suspense দিয়ে wrap করা ── */}
+          <Suspense fallback={
+            <div className="flex-1 h-11 rounded-lg bg-white/20 animate-pulse" />
+          }>
+            <HeaderSearch categories={categories} />
+          </Suspense>
 
           {/* Actions */}
           <div className="flex items-center gap-1 md:gap-2 shrink-0">
@@ -140,10 +148,9 @@ export function SiteHeader() {
                 </span>
               )}
             </Link>
-            {/* Account menu — dropdown if logged in, sign-in CTA if not */}
+
             <UserAccountMenu />
 
-            {/* Compact Sign-In button for tablets where xl: account label is hidden */}
             {!isLoggedIn && (
               <Link
                 href="/auth/login"
@@ -224,7 +231,7 @@ export function SiteHeader() {
             <Link href="/blog" className="whitespace-nowrap rounded-md px-3 py-1.5 hover:bg-white/10 shrink-0">Blog</Link>
           </div>
 
-          {/* Flash sale badge — fixed on right, never pushes items */}
+          {/* Flash sale badge */}
           <span className="shrink-0 ml-2 whitespace-nowrap rounded-md bg-amber-400 px-3 py-1 text-xs font-bold text-emerald-950">
             🔥 Flash Sale Live
           </span>
@@ -233,4 +240,4 @@ export function SiteHeader() {
 
     </header>
   );
-} 
+}
