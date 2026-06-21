@@ -28,6 +28,17 @@ const nextConfig = {
       ? { exclude: ['error', 'warn'] }
       : false,
   },
+
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.moom24.com' }],
+        destination: 'https://moom24.com/:path*',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
