@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, Suspense } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Lock, RefreshCw, CheckCircle, ArrowLeft } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -22,7 +22,7 @@ const schema = z.object({
   path:    ['confirmPassword'],
 });
 
-function ResetPasswordForm() {
+export default function ResetPasswordForm() {
   const router       = useRouter();
   const searchParams = useSearchParams();
   const email        = searchParams.get('email') || '';
@@ -219,13 +219,5 @@ function ResetPasswordForm() {
         </div>
       </motion.div>
     </div>
-  );
-}
-
-export default function ResetPasswordPage() {
-  return (
-    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-black text-white">Loading...</div>}>
-      <ResetPasswordForm />
-    </Suspense>
   );
 }
