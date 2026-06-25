@@ -1,8 +1,6 @@
-// 📁 PATH: src/app/auth/reset-password/page.jsx
-// ✅ OTP verify + নতুন password সেট → auto-login হয়ে home এ যাবে
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Lock, RefreshCw, CheckCircle, ArrowLeft } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -24,7 +22,7 @@ const schema = z.object({
   path:    ['confirmPassword'],
 });
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const router       = useRouter();
   const searchParams = useSearchParams();
   const email        = searchParams.get('email') || '';
@@ -53,7 +51,6 @@ export default function ResetPasswordPage() {
     strength <= 1 ? 'bg-red-500' : strength === 2 ? 'bg-yellow-500'
     : strength === 3 ? 'bg-blue-500' : 'bg-green-500';
 
-  /* ── OTP input handlers ──────────────────────────────────── */
   const handleOtpChange = (index, value) => {
     if (!/^\d?$/.test(value)) return;
     const next = [...otp];
@@ -77,7 +74,6 @@ export default function ResetPasswordPage() {
 
   const otpValue = otp.join('');
 
-  /* ── Submit ──────────────────────────────────────────────── */
   const onSubmit = async (data) => {
     if (otpValue.length !== 6) { toast.error('Please enter the 6-digit OTP'); return; }
     setIsLoading(true);
@@ -90,7 +86,6 @@ export default function ResetPasswordPage() {
 
       const { token, user } = res.data;
 
-      // ✅ Auto-login
       if (typeof window !== 'undefined') {
         localStorage.setItem('auth_token', token);
         localStorage.setItem('auth_user',  JSON.stringify(user));
@@ -127,7 +122,6 @@ export default function ResetPasswordPage() {
       >
         <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-2xl shadow-[0_0_50px_rgba(255,255,255,0.07)]">
 
-          {/* Icon */}
           <div className="mb-6 flex justify-center">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 shadow-lg shadow-indigo-500/30">
               <Lock className="h-9 w-9 text-white" />
@@ -140,7 +134,6 @@ export default function ResetPasswordPage() {
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
-            {/* OTP */}
             <div>
               <p className="mb-3 text-sm text-gray-400 text-center">Enter the 6-digit OTP</p>
               <div className="flex justify-center gap-3" onPaste={handlePaste}>
@@ -164,7 +157,6 @@ export default function ResetPasswordPage() {
               </div>
             </div>
 
-            {/* New Password */}
             <div>
               <div className="relative">
                 <Lock className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
@@ -184,7 +176,6 @@ export default function ResetPasswordPage() {
               {errors.newPassword && <p className="mt-1 text-sm text-red-400">{errors.newPassword.message}</p>}
             </div>
 
-            {/* Confirm Password */}
             <div>
               <div className="relative">
                 <Lock className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
@@ -228,5 +219,13 @@ export default function ResetPasswordPage() {
         </div>
       </motion.div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-black text-white">Loading...</div>}>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
