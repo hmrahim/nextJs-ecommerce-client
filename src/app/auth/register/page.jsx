@@ -8,7 +8,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import toast from 'react-hot-toast';
-import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import Link from 'next/link';
 
@@ -27,9 +26,8 @@ const schema = z.object({
 });
 
 export default function SignupPage() {
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading]       = useState(false);
 
   const {
     register,
@@ -42,9 +40,9 @@ export default function SignupPage() {
 
   const getStrength = () => {
     let score = 0;
-    if (password.length >= 8) score++;
-    if (/[A-Z]/.test(password)) score++;
-    if (/[0-9]/.test(password)) score++;
+    if (password.length >= 8)          score++;
+    if (/[A-Z]/.test(password))        score++;
+    if (/[0-9]/.test(password))        score++;
     if (/[^A-Za-z0-9]/.test(password)) score++;
     return score;
   };
@@ -59,28 +57,26 @@ export default function SignupPage() {
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      const response = await api.post('/register', data);
-      const resData  = response.data;
-
-      // ✅ email টা response থেকে নাও, না পেলে form থেকে নাও
-      const emailToVerify = resData.email || data.email;
+      const res         = await api.post('/register', data);
+      const emailToUse  = res.data?.email || data.email;
 
       toast.success('Account created! Please verify your email.');
-      router.push(`/auth/verify-email?email=${encodeURIComponent(emailToVerify)}`);
+
+      // ✅ window.location ব্যবহার — router.push এর চেয়ে 100% reliable
+      window.location.href = `/auth/verify-email?email=${encodeURIComponent(emailToUse)}`;
 
     } catch (error) {
       const errData = error?.response?.data;
-      const msg     = errData?.message || 'Signup failed';
 
-      // unverified account already exists → verify page এ পাঠাও
+      // unverified account already exists
       if (errData?.requiresVerification) {
-        const emailToVerify = errData.email || data.email;
-        toast.error('Account exists but not verified. Please check your email for OTP.');
-        router.push(`/auth/verify-email?email=${encodeURIComponent(emailToVerify)}`);
+        const emailToUse = errData.email || data.email;
+        toast.error('Please verify your email. A new OTP has been sent.');
+        window.location.href = `/auth/verify-email?email=${encodeURIComponent(emailToUse)}`;
         return;
       }
 
-      toast.error(msg);
+      toast.error(errData?.message || 'Signup failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -89,7 +85,6 @@ export default function SignupPage() {
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black px-4 py-12">
 
-      {/* Background */}
       <div className="absolute inset-0">
         <div className="absolute left-20 top-20 h-72 w-72 rounded-full bg-purple-600 blur-[120px]" />
         <div className="absolute bottom-10 right-10 h-72 w-72 rounded-full bg-indigo-600 blur-[120px]" />
@@ -103,16 +98,11 @@ export default function SignupPage() {
       >
         <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-2xl shadow-[0_0_50px_rgba(255,255,255,0.08)]">
 
-          <h1 className="mb-2 text-center text-4xl font-bold text-white">
-            Create Account
-          </h1>
-          <p className="mb-8 text-center text-gray-400">
-            Start your shopping journey
-          </p>
+          <h1 className="mb-2 text-center text-4xl font-bold text-white">Create Account</h1>
+          <p className="mb-8 text-center text-gray-400">Start your shopping journey</p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
-            {/* First Name + Last Name */}
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <div className="relative">
@@ -123,9 +113,7 @@ export default function SignupPage() {
                     className="w-full rounded-xl border border-white/10 bg-white/5 py-4 pl-12 pr-4 text-white outline-none transition focus:border-indigo-500"
                   />
                 </div>
-                {errors.firstName && (
-                  <p className="mt-1 text-sm text-red-400">{errors.firstName.message}</p>
-                )}
+                {errors.firstName && <p className="mt-1 text-sm text-red-400">{errors.firstName.message}</p>}
               </div>
 
               <div>
@@ -137,13 +125,10 @@ export default function SignupPage() {
                     className="w-full rounded-xl border border-white/10 bg-white/5 py-4 pl-12 pr-4 text-white outline-none transition focus:border-indigo-500"
                   />
                 </div>
-                {errors.lastName && (
-                  <p className="mt-1 text-sm text-red-400">{errors.lastName.message}</p>
-                )}
+                {errors.lastName && <p className="mt-1 text-sm text-red-400">{errors.lastName.message}</p>}
               </div>
             </div>
 
-            {/* Email */}
             <div>
               <div className="relative">
                 <Mail className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
@@ -153,12 +138,9 @@ export default function SignupPage() {
                   className="w-full rounded-xl border border-white/10 bg-white/5 py-4 pl-12 pr-4 text-white outline-none transition focus:border-indigo-500"
                 />
               </div>
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
-              )}
+              {errors.email && <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>}
             </div>
 
-            {/* Phone */}
             <div>
               <div className="relative">
                 <Phone className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
@@ -168,12 +150,9 @@ export default function SignupPage() {
                   className="w-full rounded-xl border border-white/10 bg-white/5 py-4 pl-12 pr-4 text-white outline-none transition focus:border-indigo-500"
                 />
               </div>
-              {errors.phone && (
-                <p className="mt-1 text-sm text-red-400">{errors.phone.message}</p>
-              )}
+              {errors.phone && <p className="mt-1 text-sm text-red-400">{errors.phone.message}</p>}
             </div>
 
-            {/* Password */}
             <div>
               <div className="relative">
                 <Lock className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
@@ -183,28 +162,14 @@ export default function SignupPage() {
                   placeholder="Password"
                   className="w-full rounded-xl border border-white/10 bg-white/5 py-4 pl-12 pr-12 text-white outline-none transition focus:border-indigo-500"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-4"
-                >
-                  {showPassword
-                    ? <EyeOff className="h-5 w-5 text-gray-400" />
-                    : <Eye className="h-5 w-5 text-gray-400" />}
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-4">
+                  {showPassword ? <EyeOff className="h-5 w-5 text-gray-400" /> : <Eye className="h-5 w-5 text-gray-400" />}
                 </button>
               </div>
-
-              {/* Password strength bar */}
               <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
-                <div
-                  className={`h-full rounded-full transition-all duration-500 ${strengthColor}`}
-                  style={{ width: `${strength * 25}%` }}
-                />
+                <div className={`h-full rounded-full transition-all duration-500 ${strengthColor}`} style={{ width: `${strength * 25}%` }} />
               </div>
-
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>
-              )}
+              {errors.password && <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>}
             </div>
 
             <motion.button

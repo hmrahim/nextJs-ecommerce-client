@@ -1,7 +1,4 @@
 // 📁 PATH: src/app/api/auth/[...nextauth]/route.js
-// ✅ CHANGE: authorize() এ 403 (requiresVerification) হলে
-//           email টা error message এ encode করে পাঠায়
-//           যাতে login page redirect করতে পারে
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import axios from 'axios';
@@ -13,10 +10,38 @@ export const authOptions = {
       credentials: {
         email:    { label: 'Email',    type: 'email'    },
         password: { label: 'Password', type: 'password' },
+        verified: { label: 'Verified', type: 'text'     }, // ← OTP verify flow এর জন্য
       },
 
       async authorize(credentials) {
         try {
+
+          // ✅ CASE 1: OTP verify করার পরে auto-login
+          // password নেই, verified=true flag আছে মানে OTP verify সফল হয়েছে
+          if (credentials.verified === 'true' && !credentials.password) {
+            // Backend থেকে /me দিয়ে user info নাও
+            // (verify-email endpoint আগেই verify করে ফেলেছে)
+            const res = await axios.post(
+              `${process.env.NEXT_PUBLIC_API_URL}/signin-verified`,
+              { email: credentials.email },
+              { headers: { 'Content-Type': 'application/json' } }
+            );
+
+            const { token, user } = res.data;
+            if (!user) throw new Error('User not found');
+
+            return {
+              id:            user.id || user._id,
+              firstName:     user.firstName,
+              lastName:      user.lastName,
+              email:         user.email,
+              role:          user.role,
+              token,
+              emailVerified: true,
+            };
+          }
+
+          // ✅ CASE 2: Normal email/password login
           const res = await axios.post(
             `${process.env.NEXT_PUBLIC_API_URL}/signin`,
             { email: credentials.email, password: credentials.password },
@@ -32,14 +57,13 @@ export const authOptions = {
             lastName:      user.lastName,
             email:         user.email,
             role:          user.role,
-            token:         token,
-            emailVerified: user.emailVerified ?? false, // ✅ যোগ
+            token,
+            emailVerified: user.emailVerified ?? false,
           };
+
         } catch (err) {
           const data = err?.response?.data;
 
-          // ✅ Email verified না হলে special error format পাঠাও
-          // Login page এই format দেখে redirect করবে
           if (data?.requiresVerification) {
             throw new Error(`VERIFY_EMAIL:${data.email || credentials.email}`);
           }
@@ -59,7 +83,7 @@ export const authOptions = {
         token.email         = user.email;
         token.role          = user.role;
         token.token         = user.token;
-        token.emailVerified = user.emailVerified; // ✅ যোগ
+        token.emailVerified = user.emailVerified;
       }
       return token;
     },
@@ -70,7 +94,7 @@ export const authOptions = {
       session.user.lastName      = token.lastName;
       session.user.role          = token.role;
       session.user.token         = token.token;
-      session.user.emailVerified = token.emailVerified; // ✅ যোগ
+      session.user.emailVerified = token.emailVerified;
       return session;
     },
   },
