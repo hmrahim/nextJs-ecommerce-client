@@ -1,3 +1,5 @@
+// 📁 PATH: src/app/auth/login/page.jsx
+// ✅ CHANGE: "Forgot Password?" link যোগ করা হয়েছে /auth/forgot-password তে
 'use client';
 
 import { useState, Suspense } from 'react';
@@ -22,13 +24,12 @@ const schema = z.object({
     ),
 });
 
-// ── useSearchParams এই আলাদা component এ ──
 function LoginForm() {
-  const router = useRouter();
+  const router       = useRouter();
   const searchParams = useSearchParams();
   const { loginWithCredentials } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading,    setIsLoading]    = useState(false);
 
   const {
     register,
@@ -64,7 +65,17 @@ function LoginForm() {
       router.push(callbackUrl);
       router.refresh();
     } catch (err) {
-      toast.error(err.message || 'Invalid email or password');
+      const msg = err.message || '';
+
+      // ✅ Backend থেকে "VERIFY_EMAIL:email@..." এলে redirect করো
+      if (msg.startsWith('VERIFY_EMAIL:')) {
+        const email = msg.replace('VERIFY_EMAIL:', '').trim();
+        toast.error('Please verify your email first. OTP sent!');
+        router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
+        return;
+      }
+
+      toast.error(msg || 'Invalid email or password');
     } finally {
       setIsLoading(false);
     }
@@ -114,6 +125,16 @@ function LoginForm() {
         {errors.password && (
           <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>
         )}
+
+        {/* ✅ Forgot Password link — password field এর নিচে */}
+        <div className="mt-2 text-right">
+          <Link
+            href="/auth/forgot-password"
+            className="text-sm text-indigo-400 hover:text-indigo-300 transition hover:underline"
+          >
+            Forgot Password?
+          </Link>
+        </div>
       </div>
 
       <motion.button

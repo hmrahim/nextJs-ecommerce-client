@@ -1,44 +1,35 @@
-// app/signup/page.jsx
-"use client";
+// 📁 PATH: src/app/auth/register/page.jsx
+// ✅ CHANGE: signup success এ /auth/verify-email?email=... এ redirect করে
+'use client';
 
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Eye, EyeOff, Mail, Lock, User, Phone } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import toast from "react-hot-toast";
-import api  from "@/lib/api";
-import Link from "next/link";
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Eye, EyeOff, Mail, Lock, User, Phone } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { useMutation } from '@tanstack/react-query';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
+import api from '@/lib/api';
+import Link from 'next/link';
 
 const schema = z.object({
-  firstName: z
+  firstName: z.string().min(2, 'First name must be at least 2 characters'),
+  lastName:  z.string().min(2, 'Last name must be at least 2 characters'),
+  email:     z.string().email('Invalid email address'),
+  phone:     z.string().regex(/^[0-9]{11}$/, 'Phone must be 11 digits'),
+  password:  z
     .string()
-    .min(2, "First name must be at least 2 characters"),
-
-  lastName: z
-    .string()
-    .min(2, "Last name must be at least 2 characters"),
-
-  email: z
-    .string()
-    .email("Invalid email address"),
-
-  phone: z
-    .string()
-    .regex(/^[0-9]{11}$/, "Phone must be 11 digits"),
-
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
+    .min(8, 'Password must be at least 8 characters')
     .regex(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-      "Must contain uppercase, lowercase and number"
+      'Must contain uppercase, lowercase and number'
     ),
 });
 
 export default function SignupPage() {
+  const router          = useRouter();
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -47,25 +38,33 @@ export default function SignupPage() {
     watch,
     reset,
     formState: { errors },
-  } = useForm({
-    resolver: zodResolver(schema),
-  });
+  } = useForm({ resolver: zodResolver(schema) });
 
-  const password = watch("password", "");
+  const password = watch('password', '');
 
   const signupMutation = useMutation({
     mutationFn: async (data) => {
-      const response = await api.post("/register", data);
+      const response = await api.post('/register', data);
       return response.data;
     },
-    onSuccess: () => {
-      toast.success("Account created successfully!");
+    onSuccess: (data) => {
+      toast.success('Account created! Please verify your email.');
       reset();
+      /* ✅ email query param দিয়ে verify page এ redirect */
+      router.push(`/auth/verify-email?email=${encodeURIComponent(data.email)}`);
     },
     onError: (error) => {
-      toast.error(
-        error?.response?.data?.message || "Signup failed"
-      );
+      const msg = error?.response?.data?.message || 'Signup failed';
+      toast.error(msg);
+
+      /* unverified account already exists → redirect to verify */
+      if (error?.response?.data?.requiresVerification) {
+        router.push(
+          `/auth/verify-email?email=${encodeURIComponent(
+            error?.response?.data?.email || watch('email')
+          )}`
+        );
+      }
     },
   });
 
@@ -79,23 +78,13 @@ export default function SignupPage() {
   };
 
   const strength = getStrength();
-
   const strengthColor =
-    strength <= 1
-      ? "bg-red-500"
-      : strength === 2
-      ? "bg-yellow-500"
-      : strength === 3
-      ? "bg-blue-500"
-      : "bg-green-500";
+    strength <= 1 ? 'bg-red-500'
+    : strength === 2 ? 'bg-yellow-500'
+    : strength === 3 ? 'bg-blue-500'
+    : 'bg-green-500';
 
-
-
-const onSubmit = (data) => {
-  signupMutation.mutate(data);
-
-}
-
+  const onSubmit = (data) => signupMutation.mutate(data);
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black px-4 py-12">
@@ -121,10 +110,7 @@ const onSubmit = (data) => {
             Start your shopping journey
           </p>
 
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="space-y-5"
-          >
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
             {/* First Name + Last Name */}
             <div className="grid grid-cols-2 gap-3">
@@ -132,15 +118,13 @@ const onSubmit = (data) => {
                 <div className="relative">
                   <User className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
                   <input
-                    {...register("firstName")}
+                    {...register('firstName')}
                     placeholder="First Name"
                     className="w-full rounded-xl border border-white/10 bg-white/5 py-4 pl-12 pr-4 text-white outline-none transition focus:border-indigo-500"
                   />
                 </div>
                 {errors.firstName && (
-                  <p className="mt-1 text-sm text-red-400">
-                    {errors.firstName.message}
-                  </p>
+                  <p className="mt-1 text-sm text-red-400">{errors.firstName.message}</p>
                 )}
               </div>
 
@@ -148,15 +132,13 @@ const onSubmit = (data) => {
                 <div className="relative">
                   <User className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
                   <input
-                    {...register("lastName")}
+                    {...register('lastName')}
                     placeholder="Last Name"
                     className="w-full rounded-xl border border-white/10 bg-white/5 py-4 pl-12 pr-4 text-white outline-none transition focus:border-indigo-500"
                   />
                 </div>
                 {errors.lastName && (
-                  <p className="mt-1 text-sm text-red-400">
-                    {errors.lastName.message}
-                  </p>
+                  <p className="mt-1 text-sm text-red-400">{errors.lastName.message}</p>
                 )}
               </div>
             </div>
@@ -166,15 +148,13 @@ const onSubmit = (data) => {
               <div className="relative">
                 <Mail className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
                 <input
-                  {...register("email")}
+                  {...register('email')}
                   placeholder="Email Address"
                   className="w-full rounded-xl border border-white/10 bg-white/5 py-4 pl-12 pr-4 text-white outline-none transition focus:border-indigo-500"
                 />
               </div>
               {errors.email && (
-                <p className="mt-1 text-sm text-red-400">
-                  {errors.email.message}
-                </p>
+                <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
               )}
             </div>
 
@@ -183,15 +163,13 @@ const onSubmit = (data) => {
               <div className="relative">
                 <Phone className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
                 <input
-                  {...register("phone")}
+                  {...register('phone')}
                   placeholder="Phone Number (11 digits)"
                   className="w-full rounded-xl border border-white/10 bg-white/5 py-4 pl-12 pr-4 text-white outline-none transition focus:border-indigo-500"
                 />
               </div>
               {errors.phone && (
-                <p className="mt-1 text-sm text-red-400">
-                  {errors.phone.message}
-                </p>
+                <p className="mt-1 text-sm text-red-400">{errors.phone.message}</p>
               )}
             </div>
 
@@ -200,8 +178,8 @@ const onSubmit = (data) => {
               <div className="relative">
                 <Lock className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
                 <input
-                  type={showPassword ? "text" : "password"}
-                  {...register("password")}
+                  type={showPassword ? 'text' : 'password'}
+                  {...register('password')}
                   placeholder="Password"
                   className="w-full rounded-xl border border-white/10 bg-white/5 py-4 pl-12 pr-12 text-white outline-none transition focus:border-indigo-500"
                 />
@@ -210,11 +188,9 @@ const onSubmit = (data) => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-4"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-400" />
-                  )}
+                  {showPassword
+                    ? <EyeOff className="h-5 w-5 text-gray-400" />
+                    : <Eye className="h-5 w-5 text-gray-400" />}
                 </button>
               </div>
 
@@ -227,9 +203,7 @@ const onSubmit = (data) => {
               </div>
 
               {errors.password && (
-                <p className="mt-1 text-sm text-red-400">
-                  {errors.password.message}
-                </p>
+                <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>
               )}
             </div>
 
@@ -239,15 +213,13 @@ const onSubmit = (data) => {
               disabled={signupMutation.isPending}
               className="w-full rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 py-4 font-semibold text-white shadow-lg transition disabled:opacity-60"
             >
-              {signupMutation.isPending
-                ? "Creating Account..."
-                : "Create Account"}
+              {signupMutation.isPending ? 'Creating Account…' : 'Create Account'}
             </motion.button>
           </form>
 
           <div className="mt-8 text-center text-gray-400">
             Already have an account?
-             <Link href="/auth/login" className="ml-2 cursor-pointer text-indigo-400 hover:underline">
+            <Link href="/auth/login" className="ml-2 cursor-pointer text-indigo-400 hover:underline">
               Sign In
             </Link>
           </div>
