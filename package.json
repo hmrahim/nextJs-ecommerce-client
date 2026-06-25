@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --turbo",
     "build": "next build",
-    "start": "next start -p $PORT",
+    "start": "node .next/standalone/server.js",
     "lint": "next lint"
   },
   "dependencies": {
@@ -19,7 +19,7 @@
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
     "lucide-react": "^1.18.0",
-   "next": "15.2.8",
+    "next": "15.2.8",
     "next-auth": "^4.24.7",
     "react": "19.0.0",
     "react-dom": "19.0.0",
