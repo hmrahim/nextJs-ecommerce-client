@@ -1,12 +1,10 @@
 // 📁 PATH: src/app/auth/register/page.jsx
-// ✅ CHANGE: signup success এ /auth/verify-email?email=... এ redirect করে
 'use client';
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Mail, Lock, User, Phone } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-import { useMutation } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import toast from 'react-hot-toast';
@@ -29,44 +27,18 @@ const schema = z.object({
 });
 
 export default function SignupPage() {
-  const router          = useRouter();
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
     handleSubmit,
     watch,
-    reset,
     formState: { errors },
   } = useForm({ resolver: zodResolver(schema) });
 
   const password = watch('password', '');
-
-  const signupMutation = useMutation({
-    mutationFn: async (data) => {
-      const response = await api.post('/register', data);
-      return response.data;
-    },
-    onSuccess: (data) => {
-      toast.success('Account created! Please verify your email.');
-      reset();
-      /* ✅ email query param দিয়ে verify page এ redirect */
-      router.push(`/auth/verify-email?email=${encodeURIComponent(data.email)}`);
-    },
-    onError: (error) => {
-      const msg = error?.response?.data?.message || 'Signup failed';
-      toast.error(msg);
-
-      /* unverified account already exists → redirect to verify */
-      if (error?.response?.data?.requiresVerification) {
-        router.push(
-          `/auth/verify-email?email=${encodeURIComponent(
-            error?.response?.data?.email || watch('email')
-          )}`
-        );
-      }
-    },
-  });
 
   const getStrength = () => {
     let score = 0;
@@ -84,7 +56,35 @@ export default function SignupPage() {
     : strength === 3 ? 'bg-blue-500'
     : 'bg-green-500';
 
-  const onSubmit = (data) => signupMutation.mutate(data);
+  const onSubmit = async (data) => {
+    setIsLoading(true);
+    try {
+      const response = await api.post('/register', data);
+      const resData  = response.data;
+
+      // ✅ email টা response থেকে নাও, না পেলে form থেকে নাও
+      const emailToVerify = resData.email || data.email;
+
+      toast.success('Account created! Please verify your email.');
+      router.push(`/auth/verify-email?email=${encodeURIComponent(emailToVerify)}`);
+
+    } catch (error) {
+      const errData = error?.response?.data;
+      const msg     = errData?.message || 'Signup failed';
+
+      // unverified account already exists → verify page এ পাঠাও
+      if (errData?.requiresVerification) {
+        const emailToVerify = errData.email || data.email;
+        toast.error('Account exists but not verified. Please check your email for OTP.');
+        router.push(`/auth/verify-email?email=${encodeURIComponent(emailToVerify)}`);
+        return;
+      }
+
+      toast.error(msg);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black px-4 py-12">
@@ -208,12 +208,13 @@ export default function SignupPage() {
             </div>
 
             <motion.button
+              type="submit"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              disabled={signupMutation.isPending}
+              disabled={isLoading}
               className="w-full rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 py-4 font-semibold text-white shadow-lg transition disabled:opacity-60"
             >
-              {signupMutation.isPending ? 'Creating Account…' : 'Create Account'}
+              {isLoading ? 'Creating Account…' : 'Create Account'}
             </motion.button>
           </form>
 
