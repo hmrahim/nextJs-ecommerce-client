@@ -5,16 +5,39 @@ import { useEffect, useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { uploadService, UPLOAD_FOLDERS } from '@/services/uploadService';
 
-// ─── Constants (export has been done — page.jsx import will do) ────────────────────
-export const PLACEMENTS = [
-  { id: 'home_hero',      name: 'Home Hero Slider',     size: '1920×720', desc: 'Top of homepage carousel' },
-  { id: 'home_strip',     name: 'Home Promo Strip',     size: '1920×80',  desc: 'Thin promo bar above header' },
-  { id: 'home_grid_a',    name: 'Home Grid A (Left)',   size: '960×420',  desc: 'Large secondary card' },
-  { id: 'home_grid_b',    name: 'Home Grid B (Right)',  size: '960×420',  desc: 'Large secondary card' },
-  { id: 'category_top',   name: 'Category Page Banner', size: '1600×320', desc: 'Above product grid' },
-  { id: 'checkout_promo', name: 'Checkout Promo',       size: '800×120',  desc: 'Inside checkout summary' },
-  { id: 'app_popup',      name: 'App / Web Popup',      size: '600×800',  desc: 'Modal on first visit' },
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+export const PLATFORMS = [
+  { id: 'web',    name: 'Next.js Web App',  icon: '🌐' },
+  { id: 'mobile', name: 'Mobile App (Expo)', icon: '📱' },
+  { id: 'both',   name: 'Both (Web + Mobile)', icon: '🔗' },
 ];
+
+export const WEB_PLACEMENTS = [
+  { id: 'web_home_hero_slider',     name: 'Home Hero Slider',       size: '1920×720', desc: 'Homepage top carousel slider' },
+  { id: 'web_home_side_panel_1',    name: 'Home Side Panel 1 (Left)', size: '400×200', desc: 'Hero section side panel - top' },
+  { id: 'web_home_side_panel_2',    name: 'Home Side Panel 2 (Right)', size: '400×200', desc: 'Hero section side panel - bottom' },
+  { id: 'web_home_promo_banner_1',  name: 'Home Promo Banner 1',    size: '800×300', desc: 'Homepage promotional banner - left' },
+  { id: 'web_home_promo_banner_2',  name: 'Home Promo Banner 2',    size: '800×300', desc: 'Homepage promotional banner - right' },
+  { id: 'web_category_page_top',    name: 'Category Page Top',      size: '1600×320', desc: 'Above product grid on category pages' },
+  { id: 'web_checkout_promo',       name: 'Checkout Promo',         size: '800×120', desc: 'Inside checkout summary section' },
+  { id: 'web_flash_sale_banner',    name: 'Flash Sale Banner',      size: '1600×400', desc: 'Flash sale section banner' },
+  { id: 'web_shop_page_banner',     name: 'Shop Page Banner',       size: '1600×320', desc: 'Top of shop/all products page' },
+  { id: 'web_popup',                name: 'Web Popup',              size: '600×800', desc: 'Modal popup on first visit' },
+];
+
+export const MOBILE_PLACEMENTS = [
+  { id: 'mobile_home_hero',            name: 'Home Hero Banner',        size: '750×400', desc: 'Mobile app homepage hero section' },
+  { id: 'mobile_home_carousel',        name: 'Home Carousel',           size: '750×300', desc: 'Mobile app homepage carousel slider' },
+  { id: 'mobile_category_banner',      name: 'Category Banner',         size: '750×200', desc: 'Category screen top banner' },
+  { id: 'mobile_product_detail_banner', name: 'Product Detail Banner',  size: '750×150', desc: 'Product detail page promo banner' },
+  { id: 'mobile_cart_promo',           name: 'Cart Promo Banner',       size: '750×120', desc: 'Cart screen promotional banner' },
+  { id: 'mobile_splash_promo',         name: 'Splash/Launch Promo',     size: '750×1334', desc: 'App launch promotional screen' },
+  { id: 'mobile_offer_popup',          name: 'Offer Popup',             size: '600×800', desc: 'In-app offer popup modal' },
+];
+
+// Combined for backward compat
+export const PLACEMENTS = [...WEB_PLACEMENTS, ...MOBILE_PLACEMENTS];
 
 export const STATUSES = [
   { id: 'live',      label: 'Live',      color: 'emerald' },
@@ -53,6 +76,143 @@ function Field({ label, required, hint, error, children }) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
+// PlacementSelector — Multi-select checkboxes for placements
+// ══════════════════════════════════════════════════════════════════════════════
+function PlacementSelector({ platform, selectedPlacements, onChange }) {
+  const getAvailablePlacements = () => {
+    if (platform === 'web') return WEB_PLACEMENTS;
+    if (platform === 'mobile') return MOBILE_PLACEMENTS;
+    return [...WEB_PLACEMENTS, ...MOBILE_PLACEMENTS]; // both
+  };
+
+  const available = getAvailablePlacements();
+
+  const togglePlacement = (placementId) => {
+    if (selectedPlacements.includes(placementId)) {
+      onChange(selectedPlacements.filter((p) => p !== placementId));
+    } else {
+      onChange([...selectedPlacements, placementId]);
+    }
+  };
+
+  const selectAll = () => {
+    onChange(available.map((p) => p.id));
+  };
+
+  const clearAll = () => {
+    onChange([]);
+  };
+
+  // Group placements by platform
+  const webPlacements = available.filter((p) => p.id.startsWith('web_'));
+  const mobilePlacements = available.filter((p) => p.id.startsWith('mobile_'));
+
+  return (
+    <div className="space-y-3">
+      {/* Quick actions */}
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={selectAll}
+          className="text-[11px] text-amber-400 hover:text-amber-300 font-semibold transition-colors"
+        >
+          Select All
+        </button>
+        <span className="text-slate-600">|</span>
+        <button
+          type="button"
+          onClick={clearAll}
+          className="text-[11px] text-slate-400 hover:text-slate-300 font-semibold transition-colors"
+        >
+          Clear All
+        </button>
+        <span className="ml-auto text-[11px] text-slate-500">
+          {selectedPlacements.length} selected
+        </span>
+      </div>
+
+      {/* Web placements section */}
+      {webPlacements.length > 0 && (
+        <div>
+          <p className="text-[11px] uppercase tracking-wider text-emerald-400 font-semibold mb-2 flex items-center gap-1.5">
+            <span>🌐</span> Next.js Web App Locations
+          </p>
+          <div className="grid grid-cols-1 gap-1.5">
+            {webPlacements.map((p) => {
+              const isChecked = selectedPlacements.includes(p.id);
+              return (
+                <label
+                  key={p.id}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-lg border cursor-pointer transition-all ${
+                    isChecked
+                      ? 'border-amber-500/40 bg-amber-500/5'
+                      : 'border-[#2a2a3a] bg-[#1a1a26] hover:border-[#3a3a4a]'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => togglePlacement(p.id)}
+                    className="w-4 h-4 rounded border-[#3a3a4a] bg-[#0f0f17] text-amber-500 focus:ring-amber-500/30 focus:ring-offset-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-xs font-medium ${isChecked ? 'text-white' : 'text-slate-300'}`}>
+                      {p.name}
+                    </p>
+                    <p className="text-[10px] text-slate-500">{p.desc} · {p.size}</p>
+                  </div>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Mobile placements section */}
+      {mobilePlacements.length > 0 && (
+        <div>
+          <p className="text-[11px] uppercase tracking-wider text-sky-400 font-semibold mb-2 flex items-center gap-1.5">
+            <span>📱</span> Mobile App Locations
+          </p>
+          <div className="grid grid-cols-1 gap-1.5">
+            {mobilePlacements.map((p) => {
+              const isChecked = selectedPlacements.includes(p.id);
+              return (
+                <label
+                  key={p.id}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-lg border cursor-pointer transition-all ${
+                    isChecked
+                      ? 'border-amber-500/40 bg-amber-500/5'
+                      : 'border-[#2a2a3a] bg-[#1a1a26] hover:border-[#3a3a4a]'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => togglePlacement(p.id)}
+                    className="w-4 h-4 rounded border-[#3a3a4a] bg-[#0f0f17] text-amber-500 focus:ring-amber-500/30 focus:ring-offset-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-xs font-medium ${isChecked ? 'text-white' : 'text-slate-300'}`}>
+                      {p.name}
+                    </p>
+                    <p className="text-[10px] text-slate-500">{p.desc} · {p.size}</p>
+                  </div>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {selectedPlacements.length === 0 && (
+        <p className="text-[11px] text-amber-400/70 italic">⚠ কমপক্ষে একটি location select করুন</p>
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
 // BannerImageUploader
 // ══════════════════════════════════════════════════════════════════════════════
 function BannerImageUploader({ value, publicId, onChange, placementSize }) {
@@ -63,19 +223,17 @@ function BannerImageUploader({ value, publicId, onChange, placementSize }) {
   const [uploadErr, setUploadErr] = useState('');
   const [imgErr, setImgErr]       = useState(false);
 
-  // value if changed broken-image state reset Do
   useEffect(() => { setImgErr(false); }, [value]);
 
   const handleFile = async (file) => {
     if (!file) return;
 
-    // ── Validation ─────────────────────────────────────────────────────────
     if (!file.type.startsWith('image/')) {
-      setUploadErr('only image file Give (JPG, PNG, WEBP, SVG)');
+      setUploadErr('শুধুমাত্র image file দিন (JPG, PNG, WEBP, SVG)');
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      setUploadErr('File size 10MB Will not be more than this');
+      setUploadErr('File size 10MB এর বেশি হবে না');
       return;
     }
 
@@ -83,7 +241,6 @@ function BannerImageUploader({ value, publicId, onChange, placementSize }) {
     setProgress(0);
     setUploading(true);
 
-    // ── Optimistic preview (local blob) ────────────────────────────────────
     const localUrl = URL.createObjectURL(file);
     onChange({ url: localUrl, publicId: null });
 
@@ -95,9 +252,8 @@ function BannerImageUploader({ value, publicId, onChange, placementSize }) {
       URL.revokeObjectURL(localUrl);
       onChange({ url: res.url, publicId: res.publicId });
     } catch (err) {
-      // upload fail If preview remove, error show
       onChange({ url: '', publicId: null });
-      setUploadErr(err?.message || 'Upload failed — Try again');
+      setUploadErr(err?.message || 'Upload failed — আবার চেষ্টা করুন');
     } finally {
       setUploading(false);
       setProgress(0);
@@ -110,11 +266,9 @@ function BannerImageUploader({ value, publicId, onChange, placementSize }) {
     if (inputRef.current) inputRef.current.value = '';
   };
 
-  // ── State: image uploaded / preview ────────────────────────────────────────
   if (value && !imgErr) {
     return (
       <div className="relative w-full rounded-xl overflow-hidden border border-[#2a2a3a] bg-[#1a1a26]">
-        {/* Preview */}
         <div className="relative aspect-[16/6] overflow-hidden bg-[#0f0f17]">
           <img
             src={value}
@@ -122,13 +276,10 @@ function BannerImageUploader({ value, publicId, onChange, placementSize }) {
             className="absolute inset-0 w-full h-full object-cover"
             onError={() => setImgErr(true)}
           />
-
-          {/* Progress overlay */}
           {uploading && (
             <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-2">
               <div className="w-8 h-8 border-2 border-amber-500/30 border-t-amber-400 rounded-full animate-spin" />
               <p className="text-xs text-amber-400 font-semibold">{progress}%</p>
-              {/* Progress bar */}
               <div className="w-32 h-1.5 rounded-full bg-white/10 overflow-hidden">
                 <div
                   className="h-full bg-amber-400 rounded-full transition-all duration-200"
@@ -138,14 +289,12 @@ function BannerImageUploader({ value, publicId, onChange, placementSize }) {
             </div>
           )}
         </div>
-
-        {/* Bottom bar */}
         <div className="flex items-center justify-between px-3 py-2 border-t border-[#2a2a3a] bg-[#0f0f17]">
           <div className="flex items-center gap-2 min-w-0">
             {publicId ? (
               <>
                 <span className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" />
-                <span className="text-xs text-slate-400 truncate">Cloudinary-In uploaded</span>
+                <span className="text-xs text-slate-400 truncate">Cloudinary-তে uploaded</span>
               </>
             ) : (
               <>
@@ -155,7 +304,6 @@ function BannerImageUploader({ value, publicId, onChange, placementSize }) {
             )}
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
-            {/* Change button */}
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
@@ -164,7 +312,6 @@ function BannerImageUploader({ value, publicId, onChange, placementSize }) {
             >
               Change
             </button>
-            {/* Remove button */}
             <button
               type="button"
               onClick={handleRemove}
@@ -178,8 +325,6 @@ function BannerImageUploader({ value, publicId, onChange, placementSize }) {
             </button>
           </div>
         </div>
-
-        {/* Hidden file input for "Change" */}
         <input
           ref={inputRef}
           type="file"
@@ -191,7 +336,6 @@ function BannerImageUploader({ value, publicId, onChange, placementSize }) {
     );
   }
 
-  // ── State: empty — drag & drop zone ────────────────────────────────────────
   return (
     <div>
       <div
@@ -210,7 +354,6 @@ function BannerImageUploader({ value, publicId, onChange, placementSize }) {
         onClick={() => inputRef.current?.click()}
       >
         <div className="flex flex-col items-center gap-2.5 py-8">
-          {/* Icon */}
           <div className="w-14 h-14 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
             {uploading ? (
               <div className="w-6 h-6 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin" />
@@ -221,7 +364,6 @@ function BannerImageUploader({ value, publicId, onChange, placementSize }) {
               </svg>
             )}
           </div>
-
           <div className="text-center">
             <p className="text-sm text-slate-300">
               <span className="text-amber-400 font-semibold">Click to upload</span> or drag &amp; drop
@@ -234,7 +376,6 @@ function BannerImageUploader({ value, publicId, onChange, placementSize }) {
             </p>
           </div>
         </div>
-
         <input
           ref={inputRef}
           type="file"
@@ -243,7 +384,6 @@ function BannerImageUploader({ value, publicId, onChange, placementSize }) {
           onChange={(e) => handleFile(e.target.files?.[0])}
         />
       </div>
-
       {uploadErr && (
         <p className="mt-1.5 text-xs text-red-400 flex items-center gap-1">
           <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -259,19 +399,20 @@ function BannerImageUploader({ value, publicId, onChange, placementSize }) {
 
 // ─── Default values ───────────────────────────────────────────────────────────
 const DEFAULT_VALUES = {
-  title:       '',
-  subtitle:    '',
-  buttonText:  'Shop now',
-  placement:   'home_hero',
-  status:      'draft',
-  priority:    5,
-  imageUrl:    '',       // Cloudinary secure_url
-  imagePublicId: '',     // Cloudinary public_id (delete will take to do)
-  linkType:    'url',
-  linkValue:   '',
-  startsAt:    '',
-  endsAt:      '',
-  devices:     'all',
+  title:         '',
+  subtitle:      '',
+  buttonText:    'Shop now',
+  platform:      'both',
+  placements:    [],
+  status:        'draft',
+  priority:      5,
+  imageUrl:      '',
+  imagePublicId: '',
+  linkType:      'url',
+  linkValue:     '',
+  startsAt:      '',
+  endsAt:        '',
+  devices:       'all',
 };
 
 // ─── ISO date → YYYY-MM-DD ────────────────────────────────────────────────────
@@ -288,10 +429,11 @@ function normalizeBanner(banner) {
     title:         banner.title         ?? '',
     subtitle:      banner.subtitle      ?? '',
     buttonText:    banner.buttonText    ?? 'Shop now',
-    placement:     banner.placement     ?? 'home_hero',
+    platform:      banner.platform      ?? 'both',
+    placements:    banner.placements    ?? (banner.placement ? [banner.placement] : []),
     status:        banner.status        ?? 'draft',
     priority:      banner.priority      ?? 5,
-    imageUrl:      banner.image         ?? '',   // backend field name: image
+    imageUrl:      banner.image         ?? '',
     imagePublicId: banner.imagePublicId ?? '',
     linkType:      banner.linkType      ?? 'url',
     linkValue:     banner.linkValue     ?? '',
@@ -320,13 +462,18 @@ export default function BannerFormModal({ open, editing, isSaving, onClose, onSa
     mode: 'onChange',
   });
 
-  // editing if changed / modal open If form reset Do
   useEffect(() => {
     reset(normalizeBanner(editing));
   }, [editing, open, reset]);
 
-  const watchedValues     = watch();
-  const currentPlacement  = PLACEMENTS.find((p) => p.id === watchedValues.placement);
+  const watchedValues = watch();
+
+  // Get recommended size from first selected placement
+  const getRecommendedSize = () => {
+    if (!watchedValues.placements || watchedValues.placements.length === 0) return null;
+    const firstPlacement = PLACEMENTS.find((p) => p.id === watchedValues.placements[0]);
+    return firstPlacement?.size ?? null;
+  };
 
   if (!open) return null;
 
@@ -335,10 +482,11 @@ export default function BannerFormModal({ open, editing, isSaving, onClose, onSa
       title:         data.title,
       subtitle:      data.subtitle      || '',
       buttonText:    data.buttonText    || '',
-      placement:     data.placement,
+      platform:      data.platform,
+      placements:    data.placements    || [],
+      placement:     data.placements?.[0] || '',
       status:        data.status,
       priority:      Number(data.priority),
-      // backend model field name was "image" — So here map Do
       image:         data.imageUrl      || '',
       imagePublicId: data.imagePublicId || '',
       linkType:      data.linkType,
@@ -356,7 +504,7 @@ export default function BannerFormModal({ open, editing, isSaving, onClose, onSa
       onClick={onClose}
     >
       <div
-        className="bg-[#0f0f17] border border-[#1e1e2e] rounded-2xl w-full max-w-4xl max-h-[92vh] overflow-y-auto"
+        className="bg-[#0f0f17] border border-[#1e1e2e] rounded-2xl w-full max-w-5xl max-h-[92vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ── Header ───────────────────────────────────────────────────────── */}
@@ -366,7 +514,7 @@ export default function BannerFormModal({ open, editing, isSaving, onClose, onSa
               {isEdit ? 'Edit Banner' : 'New Banner / Slide'}
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              {isEdit ? `Editing "${editing.title}"` : 'Image Cloudinary-In upload will be'}
+              {isEdit ? `Editing "${editing.title}"` : 'Banner upload করুন এবং platform ও location select করুন'}
             </p>
           </div>
           <button
@@ -390,7 +538,7 @@ export default function BannerFormModal({ open, editing, isSaving, onClose, onSa
               {/* ── Image Upload ── */}
               <Field
                 label="Banner Image"
-                hint={`Cloudinary-In upload will be · Recommended: ${currentPlacement?.size ?? '—'}`}
+                hint={`Cloudinary-তে upload হবে${getRecommendedSize() ? ` · Recommended: ${getRecommendedSize()}` : ''}`}
               >
                 <Controller
                   name="imageUrl"
@@ -399,7 +547,7 @@ export default function BannerFormModal({ open, editing, isSaving, onClose, onSa
                     <BannerImageUploader
                       value={field.value}
                       publicId={watchedValues.imagePublicId}
-                      placementSize={currentPlacement?.size}
+                      placementSize={getRecommendedSize()}
                       onChange={({ url, publicId }) => {
                         field.onChange(url);
                         setValue('imagePublicId', publicId ?? '', { shouldDirty: true });
@@ -441,21 +589,36 @@ export default function BannerFormModal({ open, editing, isSaving, onClose, onSa
                 </Field>
               </div>
 
-              {/* ── Placement ── */}
+              {/* ── Platform Selection ── */}
               <Field
-                label="Placement"
+                label="Platform"
                 required
-                error={errors.placement?.message}
-                hint={`${currentPlacement?.desc ?? ''}`}
+                hint="এই banner কোন platform এ দেখাবে select করুন"
               >
-                <select
-                  {...register('placement', { required: 'Placement is required' })}
-                  className={inputCls}
-                >
-                  {PLACEMENTS.map((p) => (
-                    <option key={p.id} value={p.id}>{p.name} — {p.size}</option>
-                  ))}
-                </select>
+                <div className="grid grid-cols-3 gap-2">
+                  {PLATFORMS.map((p) => {
+                    const isSelected = watchedValues.platform === p.id;
+                    return (
+                      <label
+                        key={p.id}
+                        className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border cursor-pointer transition-all text-center ${
+                          isSelected
+                            ? 'border-amber-500/50 bg-amber-500/10 text-white'
+                            : 'border-[#2a2a3a] bg-[#1a1a26] text-slate-400 hover:border-[#3a3a4a]'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          {...register('platform')}
+                          value={p.id}
+                          className="hidden"
+                        />
+                        <span className="text-base">{p.icon}</span>
+                        <span className="text-xs font-medium">{p.name}</span>
+                      </label>
+                    );
+                  })}
+                </div>
               </Field>
 
               {/* ── Link type + Link value ── */}
@@ -530,82 +693,119 @@ export default function BannerFormModal({ open, editing, isSaving, onClose, onSa
               </div>
             </div>
 
-            {/* ─── Right: Live Preview ─────────────────────────────────────── */}
-            <div>
-              <p className="text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">
-                Live preview
-              </p>
-              <div className="rounded-xl border border-[#1e1e2e] overflow-hidden bg-[#1a1a26]">
-                <div className="aspect-[16/7] relative bg-gradient-to-br from-[#1a1a26] to-[#0f0f17]">
-                  {watchedValues.imageUrl ? (
-                    <img
-                      src={watchedValues.imageUrl}
-                      alt=""
-                      className="absolute inset-0 w-full h-full object-cover"
-                      onError={(e) => { e.target.style.display = 'none'; }}
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-700 gap-2">
-                      <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.2}
-                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <p className="text-xs">Upload an image to preview</p>
+            {/* ─── Right: Placement Selection + Preview ───────────────────── */}
+            <div className="space-y-4">
+
+              {/* ── Placement Selection ── */}
+              <Field
+                label="Banner Locations (কোথায় কোথায় দেখাবে)"
+                required
+                hint="Platform অনুযায়ী available locations থেকে select করুন"
+              >
+                <Controller
+                  name="placements"
+                  control={control}
+                  rules={{
+                    validate: (val) => (val && val.length > 0) || 'কমপক্ষে একটি location select করুন',
+                  }}
+                  render={({ field }) => (
+                    <div className="max-h-[320px] overflow-y-auto rounded-xl border border-[#2a2a3a] p-3 bg-[#0f0f17]">
+                      <PlacementSelector
+                        platform={watchedValues.platform}
+                        selectedPlacements={field.value || []}
+                        onChange={(val) => field.onChange(val)}
+                      />
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent" />
-                  <div className="absolute inset-0 p-6 flex flex-col justify-center">
-                    <p className="text-xs text-amber-400 uppercase tracking-wider font-semibold">
-                      {watchedValues.subtitle || 'Subtitle'}
-                    </p>
-                    <h2 className="text-2xl font-bold text-white mt-1">
-                      {watchedValues.title || 'Banner title'}
-                    </h2>
-                    {watchedValues.buttonText && (
-                      <button
-                        type="button"
-                        className="mt-3 w-fit px-4 py-2 rounded-lg bg-amber-500 text-black text-sm font-semibold pointer-events-none"
-                      >
-                        {watchedValues.buttonText} →
-                      </button>
+                />
+                {errors.placements && (
+                  <p className="mt-1 text-[11px] text-red-400">{errors.placements.message}</p>
+                )}
+              </Field>
+
+              {/* ── Live Preview ── */}
+              <div>
+                <p className="text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">
+                  Live preview
+                </p>
+                <div className="rounded-xl border border-[#1e1e2e] overflow-hidden bg-[#1a1a26]">
+                  <div className="aspect-[16/7] relative bg-gradient-to-br from-[#1a1a26] to-[#0f0f17]">
+                    {watchedValues.imageUrl ? (
+                      <img
+                        src={watchedValues.imageUrl}
+                        alt=""
+                        className="absolute inset-0 w-full h-full object-cover"
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-700 gap-2">
+                        <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.2}
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <p className="text-xs">Upload an image to preview</p>
+                      </div>
                     )}
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent" />
+                    <div className="absolute inset-0 p-6 flex flex-col justify-center">
+                      <p className="text-xs text-amber-400 uppercase tracking-wider font-semibold">
+                        {watchedValues.subtitle || 'Subtitle'}
+                      </p>
+                      <h2 className="text-2xl font-bold text-white mt-1">
+                        {watchedValues.title || 'Banner title'}
+                      </h2>
+                      {watchedValues.buttonText && (
+                        <button
+                          type="button"
+                          className="mt-3 w-fit px-4 py-2 rounded-lg bg-amber-500 text-black text-sm font-semibold pointer-events-none"
+                        >
+                          {watchedValues.buttonText} →
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Info panel */}
-              <div className="mt-4 rounded-xl border border-[#1e1e2e] p-4 space-y-2 text-xs text-slate-400">
-                <div className="flex justify-between">
-                  <span>Placement</span>
-                  <span className="text-slate-200">{currentPlacement?.name ?? '—'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Recommended size</span>
-                  <span className="text-slate-200 font-mono">{currentPlacement?.size ?? '—'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Schedule</span>
-                  <span className="text-slate-200">
-                    {watchedValues.startsAt || '—'} → {watchedValues.endsAt || '—'}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Link</span>
-                  <span className="text-slate-200 truncate max-w-[180px]">
-                    {watchedValues.linkType === 'none'
-                      ? 'None'
-                      : watchedValues.linkValue || '—'}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Image status</span>
-                  <span className={watchedValues.imagePublicId ? 'text-emerald-400' : 'text-slate-500'}>
-                    {watchedValues.imagePublicId
-                      ? '✓ Uploaded to Cloudinary'
-                      : watchedValues.imageUrl
-                      ? '⟳ Uploading…'
-                      : 'No image'}
-                  </span>
+                {/* Info panel */}
+                <div className="mt-3 rounded-xl border border-[#1e1e2e] p-4 space-y-2 text-xs text-slate-400">
+                  <div className="flex justify-between">
+                    <span>Platform</span>
+                    <span className="text-slate-200">
+                      {PLATFORMS.find((p) => p.id === watchedValues.platform)?.name ?? '—'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Locations</span>
+                    <span className="text-slate-200 text-right max-w-[200px]">
+                      {watchedValues.placements?.length > 0
+                        ? `${watchedValues.placements.length} location(s) selected`
+                        : '—'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Schedule</span>
+                    <span className="text-slate-200">
+                      {watchedValues.startsAt || '—'} → {watchedValues.endsAt || '—'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Link</span>
+                    <span className="text-slate-200 truncate max-w-[180px]">
+                      {watchedValues.linkType === 'none'
+                        ? 'None'
+                        : watchedValues.linkValue || '—'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Image status</span>
+                    <span className={watchedValues.imagePublicId ? 'text-emerald-400' : 'text-slate-500'}>
+                      {watchedValues.imagePublicId
+                        ? '✓ Uploaded to Cloudinary'
+                        : watchedValues.imageUrl
+                        ? '⟳ Uploading…'
+                        : 'No image'}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

@@ -3,6 +3,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { bannerService } from '@/services/Bannerservice';
 import toast from 'react-hot-toast';
+import { useEffect, useState } from 'react';
+import api from '@/lib/api';
 
 // ─── Query Key Factory ────────────────────────────────────────────────────────
 export const bannerKeys = {
@@ -206,4 +208,41 @@ export function useTrackBannerImpression() {
     mutationFn: (id) => bannerService.trackImpression(id),
     // silent
   });
+}
+
+
+export function useBanners(placement, { platform = "web" } = {}) {
+  const [banners, setBanners] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!placement) return;
+    let cancelled = false;
+
+    (async () => {
+      try {
+        setLoading(true);
+        const res = await api.get(
+          `/banners/platform/${platform}/placement/${placement}`
+        );
+        if (!cancelled) {
+          setBanners(Array.isArray(res.data?.data) ? res.data.data : []);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err);
+          setBanners([]);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [placement, platform]);
+
+  return { banners, loading, error };
 }

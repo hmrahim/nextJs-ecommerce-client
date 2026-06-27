@@ -54,13 +54,19 @@ api.interceptors.response.use(
   (res) => res,
   (error) => {
     if (error.response?.status === 401) {
-      // 401 If you come session cache clear do so that next request In fresh session takes
       clearSessionCache();
-      if (typeof window !== 'undefined') window.location.href = '/auth/login';
+      const isAdminRoute = error.config?.url?.includes('/admin/');
+      // শুধু admin route এ login এ পাঠাও, public route এ না
+      if (typeof window !== 'undefined' && isAdminRoute) {
+        window.location.href = '/auth/login';
+      }
     }
     return Promise.reject(error);
   }
 );
+
+
+
 
 export const postUser = async (user) => {
   const res = await api.post(`/register`, user);

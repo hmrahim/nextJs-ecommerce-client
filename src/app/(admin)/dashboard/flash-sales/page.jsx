@@ -22,8 +22,12 @@ export default function FlashSalesPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
+      // Read current page via functional updater to avoid adding pagination
+      // to deps (which would cause an infinite re-render loop).
+      let currentPage;
+      setPagination(p => { currentPage = p.page; return p; });
       const res = await flashSaleService.adminGetAll({
-        page:  pagination.page,
+        page:  currentPage,
         limit: 20,
         search:       filters.search       || undefined,
         status:       filters.status       || undefined,
@@ -51,7 +55,7 @@ export default function FlashSalesPage() {
     } finally {
       setLoading(false);
     }
-  }, [pagination.page, filters]);
+  }, [filters]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -157,7 +161,7 @@ export default function FlashSalesPage() {
           <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          Demo mode — backend connected If real flash sales will show।
+          Demo mode — Connect backend to see real flash sales data. All CRUD operations work locally.
         </div>
       )}
 

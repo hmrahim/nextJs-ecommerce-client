@@ -4,17 +4,18 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { SessionProvider } from 'next-auth/react';
 import { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
+import { FlashSaleProvider } from '@/context/FlashSaleContext';
 
 export default function Providers({ children, session }) {
   const [queryClient] = useState(
     () => new QueryClient({
       defaultOptions: {
         queries: {
-          staleTime:            60 * 1000,       // 1 minute — refetch will be closed
-          gcTime:               5 * 60 * 1000,   // 5 minute memory In cache will be
+          staleTime:            60 * 1000,
+          gcTime:               5 * 60 * 1000,
           retry:                1,
-          refetchOnWindowFocus: false,            // ✅ Tab switch In refetch closed
-          refetchOnReconnect:   false,            // ✅ Network reconnect In refetch closed
+          refetchOnWindowFocus: false,
+          refetchOnReconnect:   false,
         },
       },
     })
@@ -23,7 +24,9 @@ export default function Providers({ children, session }) {
   return (
     <SessionProvider session={session}>
       <QueryClientProvider client={queryClient}>
-        {children}
+        <FlashSaleProvider>
+          {children}
+        </FlashSaleProvider>
         <Toaster position="top-right" />
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>

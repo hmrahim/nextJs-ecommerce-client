@@ -2,7 +2,7 @@
 // 📁 PATH: src/app/(admin)/dashboard/banners/page.jsx
 
 import { useMemo, useState } from 'react';
-import BannerFormModal, { PLACEMENTS, STATUSES } from '@/components/admin/banners/BannerFormModal';
+import BannerFormModal, { PLATFORMS, WEB_PLACEMENTS, MOBILE_PLACEMENTS, PLACEMENTS, STATUSES } from '@/components/admin/banners/BannerFormModal';
 import {
   useAdminBanners,
   useCreateBanner,
@@ -44,6 +44,59 @@ function StatusPill({ status }) {
   );
 }
 
+// ─── Platform Badge ───────────────────────────────────────────────────────────
+const PLATFORM_BADGE = {
+  web:    'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+  mobile: 'bg-sky-500/10 text-sky-400 border-sky-500/20',
+  both:   'bg-violet-500/10 text-violet-400 border-violet-500/20',
+};
+
+function PlatformBadge({ platform }) {
+  const p = PLATFORMS.find((pl) => pl.id === platform);
+  return (
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-[11px] font-semibold ${PLATFORM_BADGE[platform] ?? PLATFORM_BADGE.both}`}>
+      <span>{p?.icon ?? '🔗'}</span>
+      {p?.name ?? platform}
+    </span>
+  );
+}
+
+// ─── Placement Tags ───────────────────────────────────────────────────────────
+function PlacementTags({ placements = [], placement }) {
+  const allPlacements = placements.length > 0 ? placements : (placement ? [placement] : []);
+  if (allPlacements.length === 0) return <span className="text-slate-600 text-[11px]">No location</span>;
+
+  const displayCount = 2;
+  const shown = allPlacements.slice(0, displayCount);
+  const remaining = allPlacements.length - displayCount;
+
+  return (
+    <div className="flex flex-wrap gap-1">
+      {shown.map((pid) => {
+        const p = PLACEMENTS.find((pl) => pl.id === pid);
+        const isWeb = pid.startsWith('web_');
+        return (
+          <span
+            key={pid}
+            className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border ${
+              isWeb
+                ? 'bg-emerald-500/5 text-emerald-400 border-emerald-500/20'
+                : 'bg-sky-500/5 text-sky-400 border-sky-500/20'
+            }`}
+          >
+            {p?.name ?? pid}
+          </span>
+        );
+      })}
+      {remaining > 0 && (
+        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-500/10 text-slate-400 border border-slate-500/20">
+          +{remaining} more
+        </span>
+      )}
+    </div>
+  );
+}
+
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 function SkeletonCard() {
   return (
@@ -63,7 +116,7 @@ function SkeletonCard() {
 function SkeletonRow() {
   return (
     <tr className="animate-pulse">
-      {[...Array(8)].map((_, i) => (
+      {[...Array(9)].map((_, i) => (
         <td key={i} className="px-4 py-3">
           <div className="h-4 rounded bg-[#1a1a26]" />
         </td>
@@ -110,6 +163,7 @@ export default function BannersPage() {
   const [search,    setSearch]    = useState('');
   const [placement, setPlacement] = useState('all');
   const [status,    setStatus]    = useState('all');
+  const [platform,  setPlatform]  = useState('all');
 
   // ── UI state ────────────────────────────────────────────────────────────────
   const [view,      setView]      = useState('grid');
@@ -121,21 +175,31 @@ export default function BannersPage() {
     search,
     placement,
     status,
+    platform,
   });
+
 
   const banners = data?.banners ?? [];
   const stats   = data?.stats   ?? {};
 
-  // ── Client-side filter (debounce to work without it) ───────────────────────
+  // ── Client-side filter ─────────────────────────────────────────────────────
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
     return banners.filter((b) => {
-      if (placement !== 'all' && b.placement !== placement) return false;
-      if (status    !== 'all' && b.status    !== status)    return false;
-      if (q && !b.title.toLowerCase().includes(q))          return false;
+      if (placement !== 'all') {
+        const hasPlacements = b.placements && b.placements.includes(placement);
+        const hasLegacy = b.placement === placement;
+        if (!hasPlacements && !hasLegacy) return false;
+      }
+      if (status !== 'all' && b.status !== status) return false;
+      if (platform !== 'all') {
+        if (platform === 'web' && b.platform !== 'web' && b.platform !== 'both') return false;
+        if (platform === 'mobile' && b.platform !== 'mobile' && b.platform !== 'both') return false;
+      }
+      if (q && !b.title.toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [banners, search, placement, status]);
+  }, [banners, search, placement, status, platform]);
 
   // ── Mutations ───────────────────────────────────────────────────────────────
   const createBanner = useCreateBanner();
@@ -177,6 +241,13 @@ export default function BannersPage() {
   const isSaving =
     createBanner.isPending || updateBanner.isPending;
 
+  // ── Get available placements for filter based on platform ───────────────────
+  const getFilterPlacements = () => {
+    if (platform === 'web') return WEB_PLACEMENTS;
+    if (platform === 'mobile') return MOBILE_PLACEMENTS;
+    return [...WEB_PLACEMENTS, ...MOBILE_PLACEMENTS];
+  };
+
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
     <div className="space-y-6">
@@ -186,7 +257,7 @@ export default function BannersPage() {
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Banners / Sliders</h1>
           <p className="text-sm text-slate-400 mt-0.5">
-            Hero sliders, promo strips and category banners across the storefront.
+            Web App ও Mobile App এর সব banner location manage করুন একটি dashboard থেকে
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -250,16 +321,42 @@ export default function BannersPage() {
             </button>
           )}
         </div>
+
+        {/* Platform filter */}
+        <select
+          value={platform}
+          onChange={(e) => { setPlatform(e.target.value); setPlacement('all'); }}
+          className="px-3 py-2.5 rounded-lg bg-[#0f0f17] border border-[#1e1e2e] text-slate-300 text-sm focus:outline-none focus:border-amber-500/50 transition-colors"
+        >
+          <option value="all">All platforms</option>
+          {PLATFORMS.map((p) => (
+            <option key={p.id} value={p.id}>{p.icon} {p.name}</option>
+          ))}
+        </select>
+
+        {/* Placement filter */}
         <select
           value={placement}
           onChange={(e) => setPlacement(e.target.value)}
           className="px-3 py-2.5 rounded-lg bg-[#0f0f17] border border-[#1e1e2e] text-slate-300 text-sm focus:outline-none focus:border-amber-500/50 transition-colors"
         >
-          <option value="all">All placements</option>
-          {PLACEMENTS.map((p) => (
-            <option key={p.id} value={p.id}>{p.name}</option>
-          ))}
+          <option value="all">All locations</option>
+          {platform !== 'mobile' && (
+            <optgroup label="🌐 Web App">
+              {WEB_PLACEMENTS.map((p) => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </optgroup>
+          )}
+          {platform !== 'web' && (
+            <optgroup label="📱 Mobile App">
+              {MOBILE_PLACEMENTS.map((p) => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </optgroup>
+          )}
         </select>
+
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
@@ -296,8 +393,7 @@ export default function BannersPage() {
             : filtered.length === 0
             ? <EmptyState onAdd={openCreate} />
             : filtered.map((b) => {
-                const place = PLACEMENTS.find((p) => p.id === b.placement);
-                const ctr   = b.impressions ? ((b.clicks / b.impressions) * 100).toFixed(2) : '0.00';
+                const ctr = b.impressions ? ((b.clicks / b.impressions) * 100).toFixed(2) : '0.00';
                 return (
                   <div
                     key={b._id}
@@ -317,8 +413,11 @@ export default function BannersPage() {
                           No image
                         </div>
                       )}
-                      <div className="absolute top-2 left-2">
+                      <div className="absolute top-2 left-2 flex items-center gap-1.5">
                         <StatusPill status={b.status} />
+                      </div>
+                      <div className="absolute top-2 right-2">
+                        <PlatformBadge platform={b.platform || 'both'} />
                       </div>
                     </div>
 
@@ -327,8 +426,13 @@ export default function BannersPage() {
                       <div>
                         <p className="text-white font-semibold truncate">{b.title}</p>
                         <p className="text-xs text-slate-500 mt-0.5">
-                          {place?.name} · Priority #{b.priority}
+                          Priority #{b.priority}
                         </p>
+                      </div>
+
+                      {/* Locations */}
+                      <div>
+                        <PlacementTags placements={b.placements} placement={b.placement} />
                       </div>
 
                       {/* Analytics */}
@@ -392,7 +496,8 @@ export default function BannersPage() {
               <thead className="bg-[#0f0f17] border-b border-[#1e1e2e]">
                 <tr className="text-left text-[11px] uppercase tracking-wider text-slate-500">
                   <th className="px-4 py-3">Banner</th>
-                  <th className="px-4 py-3">Placement</th>
+                  <th className="px-4 py-3">Platform</th>
+                  <th className="px-4 py-3">Locations</th>
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3">Schedule</th>
                   <th className="px-4 py-3 text-right">Impressions</th>
@@ -406,13 +511,12 @@ export default function BannersPage() {
                   [...Array(5)].map((_, i) => <SkeletonRow key={i} />)
                 ) : filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-4 py-16 text-center text-slate-500 text-sm">
+                    <td colSpan={9} className="px-4 py-16 text-center text-slate-500 text-sm">
                       No banners match these filters.
                     </td>
                   </tr>
                 ) : (
                   filtered.map((b) => {
-                    const place = PLACEMENTS.find((p) => p.id === b.placement);
                     const ctr   = b.impressions
                       ? ((b.clicks / b.impressions) * 100).toFixed(2)
                       : '0.00';
@@ -434,8 +538,11 @@ export default function BannersPage() {
                             </div>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-slate-300 text-xs whitespace-nowrap">
-                          {place?.name ?? b.placement}
+                        <td className="px-4 py-3">
+                          <PlatformBadge platform={b.platform || 'both'} />
+                        </td>
+                        <td className="px-4 py-3">
+                          <PlacementTags placements={b.placements} placement={b.placement} />
                         </td>
                         <td className="px-4 py-3">
                           <StatusPill status={b.status} />

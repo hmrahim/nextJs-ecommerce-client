@@ -25,19 +25,30 @@ import { useToggleWishlist, useWishlistIds } from "@/hooks/useWishlist";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useFlashSalePrice } from "@/context/FlashSaleContext";
 
 function ProductCard({ p, compact = false }) {
-  const price = p.price ?? 0;
-  const comparePrice = p.comparePrice ?? null;
-  const discount =
-    comparePrice && comparePrice > price
+  const flash = useFlashSalePrice(p);
+
+  const basePrice = p.price ?? 0;
+  const baseCompare = p.comparePrice ?? null;
+
+  // When a flash sale applies, use sale price as the active price and the
+  // product's MAIN price (not comparePrice) as the original price.
+  // Flash sale discount replaces any existing product discount.
+  const price = flash.isFlash ? flash.price : basePrice;
+  const comparePrice = flash.isFlash ? flash.originalPrice : baseCompare;
+
+  const discount = flash.isFlash
+    ? flash.discountPercent
+    : comparePrice && comparePrice > price
       ? Math.round(((comparePrice - price) / comparePrice) * 100)
       : 0;
 
   const rating = p.avgRating ?? 0;
   const reviews = p.reviewCount ?? 0;
   const title = p.name ?? "";
-  const image = p.images?.[0]?.url ?? "/placeholder.png";
+  const image = p.images?.[0]?.url ?? p.image ?? "/placeholder.png";
   const brandName = p.brand?.name ?? "";
   const slug = p.slug ?? p._id;
   const href = `/shop/${slug}`;
@@ -133,7 +144,7 @@ function ProductCard({ p, compact = false }) {
         )}
         {discount > 0 && (
           <span className="absolute right-2 top-2 sale-badge pointer-events-none">
-            -{discount}%
+            {flash.isFlash ? `⚡ -${discount}%` : `-${discount}%`}
           </span>
         )}
 

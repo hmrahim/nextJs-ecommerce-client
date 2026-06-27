@@ -24,6 +24,10 @@ export const flashSaleService = {
   adminGetRevenue:  (params)       => api.get('/admin/flash-sales/revenue', { params }),
 
   // Public (storefront)
-  getActive:        ()             => api.get('/flash-sales/active'),
-  getUpcoming:      ()             => api.get('/flash-sales/upcoming'),
+  getActive:         ()       => api.get('/flash-sales/active'),
+  getUpcoming:       ()       => api.get('/flash-sales/upcoming'),
+  getBySlug:         (slug)   => api.get(`/flash-sales/${slug}`),
+  // Returns the resolved product list for the highest-priority active sale.
+  // Works for both applicationType==='specific' and 'all'.
+  getOfferProducts:  (params) => api.get('/flash-sales/offer-products', { params }),
 };

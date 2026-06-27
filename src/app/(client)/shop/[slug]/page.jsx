@@ -18,6 +18,7 @@ import {
   useShopRelatedProducts,
   useProductVariants,       // ✅ useEffect+useState instead of this React Query
 } from '@/hooks/client/useShopProducts';
+import { useFlashSalePrice } from '@/context/FlashSaleContext';
 
 function buildAttrGroups(variants = []) {
   const map = {};
@@ -162,13 +163,16 @@ function OutOfStockBanner() {
   );
 }
 
+const EMPTY_ARRAY = [];
+
 export default function ProductDetailPage() {
   const { slug } = useParams();
 
   const { data: product, isLoading, isError } = useShopProductBySlug(slug);
   const { data: related = [] }                = useShopRelatedProducts(product?._id);
   // ✅ useEffect+variantService by removing React Query — cache will be, route If you come back re-fetch will not be
-  const { data: variants = [] }               = useProductVariants(product?._id);
+  const { data: variantsData }               = useProductVariants(product?._id);
+  const variants = variantsData ?? EMPTY_ARRAY;
 
   const addToCart       = useAddToCart();
   const toggleWishlist  = useToggleWishlist();
@@ -202,6 +206,9 @@ export default function ProductDetailPage() {
     [variants, selection],
   );
 
+  // Flash sale price awareness — must be called before any conditional returns (React hooks rule)
+  const flash = useFlashSalePrice(product);
+
   if (isLoading) return <PageSkeleton />;
   if (isError || !product) {
     return (
@@ -218,11 +225,25 @@ export default function ProductDetailPage() {
   const images       = product.images ?? [];
   const variantImage = activeVariant?.image?.url || activeVariant?.image;
   const activeImage  = variantImage || images[imgIdx]?.url || '/placeholder.png';
-  const price        = activeVariant?.price ?? product.price ?? 0;
-  const comparePrice = activeVariant?.comparePrice ?? product.comparePrice ?? null;
-  const discount     = comparePrice && comparePrice > price
-    ? Math.round((comparePrice - price) / comparePrice * 100)
-    : 0;
+
+  // When flash sale is active, use flash sale price instead of product's own discount
+  // effectivePrice = actual selling price (after discount), price = original MRP
+  const basePrice    = activeVariant?.price ?? product.effectivePrice ?? product.price ?? 0;
+  const baseCompare  = activeVariant
+    ? (activeVariant.comparePrice ?? null)
+    : (product.effectivePrice != null && product.effectivePrice < product.price
+        ? product.price   // original MRP shown as strikethrough
+        : null);
+
+  // Flash sale overrides price — applies even when a variant is active
+  const price        = flash.isFlash ? flash.price        : basePrice;
+  const comparePrice = flash.isFlash ? flash.originalPrice : baseCompare;
+  const discount     = flash.isFlash
+    ? flash.discountPercent
+    : (comparePrice && comparePrice > price
+      ? Math.round((comparePrice - price) / comparePrice * 100)
+      : 0);
+  
   const stock        = activeVariant?.stock ?? product.stock ?? 0;
   const inStock      = !product.trackInventory || stock > 0;
   const brandName    = product.brand?.name    ?? '';
@@ -362,6 +383,14 @@ export default function ProductDetailPage() {
               {(product.reviewCount ?? 0).toLocaleString()} reviews
             </button>
           </div>
+
+          {/* Flash Sale Badge */}
+          {flash.isFlash && (
+            <div className="inline-flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-1.5">
+              <span className="text-amber-600 text-sm font-bold">⚡ Flash Sale</span>
+              <span className="text-xs text-amber-500">-{flash.discountPercent}% OFF</span>
+            </div>
+          )}
 
           {/* Price */}
           <div className="flex items-end gap-3">
