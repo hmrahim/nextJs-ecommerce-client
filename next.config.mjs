@@ -31,16 +31,17 @@ const nextConfig = {
       : false,
   },
 
-async redirects() {
-  return [
-    {
-      source: '/:path((?!sitemap.xml|robots.txt).*)',  // ✅ sitemap আর robots বাদ
-      has: [{ type: 'host', value: 'moom24.com' }],
-      destination: 'https://www.moom24.com/:path*',
-      permanent: true,
-    },
-  ];
-},
+  // ✅ এটা nextConfig এর ভেতরে আছে
+  async redirects() {
+    return [
+      {
+        source: '/:path((?!sitemap.xml|robots.txt).*)',
+        has: [{ type: 'host', value: 'moom24.com' }],
+        destination: 'https://www.moom24.com/:path*',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
