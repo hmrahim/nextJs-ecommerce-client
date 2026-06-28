@@ -15,7 +15,7 @@ export default async function sitemap() {
     const res = await fetch(`${API_URL}/products?limit=1000&status=active`);
     if (!res.ok) throw new Error('API failed');
     const json = await res.json();
-    const products = json?.data?.products ?? json?.products ?? [];
+   const products = json?.results ?? json?.data?.products ?? json?.products ?? [];
 
     const productPages = products.map((p) => ({
       url:             `${SITE_URL}/shop/${p.slug}`,
