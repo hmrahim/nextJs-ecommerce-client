@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#064e3b" />
+      <stop offset="60%" style="stop-color:#065f46" />
+      <stop offset="100%" style="stop-color:#047857" />
+    </linearGradient>
+    <linearGradient id="green" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#059669" />
+      <stop offset="100%" style="stop-color:#10b981" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Decorative circles -->
+  <circle cx="1050" cy="80" r="180" fill="#059669" opacity="0.15"/>
+  <circle cx="150" cy="550" r="220" fill="#10b981" opacity="0.10"/>
+  <circle cx="1100" cy="500" r="120" fill="#34d399" opacity="0.08"/>
+
+  <!-- Icon box -->
+  <rect x="80" y="180" width="160" height="160" rx="36" fill="url(#green)"/>
+  <!-- Bag handle -->
+  <path d="M112 268 Q112 228 160 228 Q208 228 208 268" stroke="white" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <!-- Bag body -->
+  <rect x="100" y="260" width="120" height="88" rx="14" fill="white" opacity="0.95"/>
+  <!-- Check -->
+  <path d="M124 304 L148 328 L196 280" stroke="#047857" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Main title -->
+  <text x="268" y="282" font-family="'Segoe UI', Arial, sans-serif" font-weight="900" font-size="110" fill="white">Moom</text>
+  <text x="830" y="282" font-family="'Segoe UI', Arial, sans-serif" font-weight="900" font-size="110" fill="url(#green)">24</text>
+
+  <!-- Tagline -->
+  <text x="80" y="370" font-family="'Segoe UI', Arial, sans-serif" font-weight="400" font-size="32" fill="#6ee7b7" letter-spacing="4">SHOP SMART · LIVE BETTER</text>
+
+  <!-- Divider -->
+  <rect x="80" y="400" width="200" height="4" rx="2" fill="#10b981" opacity="0.6"/>
+
+  <!-- Description -->
+  <text x="80" y="460" font-family="'Segoe UI', Arial, sans-serif" font-weight="300" font-size="28" fill="#a7f3d0">Electronics · Fashion · Home · Beauty &amp; More</text>
+
+  <!-- URL -->
+  <text x="80" y="560" font-family="'Segoe UI', Arial, sans-serif" font-weight="500" font-size="24" fill="#6ee7b7" opacity="0.8">www.moom24.com</text>
+
+  <!-- Right side decoration - shopping elements -->
+  <circle cx="980" cy="315" r="140" fill="white" opacity="0.04"/>
+  <circle cx="980" cy="315" r="100" fill="white" opacity="0.04"/>
+</svg>

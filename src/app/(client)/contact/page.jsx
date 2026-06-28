@@ -1,4 +1,12 @@
+
 import { Mail, Phone, MapPin, MessageSquare, Clock } from "lucide-react";
+
+export const metadata = {
+  title: 'Contact Us | Moom24',
+  description: 'Get in touch with Moom24 support team. We are here to help.',
+  alternates: { canonical: 'https://www.moom24.com/contact' },
+};
+
 function Contact() {
   return <div className="container-x py-12">
       <div className="text-center mb-10">

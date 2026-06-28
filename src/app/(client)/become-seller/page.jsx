@@ -1,4 +1,11 @@
 import { CheckCircle2, TrendingUp, Globe, Headphones, Truck, BarChart3, Wallet, ArrowRight } from "lucide-react";
+
+
+export const metadata = {
+  title: 'Become a Seller | Moom24',
+  description: 'Start selling on Moom24 marketplace. Reach millions of customers in Saudi Arabia.',
+  alternates: { canonical: 'https://www.moom24.com/become-seller' },
+};
 function BecomeSeller() {
   return <div>
       <section className="relative overflow-hidden bg-gradient-to-br from-emerald-700 via-emerald-800 to-emerald-950 py-20 text-white">

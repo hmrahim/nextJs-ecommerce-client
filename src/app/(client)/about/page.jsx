@@ -1,3 +1,9 @@
+export const metadata = {
+  title: 'About Us | Moom24',
+  description: 'Learn about Moom24 — building the future of sustainable commerce in Saudi Arabia.',
+  alternates: { canonical: 'https://www.moom24.com/about' },
+};
+
 function About() {
   return <div>
       <section className="bg-gradient-to-br from-emerald-700 to-emerald-900 py-20 text-white">

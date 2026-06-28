@@ -1,4 +1,19 @@
 import { Search, ChevronDown, MessageSquare, Phone, Mail } from "lucide-react";
+
+export const metadata = {
+  title: 'Help Center | Moom24',
+  description: 'Find answers to your questions about orders, payments, shipping, returns and more. Moom24 support is available 24/7.',
+  openGraph: {
+    title: 'Help Center | Moom24',
+    description: 'Find answers about orders, payments, shipping & returns. Support available 24/7.',
+    url: 'https://www.moom24.com/help',
+    images: [{ url: 'https://www.moom24.com/og-image.png' }],
+  },
+  alternates: {
+    canonical: 'https://www.moom24.com/help',
+  },
+};
+
 function Help() {
   return <div>
       <section className="bg-gradient-to-br from-emerald-700 to-emerald-900 py-16 text-white">
