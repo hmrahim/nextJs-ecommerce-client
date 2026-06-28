@@ -34,7 +34,7 @@ const nextConfig = {
 async redirects() {
   return [
     {
-      source: '/:path*',
+      source: '/:path((?!sitemap.xml|robots.txt).*)',  // ✅ sitemap আর robots বাদ
       has: [{ type: 'host', value: 'moom24.com' }],
       destination: 'https://www.moom24.com/:path*',
       permanent: true,
