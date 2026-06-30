@@ -1,27 +1,46 @@
 // 📁 PATH: src/services/profileService.js
 import api from '@/lib/api';
+import { uploadService, UPLOAD_FOLDERS } from '@/services/uploadService';
 
 export const profileService = {
 
-  // Get current user profile
+  // ── Profile ───────────────────────────────────────────────
+
   async getProfile() {
     const res = await api.get('/users/me');
     return res.data; // { user }
   },
 
-  // Update basic info (firstName, lastName, phone)
   async updateProfile(data) {
     const res = await api.patch('/users/me', data);
-    return res.data;
+    return res.data; // { user }
   },
 
-  // Change password
+  // ── Avatar Upload ─────────────────────────────────────────
+  // Step 1: file → Cloudinary → secure_url পাই
+  // Step 2: secure_url → PATCH /users/me/avatar → MongoDB-তে save
+
+  async uploadAvatar(file, onProgress) {
+    // ১. Cloudinary-তে direct upload
+    const uploaded = await uploadService.uploadImage(file, {
+      folder:     UPLOAD_FOLDERS.USER_AVATARS, // 'moom24/avatars'
+      onProgress,
+    });
+
+    // ২. URL backend-এ পাঠাও → DB-তে save
+    const res = await api.patch('/users/me/avatar', { avatarUrl: uploaded.url });
+    return res.data; // { message, user: { avatar, ... } }
+  },
+
+  // ── Password ──────────────────────────────────────────────
+
   async changePassword({ currentPassword, newPassword }) {
     const res = await api.patch('/users/me/password', { currentPassword, newPassword });
     return res.data;
   },
 
-  // Addresses
+  // ── Addresses ─────────────────────────────────────────────
+
   async addAddress(address) {
     const res = await api.post('/users/me/addresses', address);
     return res.data;
@@ -39,7 +58,8 @@ export const profileService = {
     return res.data;
   },
 
-  // Saved cards
+  // ── Cards ─────────────────────────────────────────────────
+
   async addCard(cardData) {
     const res = await api.post('/users/me/cards', cardData);
     return res.data;
@@ -49,19 +69,16 @@ export const profileService = {
     return res.data;
   },
 
-  // Activity log
+  // ── Misc ──────────────────────────────────────────────────
+
   async getActivity({ page = 1, limit = 20 } = {}) {
     const res = await api.get(`/users/me/activity?page=${page}&limit=${limit}`);
     return res.data;
   },
-
-  // Request account deletion
   async requestDeletion(reason) {
     const res = await api.post('/users/me/delete-request', { reason });
     return res.data;
   },
-
-  // Notification preferences
   async updateNotificationPrefs(prefs) {
     const res = await api.patch('/users/me/notifications', prefs);
     return res.data;

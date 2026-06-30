@@ -1,7 +1,8 @@
 // 📁 PATH: src/components/admin/profile/PersonalInfoPanel.jsx
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
+import Image from 'next/image';
 
 function SectionCard({ title, children }) {
   return (
@@ -33,19 +34,28 @@ function InputField({ label, id, ...props }) {
   );
 }
 
-export default function PersonalInfoPanel({ profile, onSave, saving }) {
+export default function PersonalInfoPanel({
+  profile,
+  onSave,
+  onAvatarUpload,
+  saving,
+  avatarUploading,
+  avatarProgress,
+}) {
   const { register, reset, handleSubmit: rhfHandleSubmit } = useForm({
     defaultValues: { firstName: '', lastName: '', phone: '' },
   });
-  const [deleteModal, setDeleteModal] = useState(false);
-  const [deleteReason, setDeleteReason] = useState('');
+  const [deleteModal,   setDeleteModal]   = useState(false);
+  const [deleteReason,  setDeleteReason]  = useState('');
+  const [previewUrl,    setPreviewUrl]    = useState(null); // local blob preview
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (profile) {
       reset({
         firstName: profile.firstName || '',
-        lastName: profile.lastName || '',
-        phone: profile.phone || '',
+        lastName:  profile.lastName  || '',
+        phone:     profile.phone     || '',
       });
     }
   }, [profile, reset]);
@@ -53,6 +63,28 @@ export default function PersonalInfoPanel({ profile, onSave, saving }) {
   const handleSubmit = rhfHandleSubmit(async (data) => {
     await onSave(data);
   });
+
+  // ── Avatar file select ───────────────────────────────────────
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Local preview দেখাও
+    const localUrl = URL.createObjectURL(file);
+    setPreviewUrl(localUrl);
+
+    // Upload করো
+    const result = await onAvatarUpload(file);
+
+    // Upload হলে blob revoke করো (real URL profile state-এ চলে গেছে)
+    if (result?.success) {
+      URL.revokeObjectURL(localUrl);
+      setPreviewUrl(null); // profile.avatar থেকে নেবে
+    }
+
+    // Input reset করো (একই file আবার select করা যাবে)
+    e.target.value = '';
+  };
 
   if (!profile) return null;
 
@@ -62,16 +94,18 @@ export default function PersonalInfoPanel({ profile, onSave, saving }) {
     buyer:  'bg-emerald-500/15 text-emerald-300 border-emerald-500/25',
   }[profile.role] || 'bg-slate-500/15 text-slate-300 border-slate-500/25';
 
-  const initials = `${profile.firstName?.[0] || ''}${profile.lastName?.[0] || ''}`.toUpperCase() || '?';
+  const initials   = `${profile.firstName?.[0] || ''}${profile.lastName?.[0] || ''}`.toUpperCase() || '?';
+  const avatarSrc  = previewUrl || profile.avatar || null; // preview → saved → null
 
   return (
     <div className="space-y-4">
+
       {/* Stats Row */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: 'Orders placed', value: profile.orderCount ?? '—' },
+          { label: 'Orders placed', value: profile.orderCount    ?? '—' },
           { label: 'Wishlists',     value: profile.wishlistCount ?? '—' },
-          { label: 'Reviews left',  value: profile.reviewCount ?? '—' },
+          { label: 'Reviews left',  value: profile.reviewCount   ?? '—' },
         ].map(s => (
           <div key={s.label} className="rounded-xl border border-[#1e1e2e] bg-[#13131a] p-4">
             <p className="text-2xl font-bold text-white">{s.value}</p>
@@ -80,13 +114,68 @@ export default function PersonalInfoPanel({ profile, onSave, saving }) {
         ))}
       </div>
 
-      {/* Avatar + role */}
+      {/* Account Overview */}
       <SectionCard title="Account overview">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-violet-500/20 border border-violet-500/30
-            flex items-center justify-center text-xl font-bold text-violet-300 flex-shrink-0">
-            {initials}
+
+          {/* ── Avatar with upload button ── */}
+          <div className="relative flex-shrink-0">
+            <div className="w-16 h-16 rounded-2xl overflow-hidden bg-violet-500/20 border border-violet-500/30
+              flex items-center justify-center text-xl font-bold text-violet-300">
+              {avatarSrc ? (
+                <Image
+                  src={avatarSrc}
+                  alt="Avatar"
+                  width={64}
+                  height={64}
+                  className="w-full h-full object-cover"
+                  unoptimized={!!previewUrl} // blob URL Next/Image optimize করতে পারে না
+                />
+              ) : (
+                <span>{initials}</span>
+              )}
+            </div>
+
+            {/* Upload progress ring */}
+            {avatarUploading && (
+              <div className="absolute inset-0 rounded-2xl bg-black/60 flex flex-col items-center justify-center">
+                <svg className="w-6 h-6 animate-spin text-violet-400" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                </svg>
+                {avatarProgress > 0 && (
+                  <span className="text-[10px] text-white mt-0.5">{avatarProgress}%</span>
+                )}
+              </div>
+            )}
+
+            {/* Camera icon button */}
+            {!avatarUploading && (
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                title="Change photo"
+                className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-violet-600 hover:bg-violet-500
+                  border-2 border-[#13131a] flex items-center justify-center transition-colors"
+              >
+                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </button>
+            )}
+
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={handleFileChange}
+            />
           </div>
+
+          {/* Name / email / badges */}
           <div className="flex-1 min-w-0">
             <p className="text-white font-semibold text-lg truncate">
               {profile.firstName} {profile.lastName}
@@ -111,22 +200,30 @@ export default function PersonalInfoPanel({ profile, onSave, saving }) {
               )}
             </div>
           </div>
+
           <div className="text-right text-xs text-slate-600 flex-shrink-0">
             <p>Member since</p>
             <p className="text-slate-400">
-              {profile.createdAt ? new Date(profile.createdAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }) : '—'}
+              {profile.createdAt
+                ? new Date(profile.createdAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
+                : '—'}
             </p>
           </div>
         </div>
+
+        {/* Upload hint */}
+        <p className="mt-3 text-xs text-slate-600">
+          Click the camera icon to upload a new photo. JPG, PNG or WebP · max 3 MB.
+        </p>
       </SectionCard>
 
       {/* Editable fields */}
       <SectionCard title="Basic details">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <InputField label="First name"   id="firstName" {...register('firstName')} placeholder="First name" />
-          <InputField label="Last name"    id="lastName"  {...register('lastName')}  placeholder="Last name" />
-          <InputField label="Email address" id="email"    name="email" value={profile.email || ''} disabled type="email" readOnly />
-          <InputField label="Phone number" id="phone"    {...register('phone')} placeholder="+880" type="tel" />
+          <InputField label="First name"    id="firstName" {...register('firstName')} placeholder="First name" />
+          <InputField label="Last name"     id="lastName"  {...register('lastName')}  placeholder="Last name" />
+          <InputField label="Email address" id="email"     name="email" value={profile.email || ''} disabled type="email" readOnly />
+          <InputField label="Phone number"  id="phone"     {...register('phone')} placeholder="+966" type="tel" />
         </div>
         <button
           onClick={handleSubmit}
@@ -177,7 +274,9 @@ export default function PersonalInfoPanel({ profile, onSave, saving }) {
             onClick={e => e.stopPropagation()}
           >
             <h3 className="text-white font-bold text-lg mb-1">Delete account?</h3>
-            <p className="text-slate-400 text-sm mb-4">Please provide a reason (optional). Your request will be reviewed within 48 hours.</p>
+            <p className="text-slate-400 text-sm mb-4">
+              Please provide a reason (optional). Your request will be reviewed within 48 hours.
+            </p>
             <textarea
               value={deleteReason}
               onChange={e => setDeleteReason(e.target.value)}
@@ -194,7 +293,7 @@ export default function PersonalInfoPanel({ profile, onSave, saving }) {
                 Cancel
               </button>
               <button
-                onClick={() => { setDeleteModal(false); }}
+                onClick={() => setDeleteModal(false)}
                 className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white text-sm font-medium rounded-xl transition-colors"
               >
                 Confirm deletion

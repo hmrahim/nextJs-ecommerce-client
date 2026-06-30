@@ -221,28 +221,6 @@ export default function ProductSlider({
         <ChevronRight className="h-4 w-4 stroke-[2.5]" />
       </button>
 
-      {/* ══ FADE EDGES ══ */}
-      {canLeft && (
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-0 top-0 h-full w-16 z-10"
-          style={{
-            background:
-              "linear-gradient(to right, var(--background, #fff) 0%, transparent 100%)",
-          }}
-        />
-      )}
-      {canRight && (
-        <div
-          aria-hidden
-          className="pointer-events-none absolute right-0 top-0 h-full w-16 z-10"
-          style={{
-            background:
-              "linear-gradient(to left, var(--background, #fff) 0%, transparent 100%)",
-          }}
-        />
-      )}
-
       {/* ══ PROGRESS DOTS ══ */}
       {items.length > 2 && (
         <div className="mt-4 flex justify-center gap-1.5">
