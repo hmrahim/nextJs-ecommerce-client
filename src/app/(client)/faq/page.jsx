@@ -9,7 +9,7 @@ const CATEGORIES = [
     cat: 'Orders & Payments',
     icon: '🛒',
     items: [
-      { q: 'How do I place an order?', a: 'Browse products, add to cart, select your address, choose a payment method, and confirm. You'll receive an email and SMS confirmation instantly.' },
+      { q: 'How do I place an order?', a: "Browse products, add to cart, select your address, choose a payment method, and confirm. You'll receive an email and SMS confirmation instantly." },
       { q: 'What payment methods are accepted?', a: 'We accept Visa, Mastercard, bKash, Nagad, Rocket, and cash on delivery for eligible areas.' },
       { q: 'Can I modify or cancel my order?', a: 'Orders can be cancelled within 30 minutes of placing them from My Orders. Modifications are not available after confirmation.' },
       { q: 'Is my payment information secure?', a: 'Yes. All transactions are encrypted with TLS and we never store your full card number.' },
@@ -29,7 +29,7 @@ const CATEGORIES = [
     icon: '↩️',
     items: [
       { q: 'What is your return policy?', a: 'We offer 7-day no-questions-asked returns for most items. Some categories (perishables, digital goods) are excluded.' },
-      { q: 'How do I start a return?', a: 'Go to My Orders, select the item, and tap "Return Item." We'll schedule a free pickup.' },
+      { q: 'How do I start a return?', a: "Go to My Orders, select the item, and tap \"Return Item.\" We'll schedule a free pickup." },
       { q: 'When will I receive my refund?', a: 'Refunds are processed within 3–5 business days after we receive and inspect the returned item.' },
     ],
   },
