@@ -32,17 +32,50 @@ export default function VisitorTracker() {
       return;
     }
 
-    console.log('[VisitorTracker] calling visitorService.trackVisit...');
+    const runTrackVisit = async () => {
+      let clientIp = null;
+      try {
+        const ipRes = await fetch('https://api.ipify.org?format=json');
+        if (ipRes.ok) {
+          const ipData = await ipRes.json();
+          clientIp = ipData.ip;
+        }
+      } catch (err) {
+        console.warn('[VisitorTracker] Failed to fetch client public IP side-channel:', err.message);
+      }
 
-    visitorService.trackVisit({
-      path: pathname,
-      referrer: document.referrer || null,
-      screenResolution: `${window.screen.width}×${window.screen.height}`,
-      connectionType: navigator.connection?.effectiveType || null,
-      language: navigator.language || null,
-    })
-      .then((res) => console.log('[VisitorTracker] trackVisit SUCCESS:', res.data))
-      .catch((err) => console.error('[VisitorTracker] trackVisit FAILED:', err));
+      console.log('[VisitorTracker] calling visitorService.trackVisit with IP:', clientIp);
+
+      visitorService.trackVisit({
+        path: pathname,
+        referrer: document.referrer || null,
+        screenResolution: `${window.screen.width}×${window.screen.height}`,
+        connectionType: navigator.connection?.effectiveType || null,
+        language: navigator.language || null,
+        ip: clientIp,
+      })
+        .then((res) => {
+          console.log('[VisitorTracker] trackVisit SUCCESS:', res.data);
+          if (res.data?.success && res.data?.geo) {
+            const { city, postalCode, country } = res.data.geo;
+            let text = '';
+            if (city && city !== 'Unknown') {
+              text = city;
+              if (postalCode && postalCode !== '—' && postalCode !== null) text += ` ${postalCode}`;
+            } else if (country && country !== 'Unknown') {
+              // Strip any leading emoji if it has one (like flag emoji)
+              text = country.replace(/^.+\s/, '');
+            } else {
+              text = 'Dhaka 1207';
+            }
+            sessionStorage.setItem('moom24_user_location', text);
+            window.dispatchEvent(new Event('user-location-updated'));
+          }
+        })
+        .catch((err) => console.error('[VisitorTracker] trackVisit FAILED:', err));
+    };
+
+    runTrackVisit();
   }, [pathname]);
 
   // Best-effort scroll depth + click count, throttled
@@ -77,8 +110,9 @@ export default function VisitorTracker() {
     };
   }, [pathname]);
 
-  // Request GPS coordinates once on mount
+  // Disable GPS coordinate request to respect "no browser permission prompt" requirement
   useEffect(() => {
+    /* 
     if (typeof window === 'undefined' || !navigator.geolocation) return;
 
     navigator.geolocation.getCurrentPosition(
@@ -95,6 +129,7 @@ export default function VisitorTracker() {
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );
+    */
   }, []);
 
   return null;

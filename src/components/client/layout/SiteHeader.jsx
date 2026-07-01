@@ -79,6 +79,27 @@ export function SiteHeader() {
   const { data: wishlist } = useWishlist();
   const wishlistCount = wishlist?.itemCount ?? 0;
 
+  const [location, setLocation] = useState("Dhaka 1207");
+
+  useEffect(() => {
+    const stored = sessionStorage.getItem("moom24_user_location");
+    if (stored) {
+      setLocation(stored);
+    }
+
+    const handleLocationUpdate = () => {
+      const updated = sessionStorage.getItem("moom24_user_location");
+      if (updated) {
+        setLocation(updated);
+      }
+    };
+
+    window.addEventListener("user-location-updated", handleLocationUpdate);
+    return () => {
+      window.removeEventListener("user-location-updated", handleLocationUpdate);
+    };
+  }, []);
+
   return (
     <header className="sticky top-0 z-50">
 
@@ -119,7 +140,7 @@ export function SiteHeader() {
             <MapPin className="h-4 w-4" />
             <div className="leading-tight">
               <div className="text-[10px] text-emerald-200/70">Deliver to</div>
-              <div className="font-semibold">Dhaka 1207</div>
+              <div className="font-semibold">{location}</div>
             </div>
           </div>
 
