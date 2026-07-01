@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { getSession } from 'next-auth/react';
-import { getSessionId } from './session';
+import { getSessionId, getVisitorSessionId } from './session';
 
 // ✅ Session cache — getSession() network call each one request instead of this
 // once fetch Do 30 second cache keeps it।
@@ -42,6 +42,11 @@ api.interceptors.request.use(
     const sessionId = getSessionId();
     if (sessionId) {
       config.headers['x-session-id'] = sessionId;
+    }
+
+    const visitorSessionId = getVisitorSessionId();
+    if (visitorSessionId) {
+      config.headers['x-visitor-session-id'] = visitorSessionId;
     }
 
     return config;

@@ -197,24 +197,52 @@ function VisitorModal({ visitor: v, onClose }) {
 
               {/* Journey */}
               <div className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-4">
-                <p className="text-xs font-semibold text-slate-300 mb-3">Page Journey</p>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[10px] px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
-                    Entry: {v.entryPage}
-                  </span>
-                  <svg className="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                  <span className="text-[10px] px-2.5 py-1 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20 font-medium">
-                    Current: {v.page}
-                  </span>
-                  <svg className="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                  <span className="text-[10px] px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 font-medium">
-                    Exit: {v.exitPage}
-                  </span>
-                </div>
+                <p className="text-xs font-semibold text-slate-300 mb-3 flex justify-between">
+                  <span>Page Journey ({v.pagesVisited || 0} hits)</span>
+                  <span className="text-[10px] text-slate-500 font-normal">Paths in chronological order</span>
+                </p>
+
+                {v.pages && v.pages.length > 0 ? (
+                  <div className="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                    {v.pages.map((p, idx) => {
+                      const title = p.path === '/' ? 'Homepage' : (p.path.split('/').filter(Boolean).pop() || '').replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                      return (
+                        <div key={idx} className="flex items-start justify-between gap-3 text-[11px] py-1.5 border-b border-white/[0.04] last:border-b-0">
+                          <div className="flex items-start gap-2 min-w-0">
+                            <span className="text-[9px] w-5 h-5 rounded-full bg-violet-500/10 text-violet-400 flex items-center justify-center font-mono flex-shrink-0 mt-0.5">
+                              {idx + 1}
+                            </span>
+                            <div className="min-w-0">
+                              <span className="text-slate-200 font-medium block truncate">{title || 'Page'}</span>
+                              <span className="text-slate-500 font-mono text-[9px] block truncate">{p.path}</span>
+                            </div>
+                          </div>
+                          <span className="text-slate-500 text-[10px] flex-shrink-0 font-mono mt-0.5">
+                            {new Date(p.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[10px] px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
+                      Entry: {v.entryPage}
+                    </span>
+                    <svg className="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                    <span className="text-[10px] px-2.5 py-1 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20 font-medium">
+                      Current: {v.page}
+                    </span>
+                    <svg className="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                    <span className="text-[10px] px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 font-medium">
+                      Exit: {v.exitPage}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Scroll Depth + Bounce + Commerce */}
@@ -370,36 +398,59 @@ function VisitorModal({ visitor: v, onClose }) {
           {/* ── LOCATION TAB ── */}
           {activeTab === 'location' && (
             <>
-              {/* Map placeholder */}
-              <div className="rounded-xl border border-white/[0.07] bg-[#111118] overflow-hidden" style={{ height: 180 }}>
-                <div className="w-full h-full flex flex-col items-center justify-center gap-2 relative">
-                  {/* Faux map grid */}
-                  <svg width="100%" height="100%" className="absolute inset-0 opacity-10">
-                    <defs>
-                      <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
-                        <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#6c63ff" strokeWidth="0.5"/>
-                      </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill="url(#grid)" />
-                  </svg>
-                  <div className="relative z-10 flex flex-col items-center gap-2">
-                    <div className="w-10 h-10 rounded-full bg-violet-500/20 border-2 border-violet-500/50 flex items-center justify-center animate-pulse">
-                      <svg className="w-5 h-5 text-violet-400" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                      </svg>
+              {/* Google Maps embed */}
+              <div className="rounded-xl border border-white/[0.07] bg-[#111118] overflow-hidden relative" style={{ height: 220 }}>
+                {v.lat && v.lng ? (
+                  <iframe
+                    title="Visitor Location Map"
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    scrolling="no"
+                    marginHeight="0"
+                    marginWidth="0"
+                    src={`https://maps.google.com/maps?q=${v.lat},${v.lng}&z=13&output=embed`}
+                    className="absolute inset-0 w-full h-full opacity-80"
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-slate-500/10 flex items-center justify-center text-slate-500">
+                      📍
                     </div>
-                    <p className="text-xs font-medium text-white">{v.city}, {v.country.replace(/^.+\s/, '')}</p>
-                    <p className="text-[10px] text-slate-500 font-mono">{v.lat}°N, {v.lng > 0 ? v.lng + '°E' : Math.abs(v.lng) + '°W'}</p>
+                    <p className="text-xs text-slate-500">No map coordinates available</p>
                   </div>
+                )}
+              </div>
+
+              {/* Local Address Card */}
+              <div className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-lg flex-shrink-0">
+                  📍
+                </div>
+                <div>
+                  <p className="text-[10px] text-violet-400 font-semibold uppercase tracking-wider">
+                    {v.streetAddress ? 'GPS Detailed Address' : 'Estimated Local Address'}
+                  </p>
+                  <p className="text-sm font-bold text-white mt-0.5 leading-snug">
+                    {v.streetAddress || (
+                      <>
+                        {v.city ? `${v.city}, ` : ''}
+                        {v.region && v.region !== v.city ? `${v.region}, ` : ''}
+                        {v.country || ''}
+                        {v.postalCode && v.postalCode !== '—' ? ` (${v.postalCode})` : ''}
+                      </>
+                    )}
+                  </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {[
                   { label: 'Country',     value: v.country },
+                  { label: 'Region / State', value: v.region || '—' },
                   { label: 'City',        value: v.city },
-                  { label: 'Latitude',    value: `${v.lat}°` },
-                  { label: 'Longitude',   value: `${v.lng}°` },
+                  { label: 'Latitude',    value: v.lat ? `${v.lat}°` : '—' },
+                  { label: 'Longitude',   value: v.lng ? `${v.lng}°` : '—' },
                   { label: 'Timezone',    value: v.timezone },
                   { label: 'ISP / Network', value: v.isp },
                   { label: 'Postal Code', value: v.postalCode },

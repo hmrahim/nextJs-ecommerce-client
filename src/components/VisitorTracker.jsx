@@ -77,5 +77,25 @@ export default function VisitorTracker() {
     };
   }, [pathname]);
 
+  // Request GPS coordinates once on mount
+  useEffect(() => {
+    if (typeof window === 'undefined' || !navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        console.log('[VisitorTracker] GPS allowed:', latitude, longitude);
+        visitorService.trackEvent({
+          type: 'gps_coords',
+          value: `${latitude},${longitude}`
+        }).catch(() => {});
+      },
+      (error) => {
+        console.log('[VisitorTracker] Geolocation error or blocked:', error.message);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }, []);
+
   return null;
 }
