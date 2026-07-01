@@ -1,236 +1,18 @@
 'use client';
-import { useState, useMemo } from 'react';
-// import { visitorService } from '@/services/visitorService';
+import { useState, useEffect } from 'react';
+import {
+  useVisitorStats,
+  useVisitorChart,
+  useVisitorsByDevice,
+  useVisitorsBySource,
+  useVisitorsByCountry,
+  useTopPages,
+  useVisitorsList,
+  useBulkDeleteVisitors,
+  useExportVisitorsCsv,
+  useLiveVisitorCount,
+} from '@/hooks/useVisitors';
 
-/* ═══════════════════════════════════════════════════
-   DUMMY DATA — replace with API calls from visitorService
-   ═══════════════════════════════════════════════════ */
-
-const DUMMY_STATS = {
-  totalVisitors:  18_420,
-  uniqueVisitors: 12_304,
-  pageViews:      54_812,
-  avgSession:     '3m 42s',
-  bounceRate:     38.4,
-  liveNow:        24,
-  totalChange:    '+14.2%',
-  uniqueChange:   '+9.8%',
-  pageViewChange: '+21.3%',
-  bounceChange:   '-2.1%',
-};
-
-const DEVICE_DATA = [
-  { label: 'Mobile',  count: 10_124, pct: 55, color: '#6c63ff' },
-  { label: 'Desktop', count:  7_012, pct: 38, color: '#38bdf8' },
-  { label: 'Tablet',  count:  1_284, pct:  7, color: '#34d399' },
-];
-
-const SOURCE_DATA = [
-  { label: 'Direct',         count: 5_840, pct: 47, color: '#6c63ff' },
-  { label: 'Organic Search', count: 4_102, pct: 33, color: '#38bdf8' },
-  { label: 'Social Media',   count: 1_480, pct: 12, color: '#f472b6' },
-  { label: 'Referral',       count:   620, pct:  5, color: '#34d399' },
-  { label: 'Email',          count:   262, pct:  3, color: '#fbbf24' },
-];
-
-const COUNTRY_DATA = [
-  { flag: '🇧🇩', country: 'Bangladesh',   city: 'Dhaka',       visitors: 9_840, pct: 80 },
-  { flag: '🇧🇩', country: 'Bangladesh',   city: 'Chittagong',  visitors: 1_420, pct: 12 },
-  { flag: '🇸🇦', country: 'Saudi Arabia', city: 'Riyadh',      visitors:   480, pct:  4 },
-  { flag: '🇦🇪', country: 'UAE',          city: 'Dubai',       visitors:   320, pct:  3 },
-  { flag: '🇬🇧', country: 'UK',           city: 'London',      visitors:   144, pct:  1 },
-];
-
-const TOP_PAGES = [
-  { path: '/',                       title: 'Homepage',         views: 18_420, bounce: '32%', avgTime: '2m 10s' },
-  { path: '/products',               title: 'Products Listing', views:  9_204, bounce: '41%', avgTime: '3m 58s' },
-  { path: '/products/jamdani-saree', title: 'Jamdani Saree',   views:  4_812, bounce: '28%', avgTime: '4m 22s' },
-  { path: '/auth/register',          title: 'Register',         views:  3_140, bounce: '55%', avgTime: '1m 48s' },
-  { path: '/cart',                   title: 'Shopping Cart',    views:  2_880, bounce: '22%', avgTime: '5m 04s' },
-  { path: '/products/muslin-panjabi',title: 'Muslin Panjabi',  views:  2_204, bounce: '31%', avgTime: '3m 12s' },
-];
-
-const CHART_DATA = [
-  { day: 'Mon', visitors: 2_104, pageViews: 6_820 },
-  { day: 'Tue', visitors: 1_840, pageViews: 5_412 },
-  { day: 'Wed', visitors: 2_640, pageViews: 7_104 },
-  { day: 'Thu', visitors: 3_012, pageViews: 8_840 },
-  { day: 'Fri', visitors: 2_804, pageViews: 8_120 },
-  { day: 'Sat', visitors: 3_480, pageViews: 9_840 },
-  { day: 'Sun', visitors: 2_540, pageViews: 8_676 },
-];
-
-const VISITORS = [
-  {
-    id: 'v001', ip: '103.42.71.12', country: '🇧🇩 Bangladesh', city: 'Dhaka',
-    device: 'Mobile', os: 'Android 14', browser: 'Chrome 124',
-    source: 'Direct', page: '/products/jamdani-saree',
-    duration: '4m 32s', bounce: false, time: '2 min ago', status: 'online',
-    // New fields
-    lat: 23.8103, lng: 90.4125, timezone: 'Asia/Dhaka (UTC+6)',
-    isp: 'Grameenphone Ltd', postalCode: '1207', currency: 'SAR (SAR )',
-    pagesVisited: 6, entryPage: '/', exitPage: '/products/jamdani-saree',
-    scrollDepth: '75%', clickCount: 24, cartAdded: true, purchased: false,
-    screenResolution: '390×844', connectionType: '4G', language: 'bn-BD',
-    referrerUrl: 'https://www.google.com/search?q=jamdani+saree',
-    isRegistered: true, userId: 'USR-4821', email: 'rahul.d@gmail.com',
-    isReturning: true, visitCount: 8,
-  },
-  {
-    id: 'v002', ip: '185.76.14.98', country: '🇸🇦 Saudi Arabia', city: 'Riyadh',
-    device: 'Desktop', os: 'Windows 11', browser: 'Firefox 126',
-    source: 'Organic Search', page: '/products',
-    duration: '2m 10s', bounce: false, time: '5 min ago', status: 'online',
-    lat: 24.6877, lng: 46.7219, timezone: 'Asia/Riyadh (UTC+3)',
-    isp: 'STC - Saudi Telecom', postalCode: '11564', currency: 'SAR (﷼)',
-    pagesVisited: 3, entryPage: '/products', exitPage: '/products',
-    scrollDepth: '50%', clickCount: 9, cartAdded: false, purchased: false,
-    screenResolution: '1920×1080', connectionType: 'WiFi', language: 'ar-SA',
-    referrerUrl: 'https://www.google.com/search?q=bangladeshi+saree+buy',
-    isRegistered: false, userId: null, email: null,
-    isReturning: false, visitCount: 1,
-  },
-  {
-    id: 'v003', ip: '45.118.22.67', country: '🇧🇩 Bangladesh', city: 'Chittagong',
-    device: 'Mobile', os: 'iOS 17', browser: 'Safari 17',
-    source: 'Social Media', page: '/',
-    duration: '1m 04s', bounce: true, time: '8 min ago', status: 'online',
-    lat: 22.3569, lng: 91.7832, timezone: 'Asia/Dhaka (UTC+6)',
-    isp: 'Robi Axiata', postalCode: '4000', currency: 'SAR (SAR )',
-    pagesVisited: 1, entryPage: '/', exitPage: '/',
-    scrollDepth: '25%', clickCount: 2, cartAdded: false, purchased: false,
-    screenResolution: '390×844', connectionType: '5G', language: 'bn-BD',
-    referrerUrl: 'https://www.facebook.com/',
-    isRegistered: false, userId: null, email: null,
-    isReturning: false, visitCount: 1,
-  },
-  {
-    id: 'v004', ip: '94.130.55.201', country: '🇦🇪 UAE', city: 'Dubai',
-    device: 'Desktop', os: 'macOS 14', browser: 'Chrome 124',
-    source: 'Referral', page: '/cart',
-    duration: '6m 18s', bounce: false, time: '12 min ago', status: 'online',
-    lat: 25.2048, lng: 55.2708, timezone: 'Asia/Dubai (UTC+4)',
-    isp: 'du - Emirates Integrated', postalCode: '00000', currency: 'AED (د.إ)',
-    pagesVisited: 8, entryPage: '/products/muslin-panjabi', exitPage: '/cart',
-    scrollDepth: '100%', clickCount: 31, cartAdded: true, purchased: true,
-    screenResolution: '2560×1440', connectionType: 'WiFi', language: 'en-AE',
-    referrerUrl: 'https://shop.example.com/partners',
-    isRegistered: true, userId: 'USR-1193', email: 'a.khan@email.ae',
-    isReturning: true, visitCount: 14,
-  },
-  {
-    id: 'v005', ip: '103.95.44.88', country: '🇧🇩 Bangladesh', city: 'Sylhet',
-    device: 'Tablet', os: 'Android 13', browser: 'Chrome 122',
-    source: 'Direct', page: '/products/kantha-quilt',
-    duration: '3m 50s', bounce: false, time: '18 min ago', status: 'idle',
-    lat: 24.8949, lng: 91.8687, timezone: 'Asia/Dhaka (UTC+6)',
-    isp: 'Teletalk Bangladesh', postalCode: '3100', currency: 'SAR (SAR )',
-    pagesVisited: 4, entryPage: '/', exitPage: '/products/kantha-quilt',
-    scrollDepth: '75%', clickCount: 15, cartAdded: true, purchased: false,
-    screenResolution: '800×1280', connectionType: '4G', language: 'bn-BD',
-    referrerUrl: null,
-    isRegistered: true, userId: 'USR-3047', email: 'f.ahmed@yahoo.com',
-    isReturning: true, visitCount: 3,
-  },
-  {
-    id: 'v006', ip: '81.92.33.114', country: '🇬🇧 UK', city: 'London',
-    device: 'Desktop', os: 'Windows 10', browser: 'Edge 124',
-    source: 'Email', page: '/auth/register',
-    duration: '2m 22s', bounce: false, time: '24 min ago', status: 'offline',
-    lat: 51.5074, lng: -0.1278, timezone: 'Europe/London (UTC+1)',
-    isp: 'BT Group', postalCode: 'E1 6AN', currency: 'GBP (£)',
-    pagesVisited: 2, entryPage: '/auth/register', exitPage: '/auth/register',
-    scrollDepth: '100%', clickCount: 7, cartAdded: false, purchased: false,
-    screenResolution: '1366×768', connectionType: 'WiFi', language: 'en-GB',
-    referrerUrl: 'https://mail.google.com/',
-    isRegistered: false, userId: null, email: null,
-    isReturning: false, visitCount: 1,
-  },
-  {
-    id: 'v007', ip: '103.47.19.55', country: '🇧🇩 Bangladesh', city: 'Rajshahi',
-    device: 'Mobile', os: 'Android 12', browser: 'Chrome 120',
-    source: 'Organic Search', page: '/products',
-    duration: '0m 42s', bounce: true, time: '31 min ago', status: 'offline',
-    lat: 24.3745, lng: 88.6042, timezone: 'Asia/Dhaka (UTC+6)',
-    isp: 'Banglalink', postalCode: '6000', currency: 'SAR (SAR )',
-    pagesVisited: 1, entryPage: '/products', exitPage: '/products',
-    scrollDepth: '25%', clickCount: 1, cartAdded: false, purchased: false,
-    screenResolution: '360×800', connectionType: '3G', language: 'bn-BD',
-    referrerUrl: 'https://www.google.com/search?q=panjabi+online+bd',
-    isRegistered: false, userId: null, email: null,
-    isReturning: true, visitCount: 2,
-  },
-  {
-    id: 'v008', ip: '195.14.77.30', country: '🇸🇦 Saudi Arabia', city: 'Jeddah',
-    device: 'Mobile', os: 'iOS 16', browser: 'Safari 16',
-    source: 'Direct', page: '/products/muslin-panjabi',
-    duration: '5m 08s', bounce: false, time: '42 min ago', status: 'offline',
-    lat: 21.3891, lng: 39.8579, timezone: 'Asia/Riyadh (UTC+3)',
-    isp: 'Mobily - Etihad Etisalat', postalCode: '21589', currency: 'SAR (﷼)',
-    pagesVisited: 5, entryPage: '/', exitPage: '/products/muslin-panjabi',
-    scrollDepth: '75%', clickCount: 18, cartAdded: true, purchased: false,
-    screenResolution: '414×896', connectionType: 'WiFi', language: 'ar-SA',
-    referrerUrl: null,
-    isRegistered: true, userId: 'USR-2209', email: 'm.ali@gmail.com',
-    isReturning: true, visitCount: 5,
-  },
-  {
-    id: 'v009', ip: '45.249.11.77', country: '🇧🇩 Bangladesh', city: 'Khulna',
-    device: 'Mobile', os: 'Android 13', browser: 'Chrome 123',
-    source: 'Social Media', page: '/',
-    duration: '1m 30s', bounce: true, time: '1 hr ago', status: 'offline',
-    lat: 22.8456, lng: 89.5403, timezone: 'Asia/Dhaka (UTC+6)',
-    isp: 'Airtel Bangladesh', postalCode: '9100', currency: 'SAR (SAR )',
-    pagesVisited: 1, entryPage: '/', exitPage: '/',
-    scrollDepth: '25%', clickCount: 3, cartAdded: false, purchased: false,
-    screenResolution: '412×915', connectionType: '4G', language: 'bn-BD',
-    referrerUrl: 'https://www.instagram.com/',
-    isRegistered: false, userId: null, email: null,
-    isReturning: false, visitCount: 1,
-  },
-  {
-    id: 'v010', ip: '78.46.22.199', country: '🇦🇪 UAE', city: 'Abu Dhabi',
-    device: 'Desktop', os: 'macOS 13', browser: 'Chrome 124',
-    source: 'Referral', page: '/cart',
-    duration: '7m 14s', bounce: false, time: '1 hr ago', status: 'offline',
-    lat: 24.4539, lng: 54.3773, timezone: 'Asia/Dubai (UTC+4)',
-    isp: 'Etisalat UAE', postalCode: '00000', currency: 'AED (د.إ)',
-    pagesVisited: 9, entryPage: '/products', exitPage: '/cart',
-    scrollDepth: '100%', clickCount: 40, cartAdded: true, purchased: true,
-    screenResolution: '1440×900', connectionType: 'WiFi', language: 'en-US',
-    referrerUrl: 'https://www.trustpilot.com/',
-    isRegistered: true, userId: 'USR-0874', email: 's.hassan@email.ae',
-    isReturning: true, visitCount: 22,
-  },
-  {
-    id: 'v011', ip: '103.15.88.44', country: '🇧🇩 Bangladesh', city: 'Mymensingh',
-    device: 'Mobile', os: 'Android 11', browser: 'Chrome 118',
-    source: 'Organic Search', page: '/products/jamdani-saree',
-    duration: '3m 28s', bounce: false, time: '2 hr ago', status: 'offline',
-    lat: 24.7471, lng: 90.4203, timezone: 'Asia/Dhaka (UTC+6)',
-    isp: 'Grameenphone Ltd', postalCode: '2200', currency: 'SAR (SAR )',
-    pagesVisited: 4, entryPage: '/', exitPage: '/products/jamdani-saree',
-    scrollDepth: '50%', clickCount: 13, cartAdded: false, purchased: false,
-    screenResolution: '360×780', connectionType: '4G', language: 'bn-BD',
-    referrerUrl: 'https://www.google.com/search?q=jamdani+saree+price',
-    isRegistered: false, userId: null, email: null,
-    isReturning: true, visitCount: 2,
-  },
-  {
-    id: 'v012', ip: '217.76.55.12', country: '🇬🇧 UK', city: 'Manchester',
-    device: 'Desktop', os: 'Windows 11', browser: 'Firefox 125',
-    source: 'Email', page: '/auth/register',
-    duration: '2m 00s', bounce: false, time: '3 hr ago', status: 'offline',
-    lat: 53.4808, lng: -2.2426, timezone: 'Europe/London (UTC+1)',
-    isp: 'Virgin Media', postalCode: 'M1 1AE', currency: 'GBP (£)',
-    pagesVisited: 2, entryPage: '/auth/register', exitPage: '/auth/login',
-    scrollDepth: '100%', clickCount: 6, cartAdded: false, purchased: false,
-    screenResolution: '1920×1080', connectionType: 'WiFi', language: 'en-GB',
-    referrerUrl: 'https://mail.yahoo.com/',
-    isRegistered: false, userId: null, email: null,
-    isReturning: false, visitCount: 1,
-  },
-];
 
 /* ═══════════════════════════════════════════════════
    HELPER COMPONENTS
@@ -263,12 +45,12 @@ function StatCard({ label, value, change, up, sub, color, icon }) {
   );
 }
 
-function WeeklyChart() {
-  const maxV = Math.max(...CHART_DATA.map(d => d.visitors));
+function WeeklyChart({ data = [] }) {
+  const maxV = Math.max(1, ...data.map(d => d.visitors));
   const [hovered, setHovered] = useState(null);
   return (
     <div className="flex items-end gap-1.5 h-24">
-      {CHART_DATA.map((d, i) => (
+      {data.map((d, i) => (
         <div key={i} className="flex-1 flex flex-col items-center gap-1 group relative"
           onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)}>
           {hovered === i && (
@@ -652,25 +434,48 @@ function VisitorModal({ visitor: v, onClose }) {
    ═══════════════════════════════════════════════════ */
 export default function VisitorsPage() {
   const [search, setSearch]         = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [deviceFilter, setDevice]   = useState('all');
   const [sourceFilter, setSource]   = useState('all');
   const [statusFilter, setStatus]   = useState('all');
   const [selected, setSelected]     = useState([]);
   const [modalVisitor, setModal]    = useState(null);
   const [dateRange, setDateRange]   = useState('7d');
+  const [page, setPage]             = useState(1);
 
-  const filtered = useMemo(() => VISITORS.filter(v => {
-    if (deviceFilter !== 'all' && v.device.toLowerCase() !== deviceFilter) return false;
-    if (sourceFilter !== 'all' && v.source !== sourceFilter) return false;
-    if (statusFilter !== 'all' && v.status !== statusFilter) return false;
-    if (search && !v.ip.includes(search) && !v.city.toLowerCase().includes(search.toLowerCase()) &&
-        !v.country.toLowerCase().includes(search.toLowerCase()) &&
-        !v.page.toLowerCase().includes(search.toLowerCase())) return false;
-    return true;
-  }), [search, deviceFilter, sourceFilter, statusFilter]);
+  // debounce the search box so we don't hit the API on every keystroke
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 400);
+    return () => clearTimeout(t);
+  }, [search]);
+
+  useEffect(() => { setPage(1); }, [debouncedSearch, deviceFilter, sourceFilter, statusFilter, dateRange]);
+
+  const { data: stats }        = useVisitorStats(dateRange);
+  const { data: chartData = [] }    = useVisitorChart(dateRange);
+  const { data: deviceData = [] }   = useVisitorsByDevice(dateRange);
+  const { data: sourceData = [] }   = useVisitorsBySource(dateRange);
+  const { data: countryData = [] }  = useVisitorsByCountry(dateRange);
+  const { data: topPages = [] }     = useTopPages(dateRange);
+  const { data: liveNow }      = useLiveVisitorCount();
+
+  const { data: listData, isLoading: listLoading } = useVisitorsList({
+    page, limit: 20, search: debouncedSearch,
+    device: deviceFilter, source: sourceFilter, status: statusFilter, range: dateRange,
+  });
+  const visitors    = listData?.visitors ?? [];
+  const totalCount  = listData?.total ?? 0;
+  const totalPages  = listData?.totalPages ?? 1;
+
+  const bulkDelete = useBulkDeleteVisitors();
+  const exportCsv  = useExportVisitorsCsv();
 
   const toggleSelect = (id) => setSelected(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id]);
-  const toggleAll    = ()   => setSelected(s => s.length === filtered.length ? [] : filtered.map(v => v.id));
+  const toggleAll    = ()   => setSelected(s => s.length === visitors.length ? [] : visitors.map(v => v.id));
+  const handleBulkDelete = () => {
+    if (!selected.length) return;
+    bulkDelete.mutate(selected, { onSuccess: () => setSelected([]) });
+  };
 
   const STATUS_DOT = { online: 'bg-emerald-400', idle: 'bg-amber-400', offline: 'bg-slate-600' };
   const DEVICE_ICON = {
@@ -695,7 +500,7 @@ export default function VisitorsPage() {
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-xs font-semibold text-emerald-400">{DUMMY_STATS.liveNow} live now</span>
+            <span className="text-xs font-semibold text-emerald-400">{liveNow ?? 0} live now</span>
           </div>
           <select
             value={dateRange}
@@ -707,26 +512,29 @@ export default function VisitorsPage() {
             <option value="30d">Last 30 days</option>
             <option value="90d">Last 90 days</option>
           </select>
-          <button className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white transition-colors">
+          <button
+            onClick={() => exportCsv.mutate(dateRange)}
+            disabled={exportCsv.isPending}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50">
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
-            Export CSV
+            {exportCsv.isPending ? 'Exporting…' : 'Export CSV'}
           </button>
         </div>
       </div>
 
       {/* ── Stats Grid ── */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        <StatCard label="Total Visits"    value={DUMMY_STATS.totalVisitors.toLocaleString()}  change={DUMMY_STATS.totalChange}    up={true}  sub="vs last period" color="violet"
+        <StatCard label="Total Visits"    value={(stats?.totalVisitors ?? 0).toLocaleString()}  change={stats?.totalChange}    up={!(stats?.totalChange||"").startsWith("-")}  sub="vs last period" color="violet"
           icon={<><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></>} />
-        <StatCard label="Unique Visitors" value={DUMMY_STATS.uniqueVisitors.toLocaleString()} change={DUMMY_STATS.uniqueChange}  up={true}  sub="vs last period" color="sky"
+        <StatCard label="Unique Visitors" value={(stats?.uniqueVisitors ?? 0).toLocaleString()} change={stats?.uniqueChange}  up={!(stats?.uniqueChange||"").startsWith("-")}  sub="vs last period" color="sky"
           icon={<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>} />
-        <StatCard label="Page Views"      value={DUMMY_STATS.pageViews.toLocaleString()}       change={DUMMY_STATS.pageViewChange} up={true}  sub="vs last period" color="emerald"
+        <StatCard label="Page Views"      value={(stats?.pageViews ?? 0).toLocaleString()}       change={stats?.pageViewChange} up={!(stats?.pageViewChange||"").startsWith("-")}  sub="vs last period" color="emerald"
           icon={<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>} />
-        <StatCard label="Avg. Session"    value={DUMMY_STATS.avgSession}                       change={null}                      up={true}  sub="per visitor"    color="amber"
+        <StatCard label="Avg. Session"    value={stats?.avgSession ?? "0m 00s"}                       change={null}                      up={true}  sub="per visitor"    color="amber"
           icon={<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>} />
-        <StatCard label="Bounce Rate"     value={`${DUMMY_STATS.bounceRate}%`}                 change={DUMMY_STATS.bounceChange}  up={false} sub="vs last period" color="pink"
+        <StatCard label="Bounce Rate"     value={`${stats?.bounceRate ?? 0}%`}                 change={stats?.bounceChange}  up={false} sub="vs last period" color="pink"
           icon={<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>} />
       </div>
 
@@ -735,16 +543,16 @@ export default function VisitorsPage() {
         <div className="lg:col-span-1 rounded-xl border border-white/10 bg-[#111118] p-5">
           <h2 className="text-sm font-semibold text-white mb-1">Weekly Traffic</h2>
           <p className="text-xs text-slate-500 mb-4">Visitors per day (last 7 days)</p>
-          <WeeklyChart />
+          <WeeklyChart data={chartData} />
         </div>
         <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="rounded-xl border border-white/10 bg-[#111118] p-5">
             <h2 className="text-sm font-semibold text-white mb-1">Devices</h2>
             <p className="text-xs text-slate-500 mb-4">Traffic by device type</p>
             <div className="flex items-center gap-4">
-              <DonutChart data={DEVICE_DATA} size={88} />
+              <DonutChart data={deviceData.length ? deviceData : [{ label: "No data", count: 1, pct: 100, color: "#334155" }]} size={88} />
               <div className="flex-1 space-y-2.5">
-                {DEVICE_DATA.map(d => (
+                {deviceData.map(d => (
                   <div key={d.label}>
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-1.5">
@@ -765,7 +573,7 @@ export default function VisitorsPage() {
             <h2 className="text-sm font-semibold text-white mb-1">Traffic Sources</h2>
             <p className="text-xs text-slate-500 mb-4">Where visitors come from</p>
             <div className="space-y-2.5">
-              {SOURCE_DATA.map(s => (
+              {sourceData.map(s => (
                 <div key={s.label}>
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-1.5">
@@ -792,7 +600,7 @@ export default function VisitorsPage() {
             <p className="text-xs text-slate-500 mt-0.5">Visitors by country & city</p>
           </div>
           <div className="divide-y divide-white/5">
-            {COUNTRY_DATA.map((c, i) => (
+            {countryData.map((c, i) => (
               <div key={i} className="flex items-center gap-3 px-5 py-3 hover:bg-white/[0.02] transition-colors">
                 <span className="text-xl flex-shrink-0">{c.flag}</span>
                 <div className="flex-1 min-w-0">
@@ -815,7 +623,7 @@ export default function VisitorsPage() {
             <p className="text-xs text-slate-500 mt-0.5">Most visited pages</p>
           </div>
           <div className="divide-y divide-white/5">
-            {TOP_PAGES.map((p, i) => (
+            {topPages.map((p, i) => (
               <div key={i} className="flex items-center gap-3 px-5 py-3 hover:bg-white/[0.02] transition-colors">
                 <span className="text-xs text-slate-600 font-mono w-4 flex-shrink-0">{i + 1}</span>
                 <div className="flex-1 min-w-0">
@@ -875,9 +683,9 @@ export default function VisitorsPage() {
                 className="pl-7 pr-3 py-1.5 text-xs rounded-lg border border-white/10 bg-[#0a0a0f] text-slate-300 placeholder-slate-600 focus:outline-none focus:border-violet-500/50 w-44" />
             </div>
             {selected.length > 0 && (
-              <button onClick={() => setSelected([])}
-                className="px-3 py-1.5 text-xs rounded-lg bg-red-500/15 text-red-400 border border-red-500/20 hover:bg-red-500/25 transition-colors">
-                Delete {selected.length}
+              <button onClick={handleBulkDelete} disabled={bulkDelete.isPending}
+                className="px-3 py-1.5 text-xs rounded-lg bg-red-500/15 text-red-400 border border-red-500/20 hover:bg-red-500/25 transition-colors disabled:opacity-50">
+                {bulkDelete.isPending ? 'Deleting…' : `Delete ${selected.length}`}
               </button>
             )}
           </div>
@@ -888,7 +696,7 @@ export default function VisitorsPage() {
             <thead>
               <tr className="border-b border-white/5">
                 <th className="px-4 py-3 w-8">
-                  <input type="checkbox" checked={selected.length === filtered.length && filtered.length > 0}
+                  <input type="checkbox" checked={selected.length === visitors.length && visitors.length > 0}
                     onChange={toggleAll}
                     className="w-3.5 h-3.5 rounded border-white/20 bg-white/5 accent-violet-600 cursor-pointer" />
                 </th>
@@ -898,7 +706,7 @@ export default function VisitorsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/[0.04]">
-              {filtered.map(v => (
+              {visitors.map(v => (
                 <tr key={v.id}
                   className="group hover:bg-white/[0.025] transition-colors cursor-pointer"
                   onClick={() => setModal(v)}>
@@ -960,7 +768,13 @@ export default function VisitorsPage() {
             </tbody>
           </table>
 
-          {filtered.length === 0 && (
+          {listLoading && (
+            <div className="py-16 text-center">
+              <p className="text-slate-500 text-sm">Loading visitors…</p>
+            </div>
+          )}
+
+          {!listLoading && visitors.length === 0 && (
             <div className="py-16 text-center">
               <p className="text-slate-500 text-sm">No visitors match your filters.</p>
             </div>
@@ -968,14 +782,31 @@ export default function VisitorsPage() {
         </div>
 
         <div className="px-5 py-3 border-t border-white/5 flex items-center justify-between">
-          <span className="text-xs text-slate-500">Showing {filtered.length} of {VISITORS.length} visitors</span>
+          <span className="text-xs text-slate-500">Showing {visitors.length} of {totalCount.toLocaleString()} visitors</span>
           <div className="flex items-center gap-1">
-            {[1,2,3,'…',12].map((p, i) => (
-              <button key={i}
-                className={`w-7 h-7 rounded text-xs transition-colors ${p === 1 ? 'bg-violet-600 text-white' : 'text-slate-500 hover:bg-white/5 hover:text-white'}`}>
-                {p}
-              </button>
-            ))}
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1}
+              className="w-7 h-7 rounded text-xs transition-colors text-slate-500 hover:bg-white/5 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent">
+              ‹
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter(p => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
+              .reduce((acc, p, i, arr) => {
+                if (i > 0 && p - arr[i - 1] > 1) acc.push('…');
+                acc.push(p);
+                return acc;
+              }, [])
+              .map((p, i) => (
+                p === '…'
+                  ? <span key={`ellipsis-${i}`} className="w-7 h-7 flex items-center justify-center text-xs text-slate-600">…</span>
+                  : <button key={p} onClick={() => setPage(p)}
+                      className={`w-7 h-7 rounded text-xs transition-colors ${p === page ? 'bg-violet-600 text-white' : 'text-slate-500 hover:bg-white/5 hover:text-white'}`}>
+                      {p}
+                    </button>
+              ))}
+            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages}
+              className="w-7 h-7 rounded text-xs transition-colors text-slate-500 hover:bg-white/5 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent">
+              ›
+            </button>
           </div>
         </div>
       </div>

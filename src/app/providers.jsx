@@ -5,6 +5,7 @@ import { SessionProvider } from 'next-auth/react';
 import { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { FlashSaleProvider } from '@/context/FlashSaleContext';
+import VisitorTracker from '@/components/VisitorTracker';
 
 export default function Providers({ children, session }) {
   const [queryClient] = useState(
@@ -24,6 +25,7 @@ export default function Providers({ children, session }) {
   return (
     <SessionProvider session={session}>
       <QueryClientProvider client={queryClient}>
+        <VisitorTracker />
         <FlashSaleProvider>
           {children}
         </FlashSaleProvider>

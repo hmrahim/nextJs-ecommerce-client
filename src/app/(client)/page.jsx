@@ -7,6 +7,7 @@ import FeaturedProducts from "@/components/client/home/FeaturedProducts";
 import Vendor from "@/components/client/home/Vendor";
 import Banners from "@/components/client/home/Banners";
 import Recommended from "@/components/client/home/Recommended";
+import BundleDeals from "@/components/client/home/BundleDeals"; 
 
 
 export const metadata = {
@@ -42,6 +43,8 @@ export default function Home() {
 
       {/* Featured Products */}
       <FeaturedProducts />
+      {/* Bundle Deals */}
+      <BundleDeals />
 
       {/* Banners */}
       <Banners />

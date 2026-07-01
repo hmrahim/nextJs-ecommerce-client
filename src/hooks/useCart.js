@@ -10,6 +10,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { cartService } from '@/services/cartService';
 import { useCouponStore } from '@/store/couponStore';
+import { visitorService } from '@/services/visitorService';
 
 export const CART_KEY = ['cart'];
 
@@ -75,6 +76,7 @@ export function useAddToCart() {
     onSuccess: ({ data }) => {
       qc.setQueryData(CART_KEY, normalizeCart(data?.data));
       toast.success('Added to cart');
+      visitorService.trackEvent({ type: 'cart' }).catch(() => {});
     },
     onError: (err) => {
       const status  = err?.response?.status;

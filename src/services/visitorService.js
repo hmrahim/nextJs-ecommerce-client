@@ -4,8 +4,20 @@ import api from '@/lib/api';
  * Visitor Analytics Service
  * Backend endpoint pattern: /admin/visitors/*
  * Replace base path if your API uses a different prefix.
+ *
+ * ⚠️ FIX: the tracking pings used to hit /track/visit and /track/event.
+ * Ad blockers (uBlock Origin, Brave Shields, AdBlock+EasyPrivacy) block
+ * ANY url containing "/track", "/analytics", "/pixel", "/collect", or
+ * "/beacon" — even first-party same-domain requests. That's why visits
+ * were never saving: the request never left the browser, and it failed
+ * silently because trackVisit()/trackEvent() are called with .catch(() => {})
+ * in VisitorTracker.jsx. Renamed to neutral paths that match the backend.
  */
 export const visitorService = {
+
+  // Silent tracking pings — called by <VisitorTracker /> on every route change
+  trackVisit: (payload) => api.post('/session/ping', payload),
+  trackEvent: (payload) => api.post('/session/activity', payload),
 
   // All visitors — paginated + filterable
   // params: { page, limit, search, country, device, source, dateFrom, dateTo }

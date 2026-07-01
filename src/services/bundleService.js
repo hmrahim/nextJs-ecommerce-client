@@ -15,4 +15,8 @@ export const bundleService = {
 
   // Product search for bundle builder
   searchProducts: (q)        => api.get('/admin/products/search', { params: { q, limit: 20 } }),
+
+  // Public (storefront)
+  getAll:    ()      => api.get('/bundles'),
+  getBySlug: (slug)  => api.get(`/bundles/${slug}`),
 };
