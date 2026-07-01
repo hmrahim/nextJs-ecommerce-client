@@ -12,14 +12,27 @@ import { visitorService } from '@/services/visitorService';
  * - Location: read server-side from the request IP (no navigator.geolocation).
  * - Session identity: reuses the existing guest `x-session-id` header
  *   already attached by lib/api.js, so guest → logged-in journeys link up.
+ *
+ * 🔧 TEMPORARY DEBUG BUILD — console.log lines added to trace why the
+ * pageview ping wasn't firing. Remove the console.log lines once confirmed
+ * working, revert to the original clean version.
  */
 export default function VisitorTracker() {
   const pathname = usePathname();
   const lastClickSent = useRef(0);
 
+  console.log('[VisitorTracker] component rendered, pathname =', pathname);
+
   // Track page views
   useEffect(() => {
-    if (!pathname || pathname.startsWith('/dashboard')) return;
+    console.log('[VisitorTracker] useEffect fired, pathname =', pathname);
+
+    if (!pathname || pathname.startsWith('/dashboard')) {
+      console.log('[VisitorTracker] SKIPPED — pathname is falsy or starts with /dashboard');
+      return;
+    }
+
+    console.log('[VisitorTracker] calling visitorService.trackVisit...');
 
     visitorService.trackVisit({
       path: pathname,
@@ -27,7 +40,9 @@ export default function VisitorTracker() {
       screenResolution: `${window.screen.width}×${window.screen.height}`,
       connectionType: navigator.connection?.effectiveType || null,
       language: navigator.language || null,
-    }).catch(() => {});
+    })
+      .then((res) => console.log('[VisitorTracker] trackVisit SUCCESS:', res.data))
+      .catch((err) => console.error('[VisitorTracker] trackVisit FAILED:', err));
   }, [pathname]);
 
   // Best-effort scroll depth + click count, throttled
