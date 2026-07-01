@@ -34,6 +34,7 @@ const RESOURCE_MAP = {
   Inventory:      ['inventory', 'stock'],
   AuditLog:       ['audit'],
   SearchLog:      ['search'],
+  Visitor:        ['visitor', 'visitors'],
 };
 
 function keyMatchesAny(key, fragments) {

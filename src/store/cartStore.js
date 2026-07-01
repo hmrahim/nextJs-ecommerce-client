@@ -6,15 +6,20 @@ import { getSessionId } from '@/lib/session';
 // Map a backend cart item -> the shape the UI components expect
 // (item.product.*, item.variant.*, item.quantity, item.key)
 const mapServerItem = (i) => {
-  const key = i.variantSku && i.variantSku !== 'default'
+  let key = i.variantSku && i.variantSku !== 'default'
     ? `${i.productId}-${i.variantSku}`
     : String(i.productId);
+
+  if (i.bundleId) {
+    key = `${key}-bundle-${i.bundleId}`;
+  }
 
   return {
     key,
     productId: i.productId,
     variantSku: i.variantSku,
     quantity: i.qty,
+    bundleId: i.bundleId || null,
     product: {
       id: i.productId,
       _id: i.productId,
@@ -52,13 +57,13 @@ export const useCartStore = create(
       },
 
       /* ── Add item (calls backend, then refreshes from response) ── */
-      addItem: async (product, quantity = 1, variant = null) => {
+      addItem: async (product, quantity = 1, variant = null, bundleId = null) => {
         const productId = product._id || product.id;
         const variantSku = variant?.sku || 'default';
 
         set({ loading: true, error: null });
         try {
-          const { data } = await cartService.addItem(productId, quantity, variantSku);
+          const { data } = await cartService.addItem(productId, quantity, variantSku, bundleId);
           const items = (data?.data?.items || []).map(mapServerItem);
           set({ items, loading: false });
           return { success: true };
@@ -78,7 +83,7 @@ export const useCartStore = create(
 
         set({ loading: true, error: null });
         try {
-          const { data } = await cartService.updateItem(item.productId, quantity, item.variantSku);
+          const { data } = await cartService.updateItem(item.productId, quantity, item.variantSku, item.bundleId);
           const items = (data?.data?.items || []).map(mapServerItem);
           set({ items, loading: false });
         } catch (err) {
@@ -93,7 +98,7 @@ export const useCartStore = create(
 
         set({ loading: true, error: null });
         try {
-          const { data } = await cartService.removeItem(item.productId, item.variantSku);
+          const { data } = await cartService.removeItem(item.productId, item.variantSku, item.bundleId);
           const items = (data?.data?.items || []).map(mapServerItem);
           set({ items, loading: false });
         } catch (err) {
@@ -130,7 +135,7 @@ export const useCartStore = create(
       },
       get subtotal() {
         return get().items.reduce((acc, i) => {
-          const price = i.variant?.price ?? i.product.price ?? 0;
+          const price = i.bundleId ? i.product.price : (i.variant?.price ?? i.product.price ?? 0);
           return acc + price * i.quantity;
         }, 0);
       },

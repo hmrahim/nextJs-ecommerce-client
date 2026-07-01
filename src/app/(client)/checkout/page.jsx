@@ -813,6 +813,7 @@ export default function CheckoutPage() {
         quantity:    i.quantity,
         unitPrice:   i.price,
         lineTotal:   i.lineTotal,
+        bundleId:    i.bundleId || null,
       })),
 
       // Shipping address

@@ -1,5 +1,44 @@
 'use client';
 import { useState, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import notificationService from '@/services/notificationService';
+
+function formatTimeAgo(dateString) {
+  if (!dateString) return '';
+  const now = new Date();
+  const date = new Date(dateString);
+  const diffMs = now - date;
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHr = Math.floor(diffMin / 60);
+  const diffDays = Math.floor(diffHr / 24);
+
+  if (diffSec < 60) return 'Just now';
+  if (diffMin < 60) return `${diffMin}m ago`;
+  if (diffHr < 24) return `${diffHr}h ago`;
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays} days ago`;
+  return date.toLocaleDateString();
+}
+
+function getNotificationDateGroup(dateString) {
+  if (!dateString) return 'Earlier';
+  const now = new Date();
+  const date = new Date(dateString);
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const compareDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+  if (compareDate.getTime() === today.getTime()) {
+    return 'Today';
+  } else if (compareDate.getTime() === yesterday.getTime()) {
+    return 'Yesterday';
+  } else {
+    return 'Earlier';
+  }
+}
+
 
 /* ── Types & Config ──────────────────────────────────────── */
 const TYPE_CONFIG = {
@@ -54,25 +93,6 @@ const PRIORITY_CFG = {
   low:      { label: 'Low',      cls: 'bg-slate-500/15 text-slate-400 border-slate-500/25' },
 };
 
-/* ── Dummy Notifications ─────────────────────────────────── */
-const INITIAL_NOTIFICATIONS = [
-  { id: 1,  type: 'stock',   priority: 'critical', title: 'Critical Stock Alert',         message: 'Kantha Quilt is almost out of stock — only 2 units remain. Restock immediately to avoid lost sales.', time: '2 min ago',  date: 'Today',     unread: true,  pinned: true,  actions: [{ label: 'Restock', href: '/dashboard/inventory' }, { label: 'View Product', href: '/dashboard/products' }] },
-  { id: 2,  type: 'order',   priority: 'high',     title: 'New Order Received',            message: 'Order #ORD-2841 placed by Rahim Uddin for SAR 1,250. 3 items. Payment via bKash — awaiting confirmation.', time: '5 min ago',  date: 'Today',     unread: true,  pinned: false, actions: [{ label: 'View Order', href: '/dashboard/orders' }] },
-  { id: 3,  type: 'payment', priority: 'high',     title: 'Payment Failed',                message: 'Order #ORD-2838 payment via Nagad failed. Customer Karim Hossain may need to retry. Total: SAR 720.', time: '12 min ago', date: 'Today',     unread: true,  pinned: false, actions: [{ label: 'View Order', href: '/dashboard/orders' }] },
-  { id: 4,  type: 'user',    priority: 'medium',   title: 'New Customer Registered',       message: 'Farida Begum just created a new account from Dhaka. First-time buyer — consider sending a welcome coupon.', time: '18 min ago', date: 'Today',     unread: true,  pinned: false, actions: [{ label: 'View Customer', href: '/dashboard/customers' }] },
-  { id: 5,  type: 'review',  priority: 'low',      title: 'New 5★ Product Review',         message: 'A verified buyer left a 5-star review on "Jamdani Saree". Check and approve it to boost product credibility.', time: '45 min ago', date: 'Today',     unread: true,  pinned: false, actions: [{ label: 'View Review', href: '/dashboard/reviews' }] },
-  { id: 6,  type: 'order',   priority: 'high',     title: 'Order Cancellation Request',    message: 'Customer Nusrat Jahan has requested cancellation of Order #ORD-2835. Order is in processing state.', time: '1 hr ago',   date: 'Today',     unread: true,  pinned: false, actions: [{ label: 'View Order', href: '/dashboard/orders' }] },
-  { id: 7,  type: 'system',  priority: 'medium',   title: 'Coupon Usage Spike',            message: 'Coupon "EID2024" has been used 48 times in the last 6 hours. Usage is 73% of total allocation.', time: '2 hr ago',   date: 'Today',     unread: false, pinned: false, actions: [{ label: 'View Coupons', href: '/dashboard/coupons' }] },
-  { id: 8,  type: 'payment', priority: 'low',      title: 'Daily Payment Summary',         message: 'Today\'s payment summary: SAR 48,320 collected across 38 orders. bKash: 62%, Nagad: 24%, COD: 14%.', time: '3 hr ago',   date: 'Today',     unread: false, pinned: false, actions: [] },
-  { id: 9,  type: 'stock',   priority: 'medium',   title: 'Low Stock Warning',             message: '"Muslin Panjabi (L)" is running low — 7 units remaining. This item has averaged 12 sales/week.', time: '5 hr ago',   date: 'Today',     unread: false, pinned: false, actions: [{ label: 'Restock', href: '/dashboard/inventory' }] },
-  { id: 10, type: 'user',    priority: 'low',      title: '5 New Registrations',           message: '5 new customers registered today: Mitu Akter, Sohel Rana, Arif Khan, Rina Begum, Hafiz Ali.', time: 'Yesterday',  date: 'Yesterday', unread: false, pinned: false, actions: [{ label: 'View Customers', href: '/dashboard/customers' }] },
-  { id: 11, type: 'order',   priority: 'medium',   title: 'Bulk Order Alert',              message: 'Large order #ORD-2830 received — 12 items totalling SAR 18,400 from a verified wholesale buyer.', time: 'Yesterday',  date: 'Yesterday', unread: false, pinned: false, actions: [{ label: 'View Order', href: '/dashboard/orders' }] },
-  { id: 12, type: 'system',  priority: 'low',      title: 'Weekly Report Ready',           message: 'Your weekly analytics report for the week of June 2–8 is now available. Revenue up 18.4% vs prior week.', time: '2 days ago', date: 'Earlier',   unread: false, pinned: false, actions: [{ label: 'View Reports', href: '/dashboard/reports' }] },
-  { id: 13, type: 'review',  priority: 'high',     title: '1★ Review Flagged',             message: 'A 1-star review with potentially false claims was submitted on "Brass Ornament Set". Requires moderation.', time: '2 days ago', date: 'Earlier',   unread: false, pinned: false, actions: [{ label: 'Moderate Review', href: '/dashboard/reviews' }] },
-  { id: 14, type: 'payment', priority: 'medium',   title: 'Refund Processed',              message: 'Refund of SAR 3,800 processed for Order #ORD-2821 (Nusrat Jahan). Transaction ID: TXN-88421.', time: '3 days ago', date: 'Earlier',   unread: false, pinned: false, actions: [] },
-  { id: 15, type: 'stock',   priority: 'critical', title: 'Product Out of Stock',          message: '"Nakshi Kantha Pouch (Small)" is completely out of stock. 6 customers have it in their wishlists.', time: '3 days ago', date: 'Earlier',   unread: false, pinned: false, actions: [{ label: 'Restock', href: '/dashboard/inventory' }, { label: 'Notify Customers', href: '#' }] },
-];
-
 const CHANNEL_PREFS = [
   { key: 'order_new',       label: 'New Orders',          desc: 'Every new order placed on the store', inApp: true,  email: true,  sms: false },
   { key: 'order_cancel',    label: 'Order Cancellations', desc: 'When a customer requests cancellation', inApp: true,  email: true,  sms: true  },
@@ -100,7 +120,8 @@ function Toggle({ value, onChange }) {
 
 /* ── Main Page ───────────────────────────────────────────── */
 export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
+  const queryClient = useQueryClient();
+
   const [activeTab, setActiveTab]         = useState('all');      // all | unread | pinned
   const [typeFilter, setTypeFilter]       = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
@@ -109,6 +130,48 @@ export default function NotificationsPage() {
   const [showSettings, setShowSettings]   = useState(false);
   const [channelPrefs, setChannelPrefs]   = useState(CHANNEL_PREFS);
   const [expandedId, setExpandedId]       = useState(null);
+  const [pinnedIds, setPinnedIds]         = useState([]);
+
+  // Fetch notifications
+  const { data: notifData } = useQuery({
+    queryKey: ['admin-notifications'],
+    queryFn: () => notificationService.getAdminNotifications(),
+    refetchInterval: 30000,
+  });
+
+  const rawNotifications = notifData?.notifications || [];
+
+  const notifications = useMemo(() => {
+    return rawNotifications.map(n => {
+      // Determine priority
+      let priority = 'low';
+      if (n.type === 'order' || n.type === 'payment') priority = 'high';
+      else if (n.type === 'system' || n.type === 'stock') priority = 'medium';
+
+      // Determine actions
+      const actions = [];
+      if (n.type === 'order' && n.data?.orderId) {
+        actions.push({ label: 'View Order', href: `/dashboard/orders/${n.data.orderId}` });
+      } else if (n.type === 'system' && n.data?.quotationId) {
+        actions.push({ label: 'View Quotation', href: `/dashboard/quotations` });
+      } else if (n.type === 'system' && n.data?.contactId) {
+        actions.push({ label: 'View Message', href: `/dashboard/contact` });
+      }
+
+      return {
+        id: n._id,
+        type: n.type,
+        priority: priority,
+        title: n.title,
+        message: n.message,
+        time: formatTimeAgo(n.createdAt),
+        date: getNotificationDateGroup(n.createdAt),
+        unread: !n.isRead,
+        pinned: pinnedIds.includes(n._id),
+        actions: actions
+      };
+    });
+  }, [rawNotifications, pinnedIds]);
 
   /* ── Derived ── */
   const unreadCount = notifications.filter(n => n.unread).length;
@@ -136,14 +199,54 @@ export default function NotificationsPage() {
     return Object.entries(groups);
   }, [filtered]);
 
-  /* ── Actions ── */
-  const markRead    = (id) => setNotifications(p => p.map(n => n.id === id ? { ...n, unread: false } : n));
-  const markAllRead = ()   => setNotifications(p => p.map(n => ({ ...n, unread: false })));
-  const deleteOne   = (id) => { setNotifications(p => p.filter(n => n.id !== id)); setSelected(s => s.filter(x => x !== id)); };
-  const togglePin   = (id) => setNotifications(p => p.map(n => n.id === id ? { ...n, pinned: !n.pinned } : n));
+  /* ── Mutation definitions ── */
+  const markOneReadMutation = useMutation({
+    mutationFn: (id) => notificationService.markOneRead(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-notifications'] });
+    }
+  });
 
-  const deleteSelected  = () => { setNotifications(p => p.filter(n => !selected.includes(n.id))); setSelected([]); };
-  const markSelectedRead = () => { setNotifications(p => p.map(n => selected.includes(n.id) ? { ...n, unread: false } : n)); setSelected([]); };
+  const markAllReadMutation = useMutation({
+    mutationFn: () => notificationService.markAllRead(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-notifications'] });
+    }
+  });
+
+  const deleteOneMutation = useMutation({
+    mutationFn: (id) => notificationService.deleteOne(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-notifications'] });
+    }
+  });
+
+  /* ── Actions ── */
+  const markRead    = (id) => markOneReadMutation.mutate(id);
+  const markAllRead = ()   => markAllReadMutation.mutate();
+  const deleteOne   = (id) => {
+    deleteOneMutation.mutate(id);
+    setSelected(s => s.filter(x => x !== id));
+  };
+  const togglePin   = (id) => {
+    setPinnedIds(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
+  };
+
+  const deleteSelected  = async () => {
+    for (const id of selected) {
+      await notificationService.deleteOne(id);
+    }
+    queryClient.invalidateQueries({ queryKey: ['admin-notifications'] });
+    setSelected([]);
+  };
+
+  const markSelectedRead = async () => {
+    for (const id of selected) {
+      await notificationService.markOneRead(id);
+    }
+    queryClient.invalidateQueries({ queryKey: ['admin-notifications'] });
+    setSelected([]);
+  };
 
   const toggleSelect = (id) => setSelected(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id]);
   const toggleSelectAll = () => setSelected(s => s.length === filtered.length ? [] : filtered.map(n => n.id));
@@ -157,6 +260,7 @@ export default function NotificationsPage() {
     { key: 'unread', label: 'Unread',  count: unreadCount },
     { key: 'pinned', label: 'Pinned',  count: pinnedCount },
   ];
+
 
   return (
     <div className="space-y-5">

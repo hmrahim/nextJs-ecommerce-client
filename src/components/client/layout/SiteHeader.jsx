@@ -136,11 +136,14 @@ export function SiteHeader() {
           </Link>
 
           {/* Location */}
-          <div className="hidden lg:flex items-center gap-1 text-xs text-emerald-100 cursor-pointer hover:text-white shrink-0">
-            <MapPin className="h-4 w-4" />
-            <div className="leading-tight">
+          <div 
+            title={location}
+            className="hidden lg:flex items-center gap-1 text-xs text-emerald-100 cursor-pointer hover:text-white shrink-0 max-w-[200px]"
+          >
+            <MapPin className="h-4 w-4 shrink-0" />
+            <div className="leading-tight min-w-0">
               <div className="text-[10px] text-emerald-200/70">Deliver to</div>
-              <div className="font-semibold">{location}</div>
+              <div className="font-semibold truncate">{location}</div>
             </div>
           </div>
 

@@ -1,14 +1,15 @@
 'use client';
 import Image from 'next/image';
 import { Trash2, Plus, Minus, Heart, Loader2 } from 'lucide-react';
-import { useCartStore } from '@/store/cartStore';
+import { useUpdateCartItem, useRemoveCartItem } from '@/hooks/useCart';
 import { useToggleWishlist, useWishlistIds } from '@/hooks/useWishlist';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function CartItem({ item }) {
-  const { updateQuantity, removeItem } = useCartStore();
+  const updateItem = useUpdateCartItem();
+  const removeItemMutation = useRemoveCartItem();
   const { data: session } = useSession();
   const router = useRouter();
 
@@ -108,9 +109,9 @@ export default function CartItem({ item }) {
           {/* qty stepper */}
           <div className="flex items-center rounded-lg border border-border bg-white overflow-hidden">
             <button
-              onClick={() => updateQuantity(item.key, item.quantity - 1)}
+              onClick={() => updateItem.mutate({ productId: item.productId, variantSku: item.variantSku || 'default', quantity: Math.max(1, item.quantity - 1), bundleId: item.bundleId })}
               className="flex h-8 w-8 items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-40"
-              disabled={item.quantity <= 1}
+              disabled={item.quantity <= 1 || updateItem.isPending}
               aria-label="Decrease quantity"
             >
               <Minus className="h-3.5 w-3.5" />
@@ -119,8 +120,9 @@ export default function CartItem({ item }) {
               {item.quantity}
             </span>
             <button
-              onClick={() => updateQuantity(item.key, item.quantity + 1)}
+              onClick={() => updateItem.mutate({ productId: item.productId, variantSku: item.variantSku || 'default', quantity: item.quantity + 1, bundleId: item.bundleId })}
               className="flex h-8 w-8 items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              disabled={updateItem.isPending}
               aria-label="Increase quantity"
             >
               <Plus className="h-3.5 w-3.5" />
@@ -132,10 +134,15 @@ export default function CartItem({ item }) {
 
           {/* remove */}
           <button
-            onClick={() => removeItem(item.key)}
-            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors"
+            onClick={() => removeItemMutation.mutate({ productId: item.productId, variantSku: item.variantSku || 'default', bundleId: item.bundleId })}
+            disabled={removeItemMutation.isPending}
+            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors disabled:opacity-50"
           >
-            <Trash2 className="h-3.5 w-3.5" />
+            {removeItemMutation.isPending ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Trash2 className="h-3.5 w-3.5" />
+            )}
             Remove
           </button>
 

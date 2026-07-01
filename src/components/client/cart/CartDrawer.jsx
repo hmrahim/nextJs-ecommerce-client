@@ -1,7 +1,7 @@
 'use client';
 import { ShoppingCart, X, ArrowRight, Package, Truck, ShieldCheck } from 'lucide-react';
 import { useUIStore } from '@/store/uiStore';
-import { useCartStore } from '@/store/cartStore';
+import { useCart } from '@/hooks/useCart';
 import CartItem from './CartItem';
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
@@ -20,7 +20,10 @@ function TrustBadge({ icon: Icon, label }) {
 
 export default function CartDrawer() {
   const { cartOpen, closeCart } = useUIStore();
-  const { items, subtotal, totalItems } = useCartStore();
+  const { data: cartData } = useCart();
+  const items = cartData?.items ?? [];
+  const subtotal = cartData?.subtotal ?? 0;
+  const totalItems = cartData?.itemCount ?? 0;
   const drawerRef = useRef(null);
 
   /* close on Escape */

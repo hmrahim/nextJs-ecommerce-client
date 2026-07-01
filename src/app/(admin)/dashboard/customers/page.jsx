@@ -10,6 +10,8 @@ import CustomerTable               from '@/components/admin/customers/CustomerTa
 import CustomerDetailDrawer        from '@/components/admin/customers/CustomerDetailDrawer';
 import { DUMMY_CUSTOMERS }         from '@/components/admin/customers/_dummyData';
 import { ADMIN_ITEMS_PER_PAGE }    from '@/lib/constants';
+import { getSocket }               from '@/lib/socket';
+import { toast as hotToast }       from 'react-hot-toast';
 
 const PAGE_SIZE = ADMIN_ITEMS_PER_PAGE || 15;
 
@@ -20,6 +22,9 @@ export default function CustomersPage() {
   const [allCustomers, setAllCustomers] = useState([]);   // full set (dummy or fetched)
   const [loading, setLoading]           = useState(true);
   const [usingDummy, setUsingDummy]     = useState(false);
+  const [counts, setCounts]             = useState({});
+  const [stats, setStats]               = useState(null);
+  const [apiPagination, setApiPagination] = useState({ page: 1, total: 0, pages: 1 });
 
   const [filters, setFilters]   = useState(DEFAULT_FILTERS);
   const [segment, setSegment]   = useState('all');
@@ -29,10 +34,21 @@ export default function CustomersPage() {
   const [bulkOp, setBulkOp]     = useState('');
 
   const [drawer, setDrawer]     = useState(null);   // customer object for detail drawer
-  const [toastMsg, setToast]    = useState('');
 
   // ── Toast helper ──────────────────────────────────────────────────────────
-  const toast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 2800); };
+  const toast = (msg, isError = false) => {
+    if (isError) {
+      hotToast.error(msg, {
+        style: { background: '#13131c', color: '#fff', border: '1px solid rgba(239, 68, 68, 0.2)' },
+        iconTheme: { primary: '#ef4444', secondary: '#fff' }
+      });
+    } else {
+      hotToast.success(msg, {
+        style: { background: '#13131c', color: '#fff', border: '1px solid rgba(16, 185, 129, 0.2)' },
+        iconTheme: { primary: '#10b981', secondary: '#fff' }
+      });
+    }
+  };
 
   // ── Fetch (backend) ────────────────────────────────────────────────────────
   const load = useCallback(async () => {
@@ -50,6 +66,9 @@ export default function CustomersPage() {
         segment: segment !== 'all' ? segment : undefined,
       });
       setAllCustomers(res.data?.customers || res.data?.data || []);
+      setCounts(res.data?.counts || {});
+      setStats(res.data?.stats || null);
+      setApiPagination(res.data?.pagination || { page: 1, total: 0, pages: 1 });
       setUsingDummy(false);
     } catch {
       setAllCustomers(DUMMY_CUSTOMERS);
@@ -60,6 +79,34 @@ export default function CustomersPage() {
   }, [page, filters, segment]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Real-time socket sync
+  useEffect(() => {
+    let socket;
+    let active = true;
+
+    (async () => {
+      socket = await getSocket();
+      if (!active) return;
+
+      const handleRealtimeChange = (evt) => {
+        console.log('[CustomersPage] Socket event received:', evt);
+        load();
+      };
+
+      socket.on('User:change', handleRealtimeChange);
+
+      return () => {
+        if (socket) {
+          socket.off('User:change', handleRealtimeChange);
+        }
+      };
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [load]);
 
   // ── Client-side filter + sort (dummy mode) ────────────────────────────────
   const processed = useMemo(() => {
@@ -106,30 +153,39 @@ export default function CustomersPage() {
     return processed.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   }, [processed, usingDummy, page]);
 
-  const pagination = useMemo(() => ({
-    page,
-    total:  usingDummy ? processed.length : allCustomers.length,
-    pages:  Math.max(1, Math.ceil((usingDummy ? processed.length : allCustomers.length) / PAGE_SIZE)),
-  }), [usingDummy, processed, allCustomers, page]);
+  const pagination = useMemo(() => {
+    if (usingDummy) {
+      return {
+        page,
+        total:  processed.length,
+        pages:  Math.max(1, Math.ceil(processed.length / PAGE_SIZE)),
+      };
+    }
+    return apiPagination;
+  }, [usingDummy, processed, apiPagination, page]);
 
   // ── Segment counts (always from full dummy set or derived) ─────────────────
   const segCounts = useMemo(() => {
-    const source = usingDummy ? DUMMY_CUSTOMERS : allCustomers;
-    return Object.fromEntries(SEGMENTS.map(s => [s.key, source.filter(s.filter).length]));
-  }, [usingDummy, allCustomers]);
+    if (usingDummy) {
+      return Object.fromEntries(SEGMENTS.map(s => [s.key, DUMMY_CUSTOMERS.filter(s.filter).length]));
+    }
+    return counts;
+  }, [usingDummy, counts]);
 
   // ── Stats ──────────────────────────────────────────────────────────────────
   const statsData = useMemo(() => {
-    const src = usingDummy ? DUMMY_CUSTOMERS : allCustomers;
-    return {
-      total:   usingDummy ? DUMMY_CUSTOMERS.length : pagination.total,
-      active:  src.filter(c => c.isActive && !c.isBanned && c.emailVerified).length,
-      new:     src.filter(c => new Date(c.createdAt) > new Date(Date.now() - 86400000 * 30)).length,
-      vip:     src.filter(c => c.tags?.includes('VIP')).length,
-      banned:  src.filter(c => c.isBanned).length,
-      revenue: src.reduce((s, c) => s + (c.totalSpent || 0), 0),
-    };
-  }, [usingDummy, allCustomers, pagination.total]);
+    if (usingDummy) {
+      return {
+        total:   DUMMY_CUSTOMERS.length,
+        active:  DUMMY_CUSTOMERS.filter(c => c.isActive && !c.isBanned && c.emailVerified).length,
+        new:     DUMMY_CUSTOMERS.filter(c => new Date(c.createdAt) > new Date(Date.now() - 86400000 * 30)).length,
+        vip:     DUMMY_CUSTOMERS.filter(c => c.tags?.includes('VIP')).length,
+        banned:  DUMMY_CUSTOMERS.filter(c => c.isBanned).length,
+        revenue: DUMMY_CUSTOMERS.reduce((s, c) => s + (c.totalSpent || 0), 0),
+      };
+    }
+    return stats || { total: 0, active: 0, new: 0, vip: 0, banned: 0, revenue: 0 };
+  }, [usingDummy, stats]);
 
   // ── Mutate helper (optimistic update) ─────────────────────────────────────
   const mutate = (id, fn) => {
@@ -139,21 +195,47 @@ export default function CustomersPage() {
 
   // ── Handlers ──────────────────────────────────────────────────────────────
   const onToggleBan = async (id, reason) => {
-    mutate(id, c => ({ ...c, isBanned: !c.isBanned, banReason: c.isBanned ? '' : reason }));
-    toast(`Customer ${allCustomers.find(c=>c._id===id)?.isBanned ? 'unbanned' : 'banned'}`);
-    if (!usingDummy) await customerService.adminToggleBan(id, reason).catch(console.error);
+    const customer = allCustomers.find(c => c._id === id);
+    const willBan = !customer?.isBanned;
+    mutate(id, c => ({ ...c, isBanned: willBan, banReason: willBan ? reason : '' }));
+    toast(`Customer ${willBan ? 'banned' : 'unbanned'}`);
+    if (!usingDummy) {
+      try {
+        await customerService.adminToggleBan(id, reason);
+      } catch (err) {
+        toast('Failed to update ban status', true);
+        mutate(id, c => ({ ...c, isBanned: !willBan, banReason: !willBan ? reason : '' }));
+      }
+    }
   };
   const onToggleVerify = async (id) => {
-    mutate(id, c => ({ ...c, emailVerified: !c.emailVerified }));
+    const customer = allCustomers.find(c => c._id === id);
+    const willVerify = !customer?.emailVerified;
+    mutate(id, c => ({ ...c, emailVerified: willVerify }));
     toast('Email verification status updated');
-    if (!usingDummy) await customerService.adminToggleVerify(id).catch(console.error);
+    if (!usingDummy) {
+      try {
+        await customerService.adminToggleVerify(id);
+      } catch (err) {
+        toast('Failed to update verification status', true);
+        mutate(id, c => ({ ...c, emailVerified: !willVerify }));
+      }
+    }
   };
   const onDelete = async (id) => {
+    const original = allCustomers.find(c => c._id === id);
     setAllCustomers(prev => prev.filter(c => c._id !== id));
     setSelected(prev => prev.filter(x => x !== id));
     if (drawer?._id === id) setDrawer(null);
     toast('Customer deleted');
-    if (!usingDummy) await customerService.adminDelete(id).catch(console.error);
+    if (!usingDummy) {
+      try {
+        await customerService.adminDelete(id);
+      } catch (err) {
+        toast('Failed to delete customer', true);
+        if (original) setAllCustomers(prev => [...prev, original]);
+      }
+    }
   };
 
   // Bulk
@@ -200,7 +282,7 @@ export default function CustomersPage() {
       const url = URL.createObjectURL(res.data);
       const a = document.createElement('a'); a.href = url; a.download = 'customers.csv'; a.click();
       toast('CSV exported');
-    } catch { toast('Export failed'); }
+    } catch { toast('Export failed', true); }
   };
 
   const handleFilterChange = (f) => { setFilters(f); setPage(1); setSelected([]); };
@@ -290,18 +372,35 @@ export default function CustomersPage() {
           onToggleBan={onToggleBan}
           onToggleVerify={onToggleVerify}
           onDelete={onDelete}
-          onAddNote={(id, text) => { if (!usingDummy) customerService.adminAddNote(id, text).catch(console.error); }}
-          onDeleteNote={(id, noteId) => { if (!usingDummy) customerService.adminDeleteNote(id, noteId).catch(console.error); }}
-          onSendEmail={(id, data) => usingDummy ? Promise.resolve() : customerService.adminSendEmail(id, data)}
+          onAddNote={async (id, text) => {
+            if (usingDummy) return;
+            try {
+              await customerService.adminAddNote(id, text);
+              toast('Note added successfully');
+            } catch (err) {
+              toast('Failed to add note', true);
+            }
+          }}
+          onDeleteNote={async (id, noteId) => {
+            if (usingDummy) return;
+            try {
+              await customerService.adminDeleteNote(id, noteId);
+              toast('Note deleted successfully');
+            } catch (err) {
+              toast('Failed to delete note', true);
+            }
+          }}
+          onSendEmail={async (id, data) => {
+            if (usingDummy) return Promise.resolve();
+            try {
+              await customerService.adminSendEmail(id, data);
+              toast('Email sent successfully');
+            } catch (err) {
+              toast('Failed to send email', true);
+              throw err;
+            }
+          }}
         />
-      )}
-
-      {/* ── Toast ── */}
-      {toastMsg && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-[#1e1e2e] border border-[#2a2a3f] text-slate-200 text-sm font-medium shadow-2xl">
-          <span className="text-emerald-400">✓</span>
-          {toastMsg}
-        </div>
       )}
     </div>
   );

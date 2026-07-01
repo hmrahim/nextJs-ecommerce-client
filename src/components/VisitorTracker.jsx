@@ -57,9 +57,16 @@ export default function VisitorTracker() {
         .then((res) => {
           console.log('[VisitorTracker] trackVisit SUCCESS:', res.data);
           if (res.data?.success && res.data?.geo) {
-            const { city, postalCode, country } = res.data.geo;
+            const { city, postalCode, country, streetAddress } = res.data.geo;
             let text = '';
-            if (city && city !== 'Unknown') {
+            if (streetAddress) {
+              const parts = streetAddress.split(',').map(p => p.trim());
+              if (parts.length > 3) {
+                text = parts.slice(0, 3).join(', ');
+              } else {
+                text = streetAddress;
+              }
+            } else if (city && city !== 'Unknown') {
               text = city;
               if (postalCode && postalCode !== '—' && postalCode !== null) text += ` ${postalCode}`;
             } else if (country && country !== 'Unknown') {

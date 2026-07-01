@@ -2,49 +2,8 @@
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
-
-const NOTIFICATIONS = [
-  {
-    id: 1,
-    type: 'order',
-    title: 'New Order Received',
-    message: 'Order #ORD-2841 placed by Rahim Uddin — SAR 1,250',
-    time: '2 min ago',
-    unread: true,
-  },
-  {
-    id: 2,
-    type: 'user',
-    title: 'New User Registered',
-    message: 'Farida Begum just created an account.',
-    time: '18 min ago',
-    unread: true,
-  },
-  {
-    id: 3,
-    type: 'stock',
-    title: 'Low Stock Alert',
-    message: 'Product "Handmade Kantha Quilt" has only 3 units left.',
-    time: '1 hr ago',
-    unread: true,
-  },
-  {
-    id: 4,
-    type: 'payment',
-    title: 'Payment Successful',
-    message: 'Order #ORD-2839 payment confirmed via bKash.',
-    time: '3 hr ago',
-    unread: false,
-  },
-  {
-    id: 5,
-    type: 'review',
-    title: 'New Product Review',
-    message: 'Someone left a 5★ review on "Jamdani Saree".',
-    time: 'Yesterday',
-    unread: false,
-  },
-];
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import notificationService from '@/services/notificationService';
 
 const TYPE_CONFIG = {
   order: {
@@ -87,20 +46,109 @@ const TYPE_CONFIG = {
         d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
     ),
   },
+  system: {
+    bg: 'bg-slate-500/15',
+    text: 'text-slate-400',
+    icon: (
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+    ),
+  },
+  shipment: {
+    bg: 'bg-blue-500/15',
+    text: 'text-blue-400',
+    icon: (
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+        d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+    ),
+  },
+  promo: {
+    bg: 'bg-rose-500/15',
+    text: 'text-rose-400',
+    icon: (
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+        d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5a2 2 0 10-2 2h2zm0 0h4m-4 0H8m12 3a2 2 0 100-4h-4m-8 0H4a2 2 0 110 4h4m12 0v7a2 2 0 01-2 2H6a2 2 0 01-2-2v-7" />
+    ),
+  }
 };
+
+const FALLBACK_CONFIG = {
+  bg: 'bg-slate-500/15',
+  text: 'text-slate-400',
+  icon: (
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+  )
+};
+
+function formatTimeAgo(dateString) {
+  if (!dateString) return '';
+  const now = new Date();
+  const date = new Date(dateString);
+  const diffMs = now - date;
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHr = Math.floor(diffMin / 60);
+  const diffDays = Math.floor(diffHr / 24);
+
+  if (diffSec < 60) return 'Just now';
+  if (diffMin < 60) return `${diffMin}m ago`;
+  if (diffHr < 24) return `${diffHr}h ago`;
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays} days ago`;
+  return date.toLocaleDateString();
+}
 
 export default function AdminHeader({ onToggleSidebar, sidebarCollapsed }) {
   const { user, logout } = useAuth();
+  const queryClient = useQueryClient();
 
   const [profileOpen, setProfileOpen]   = useState(false);
   const [notifOpen,   setNotifOpen]     = useState(false);
-  const [notifications, setNotifications] = useState(NOTIFICATIONS);
 
   const profileRef = useRef(null);
   const notifRef   = useRef(null);
 
-  const unreadCount = notifications.filter(n => n.unread).length;
+  // Fetch notifications
+  const { data: notifData } = useQuery({
+    queryKey: ['admin-notifications'],
+    queryFn: () => notificationService.getAdminNotifications(),
+    refetchInterval: 30000,
+  });
 
+  const rawNotifications = notifData?.notifications || [];
+  const unreadCount = rawNotifications.filter(n => !n.isRead).length;
+
+  const notifications = rawNotifications.map(n => ({
+    id: n._id,
+    type: n.type,
+    title: n.title,
+    message: n.message,
+    time: formatTimeAgo(n.createdAt),
+    unread: !n.isRead
+  }));
+
+  const markAllReadMutation = useMutation({
+    mutationFn: () => notificationService.markAllRead(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-notifications'] });
+    }
+  });
+
+  const markOneReadMutation = useMutation({
+    mutationFn: (id) => notificationService.markOneRead(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-notifications'] });
+    }
+  });
+
+  const markAllRead = () => {
+    markAllReadMutation.mutate();
+  };
+
+  const markOneRead = (id) => {
+    markOneReadMutation.mutate(id);
+  };
   // outside click
   useEffect(() => {
     function handle(e) {
@@ -111,17 +159,12 @@ export default function AdminHeader({ onToggleSidebar, sidebarCollapsed }) {
     return () => document.removeEventListener('mousedown', handle);
   }, []);
 
-  const markAllRead = () =>
-    setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
-
-  const markOneRead = (id) =>
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, unread: false } : n));
-
   const initials = user?.name
     ? user.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
     : 'AD';
 
   return (
+
     <header className="admin-header-new">
       {/* Toggle */}
       <button className="header-toggle-btn" onClick={onToggleSidebar} aria-label="Toggle sidebar">
